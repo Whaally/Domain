@@ -23,6 +23,8 @@ jobs:
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       id: semantic
+      with:
+        dry_run: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -42,4 +44,4 @@ jobs:
       
     - name: Publish
       if: startsWith(github.ref, 'refs/heads/main')
-      run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push **\*.nupkg --source 'https://int.nugettest.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
