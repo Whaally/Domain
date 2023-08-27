@@ -6,11 +6,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" />
-		<PackageReference Include="Microsoft.Orleans.Sdk" />
-		<PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" />
 		<PackageReference Include="Microsoft.Orleans.EventSourcing" />
-		<PackageReference Include="Microsoft.Orleans.Client" />
-		<PackageReference Include="Microsoft.Orleans.Serialization.Protobuf" />
+		<PackageReference Include="Microsoft.Orleans.Sdk" />
 		<PackageReference Include="Marten" />
 		<PackageReference Include="System.Text.Json" />
 	</ItemGroup>
