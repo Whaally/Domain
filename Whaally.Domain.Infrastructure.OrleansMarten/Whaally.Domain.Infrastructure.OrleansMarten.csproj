@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+	</PropertyGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\src\Whaally.Domain\Whaally.Domain.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" />
+		<PackageReference Include="Microsoft.Orleans.Sdk" />
+		<PackageReference Include="Microsoft.Orleans.Clustering.AzureStorage" />
+		<PackageReference Include="Microsoft.Orleans.EventSourcing" />
+		<PackageReference Include="Microsoft.Orleans.Client" />
+		<PackageReference Include="Microsoft.Orleans.Serialization.Protobuf" />
+		<PackageReference Include="Marten" />
+		<PackageReference Include="System.Text.Json" />
+	</ItemGroup>
+	
+</Project>

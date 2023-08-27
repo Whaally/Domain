@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{675431A2-F61
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Infrastructure.OrleansMarten", "Whaally.Domain.Infrastructure.OrleansMarten\Whaally.Domain.Infrastructure.OrleansMarten.csproj", "{A2A8565F-FF0F-45C0-B209-C72B60547877}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{A0550B59-00AA-40D4-A6F9-9317C1D7D0C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0550B59-00AA-40D4-A6F9-9317C1D7D0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0550B59-00AA-40D4-A6F9-9317C1D7D0C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2A8565F-FF0F-45C0-B209-C72B60547877}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2A8565F-FF0F-45C0-B209-C72B60547877}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2A8565F-FF0F-45C0-B209-C72B60547877}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2A8565F-FF0F-45C0-B209-C72B60547877}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{12D0F497-07C9-4ED3-B390-2C54FA0BEA0B} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 		{A0550B59-00AA-40D4-A6F9-9317C1D7D0C7} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
+		{A2A8565F-FF0F-45C0-B209-C72B60547877} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68BCF0DD-5501-460A-B702-728C2A93C91C}
