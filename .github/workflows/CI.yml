@@ -32,7 +32,7 @@ jobs:
         dotnet-version: 7.0.x
 
     - name: Restore
-      run: dotnet restore -p:Configuration=$SOLUTION
+      run: dotnet restore
 
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ steps.semantic.outputs.new_release_version }} -p:AssemblyVersion=${{steps.semantic.outputs.new_release_major_version}} -p:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} -p:PackageReleaseNotes=${{ steps.semantic.outputs.new_release_notes }}  --no-restore
