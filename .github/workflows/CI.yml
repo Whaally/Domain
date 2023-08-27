@@ -35,7 +35,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ steps.semantic.outputs.new_release_version }} -p:AssemblyVersion=${{steps.semantic.outputs.new_release_major_version}} -p:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} -p:PackageReleaseNotes=${{ steps.semantic.outputs.new_release_notes }}  --no-restore
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ steps.semantic.outputs.new_release_version }} -p:AssemblyVersion=${{steps.semantic.outputs.new_release_major_version}} -p:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} -p:PackageReleaseNotes="${{ steps.semantic.outputs.new_release_notes }}"  --no-restore
 
     - name: Test
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
