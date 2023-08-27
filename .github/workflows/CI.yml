@@ -10,11 +10,6 @@ on:
     
 jobs:
   build:
-
-    env:
-      BUILD_CONFIG: 'Release'
-      SOLUTION: 'Whaally.Domain.sln'
-
     runs-on: ubuntu-latest
 
     steps:
@@ -34,13 +29,13 @@ jobs:
         dotnet-version: 7.0.x
 
     - name: Restore
-      run: dotnet restore
+      run: dotnet restore /property:Configuration=Release
 
     - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ steps.semantic.outputs.new_release_version }} -p:AssemblyVersion=${{steps.semantic.outputs.new_release_major_version}} -p:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} -p:PackageReleaseNotes="${{ steps.semantic.outputs.new_release_notes }}"  --no-restore
+      run: dotnet build --configuration Release /property:Version=${{ steps.semantic.outputs.new_release_version }} /property:AssemblyVersion=${{steps.semantic.outputs.new_release_major_version}} /property:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} /property:PackageReleaseNotes="${{ steps.semantic.outputs.new_release_notes }}"  --no-restore
 
     - name: Test
-      run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
+      run: dotnet test /property:Configuration=Release --no-restore --no-build --verbosity normal
       
     - name: Publish
       if: startsWith(github.ref, 'refs/heads/main')
