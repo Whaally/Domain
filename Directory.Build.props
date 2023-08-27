@@ -6,9 +6,9 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
-    <BaseArtifactsPath>$(MSBuildThisFileDirectory)artifacts/$(Configuration)/</BaseArtifactsPath>
-    <BaseArtifactsPathSuffix>$(ProjectCategory)/$(MSBuildProjectName)</BaseArtifactsPathSuffix>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)build/$(Configuration)/$(BaseArtifactsPathSuffix)/</BaseIntermediateOutputPath>
+    <BaseArtifactsPath>$(MSBuildThisFileDirectory)artifacts/$(BaseArtifactsPathSuffix)/</BaseArtifactsPath>
+    <BaseArtifactsPathSuffix>$(ProjectCategory)/$(MSBuildProjectName)/$(Configuration)</BaseArtifactsPathSuffix>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)build/$(BaseArtifactsPathSuffix)/</BaseIntermediateOutputPath>
     <BaseOutputPath>$(BaseArtifactsPath)/$(BaseArtifactsPathSuffix)/</BaseOutputPath>
     <PackageOutputPath>$(BaseArtifactsPath)pkg/</PackageOutputPath>
     <OutputPath>$(BaseOutputPath)</OutputPath>
