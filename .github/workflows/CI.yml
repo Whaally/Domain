@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
@@ -26,18 +26,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1
-      with:
-        nuget-version: latest
-
-    - name: Restore dependencies
-      run: nuget restore $SOLUTION
-
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
+
+    - name: Restore
+      run: dotnet restore
 
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ steps.semantic.outputs.new_release_version }} -p:AssemblyVersion=${{steps.semantic.outputs.new_release_major_version}} -p:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} -p:PackageReleaseNotes=${{ steps.semantic.outputs.new_release_notes }}  --no-restore
@@ -46,5 +41,5 @@ jobs:
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
       
     - name: Publish
-      if: startsWith(github.ref, 'refs/heads/release')
-      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+      if: startsWith(github.ref, 'refs/heads/main')
+      run: dotnet nuget push **\*.nupkg --source 'https://int.nugettest.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
