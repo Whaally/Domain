@@ -1,8 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\assets\whaally-logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentResults" Version="3.15.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"
+        Version="6.0.0" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <PackageId>Whaally.Domain</PackageId>
+    <Description>Decouple domain model from infrastructure allowing independent evolution of
+        both.</Description>
+    <PackageProjectUrl>https://github.com/whaally/domain</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/whaally/domain</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) Whaally 2023</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Corstian Boerman</Authors>
+    <Company>Whaally</Company>
+    <PackageTags>ddd domain model abstraction orchestrator orchestration distributed framework
+        actor</PackageTags>
+    <PackageIcon>whaally-logo.png</PackageIcon>
+  </PropertyGroup>
 
 </Project>

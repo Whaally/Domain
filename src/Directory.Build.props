@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <!-- Badly formatted XML-->
-	  <WarningsNotAsErrors>CS1570</WarningsNotAsErrors>
+    <WarningsNotAsErrors>CS1570</WarningsNotAsErrors>
   </PropertyGroup>
 
 </Project>
