@@ -3,10 +3,6 @@
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
 	</PropertyGroup>
-	
-  <ItemGroup>
-    <ProjectReference Include="..\src\Whaally.Domain\Whaally.Domain.csproj" />
-  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" />
@@ -17,6 +13,10 @@
 		<PackageReference Include="Microsoft.Orleans.Serialization.Protobuf" />
 		<PackageReference Include="Marten" />
 		<PackageReference Include="System.Text.Json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Whaally.Domain\Whaally.Domain.csproj" />
 	</ItemGroup>
 	
 </Project>

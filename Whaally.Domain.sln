@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{675431A2-F61
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Infrastructure.OrleansMarten", "Whaally.Domain.Infrastructure.OrleansMarten\Whaally.Domain.Infrastructure.OrleansMarten.csproj", "{A2A8565F-FF0F-45C0-B209-C72B60547877}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Infrastructure.OrleansMarten", "src\Whaally.Domain.Infrastructure.OrleansMarten\Whaally.Domain.Infrastructure.OrleansMarten.csproj", "{A2A8565F-FF0F-45C0-B209-C72B60547877}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
