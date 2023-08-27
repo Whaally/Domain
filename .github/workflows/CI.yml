@@ -27,7 +27,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup NuGet
-      uses: NuGet/setup-nuget@latest
+      uses: NuGet/setup-nuget@v1
+      with:
+        nuget-version: latest
 
     - name: Restore dependencies
       run: nuget restore $SOLUTION
