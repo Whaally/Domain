@@ -38,5 +38,5 @@ jobs:
       run: dotnet test /property:Configuration=Release --no-restore --no-build --verbosity normal
       
     - name: Publish
-      if: startsWith(github.ref, 'refs/heads/main')
-      run: dotnet nuget push **\*.nupkg --source 'https://int.nugettest.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      if: startsWith(github.ref, 'refs/heads/main') && ${{ steps.semantic.outputs.new_release_version }} != ""
+      run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
