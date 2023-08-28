@@ -31,7 +31,7 @@ jobs:
 
     - name: Build for Publish
       run: |
-        if [ ${{ steps.semantic.outputs.new_release_version }} != "" ]; then
+        if [ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]; then
           dotnet build --configuration Release /property:Version="${{ steps.semantic.outputs.new_release_version }}" /property:AssemblyVersion="${{steps.semantic.outputs.new_release_major_version}}" /property:AssemblyFileVersion=${{ steps.semantic.outputs.new_release_version }} /property:PackageReleaseNotes="${{ steps.semantic.outputs.new_release_notes }}"  --no-restore
         else
           dotnet build --configuration Release --no-restore
@@ -41,5 +41,5 @@ jobs:
       run: dotnet test /property:Configuration=Release --no-restore --no-build --verbosity normal
       
     - name: Publish
-      if: startsWith(github.ref, 'refs/heads/main') || ${{ steps.semantic.outputs.new_release_version }} != ""
+      if: startsWith(github.ref, 'refs/heads/main') && ${{ steps.semantic.outputs.new_release_version != '' }}
       run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
