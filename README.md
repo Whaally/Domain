@@ -16,7 +16,7 @@ The end result is an approach wherein we can focus on the development of busines
 
 Check out this talk by [@corstian](https://github.com/corstian) from NDC Oslo 2023 providing more context to the conceptual principles underpinning this project.
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/5A22s_QXTRg?si=d2qJ4azHSZORd9Po" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+[![How complex software impacts your cognitive abilities](./assets/NDCOslo2023-video-thumbnail.jpg)](https://www.youtube.com/watch?v=5A22s_QXTRg)
 
 ## Interaction pattern
 This project is designed to facilitate a coherent interaction pattern within the domain model. 
