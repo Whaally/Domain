@@ -17,6 +17,102 @@ The end result is an approach wherein we can focus on the development of busines
 ## Example usage
 The implementation of a simple aggregate looks like this:
 
+**Aggregate**
+First we're defining the aggregate which should hold the information. This can be anything, as long as it implements the `IAggregate` interface.
+
+```csharp
+public record User(
+    string FirstName,
+    string LastName): IAggregate;
+```
+
+**Events**
+To make a change, we should have an event to reflect the change. This event again can be anything, as long as it implements the `IEvent` interface.
+
+```csharp
+public record NameChanged(
+    string FirstName,
+    string LastName) : IEvent;
+```
+
+To know how this event should be applied to our aggregate, we're creating an aggregate handler to deal with this. The `IAggregateHandler<TAggregate, TEvent>` interface defines the behaviour contract we must fulfill. The event handler returns the new state of the aggregate.
+
+```csharp
+public class NameChangedHandler : IEventHandler<User, NameChanged>
+{
+    public User Apply(IeventHandlerContext<User> context, NameChanged @event)
+        => context.Aggregate with {
+            FirstName = @event.FirstName,
+            LastName = @event.LastName
+        };
+}
+```
+
+**Commands**
+Given we cannot (or should not) directly apply events to the aggregate, a command is necessary. The pattern to do so is simmilar to the way events and event handlers are constructed:
+
+```csharp
+public record ChangeName(
+    string FirstName,
+    string LastName) : ICommand;
+```
+
+The event handler for a command looks like this. Even though an event handler may access the information contained by the aggregate, it cannot change it. The return type of an aggregate is therefore a result object indicating the success state of the operation.
+
+```csharp
+public class ChangeNameHandler : ICommandHandler<User, ChangeName> {
+    public IResultBase Evaluate(ICommandHandlerContext<User> context, ChangeName command)
+    {
+        context.StageEvent(
+            new NameChanged(
+                command.FirstName,
+                command.LastName
+            ));
+
+        return Result.Ok();
+    }
+}
+```
+
+**Services**
+To implement more complex behaviour within the domain which either requires coordination across multiple aggregates, or requires the integration of external services, we should build a service. The general pattern is again similar to the way events and commands are built.
+
+```csharp
+public record MassRename() : IService;
+```
+
+
+```csharp
+public class MassRenameHandler : IServiceHandler<MassRename> {
+    private readonly IUserRepository _userRepo;
+
+    public MassRenameHandler(IUserRepository userRepo) {
+        _userRepo = userRepo;
+    }
+
+    public async Task<IResultBase> Handle(IServiceHandlerContext context, MassRename service)
+    {
+        var users = await _userRepo.GetAll();
+
+        foreach (var user in users) {
+            context.StageCommand(
+                user.Id,
+                new ChangeName("No", "Name")
+            );
+        }
+
+        return Result.Ok();
+    }
+}
+```
+
+The service therefore relies on the earlier defined commands and events, and can benefit from the behaviour they implement without touching them.
+
+**Infrastructure**
+The way such a domain model can be coupled with infrastructure is demo'ed in the [Whaally.Domain.Infrastructure.OrleansMarten](src/Whaally.Domain.Infrastructure.OrleansMarten/) project. This provides a solid base relying on [Orleans](https://github.com/dotnet/orleans) for scalability and [Marten](https://martendb.io/) for event sourcing, persistence and projections. At the moment it is recommended these files are copied to your own project, to allow yourself the freedom to tweak your infrastructure as required.
+
+**More samples**
+A more complicated sample with some tests can be found in the [samples](samples/) folder.
 
 
 ## Interaction pattern
