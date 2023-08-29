@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Skyhop.Domain.Benchmark": {
+      "commandName": "Project"
+    },
+    "Skyhop.Domain.Benchmark Profiling": {
+      "commandName": "Project",
+      "commandLineArgs": "--profiler EP"
+    }
+  }
+}

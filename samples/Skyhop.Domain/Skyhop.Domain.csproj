@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="AircraftContext\Services\**" />
+    <Compile Remove="AirfieldContext\**" />
+    <Compile Remove="BoundedContext\**" />
+    <EmbeddedResource Remove="AircraftContext\Services\**" />
+    <EmbeddedResource Remove="AirfieldContext\**" />
+    <EmbeddedResource Remove="BoundedContext\**" />
+    <None Remove="AircraftContext\Services\**" />
+    <None Remove="AirfieldContext\**" />
+    <None Remove="BoundedContext\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite" Version="2.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Whaally.Domain\Whaally.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
