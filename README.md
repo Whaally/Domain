@@ -17,7 +17,7 @@ The end result is an approach wherein we can focus on the development of busines
 ## Example usage
 The implementation of a simple aggregate looks like this:
 
-**Aggregate**
+### Aggregate
 First we're defining the aggregate which should hold the information. This can be anything, as long as it implements the `IAggregate` interface.
 
 ```csharp
@@ -26,7 +26,7 @@ public record User(
     string LastName): IAggregate;
 ```
 
-**Events**
+### Events
 To make a change, we should have an event to reflect the change. This event again can be anything, as long as it implements the `IEvent` interface.
 
 ```csharp
@@ -48,7 +48,7 @@ public class NameChangedHandler : IEventHandler<User, NameChanged>
 }
 ```
 
-**Commands**
+### Commands
 Given we cannot (or should not) directly apply events to the aggregate, a command is necessary. The pattern to do so is simmilar to the way events and event handlers are constructed:
 
 ```csharp
@@ -74,7 +74,7 @@ public class ChangeNameHandler : ICommandHandler<User, ChangeName> {
 }
 ```
 
-**Services**
+### Services
 To implement more complex behaviour within the domain which either requires coordination across multiple aggregates, or requires the integration of external services, we should build a service. The general pattern is again similar to the way events and commands are built.
 
 ```csharp
@@ -108,10 +108,10 @@ public class MassRenameHandler : IServiceHandler<MassRename> {
 
 The service therefore relies on the earlier defined commands and events, and can benefit from the behaviour they implement without touching them.
 
-**Infrastructure**
+### Infrastructure
 The way such a domain model can be coupled with infrastructure is demo'ed in the [Whaally.Domain.Infrastructure.OrleansMarten](src/Whaally.Domain.Infrastructure.OrleansMarten/) project. This provides a solid base relying on [Orleans](https://github.com/dotnet/orleans) for scalability and [Marten](https://martendb.io/) for event sourcing, persistence and projections. At the moment it is recommended these files are copied to your own project, to allow yourself the freedom to tweak your infrastructure as required.
 
-**More samples**
+### More samples
 A more complicated sample with some tests can be found in the [samples](samples/) folder.
 
 
