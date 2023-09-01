@@ -1,8 +1,9 @@
 # Whaally.Domain
 
-[![NuGet Badge](https://img.shields.io/nuget/v/Whaally.Domain)](https://www.nuget.org/packages/Whaally.Domain)
-
 !["Complex Software is an Occupational Health Hazard!](./assets/Complex-Software-Hazard.png)
+
+
+[![NuGet Badge](https://img.shields.io/nuget/v/Whaally.Domain)](https://www.nuget.org/packages/Whaally.Domain)
 
 The goal of the `Whaally.Domain` library is to simplify the development of highly-scalable domain models. The way this library attempts to solve this problem is by providing a framework dictating what components exist and how they may interact with one another. The terminology for these components had largely been inspired by the language used by DDD practitioners, as well as the practices used by those working with event-sourcing techniques.
 
