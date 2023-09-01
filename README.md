@@ -1,8 +1,8 @@
-# Whaally.Domain
-
 !["Complex Software is an Occupational Health Hazard!](./assets/Complex-Software-Hazard.png)
 
 ---
+
+# Whaally.Domain
 
 [![NuGet Badge](https://img.shields.io/nuget/v/Whaally.Domain)](https://www.nuget.org/packages/Whaally.Domain)
 
