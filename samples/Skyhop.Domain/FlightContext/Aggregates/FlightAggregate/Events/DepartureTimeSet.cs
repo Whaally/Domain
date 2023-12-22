@@ -2,6 +2,8 @@
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
+    [Immutable]
+    [GenerateSerializer]
     public record DepartureTimeSet(DateTime DepartureTime) : IEvent;
 
     internal class DepartureTimeSetHandler : IEventHandler<Flight, DepartureTimeSet>

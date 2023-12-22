@@ -15,6 +15,11 @@ public class FlightController : ControllerBase
     {
         _aggregateHandlerFactory = aggregateHandlerFactory;
     }
+
+    [HttpPost("new")]
+    public Task<IResult> New()
+        => _aggregateHandlerFactory.Instantiate<Flight>(Guid.NewGuid().ToString())
+            .EvaluateAndApply(new Create());
     
     [HttpPost("{id}/aircraft/clear")]
     public Task<IResult> RemoveAircraft(string id) =>

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Marten;
 using Marten.Events.Daemon.Resiliency;
 using Orleans.EventSourcing;
@@ -30,7 +31,18 @@ public class Program
             /*
              * The `AddDomain` call registers all required classes with the service collection, while also discovering
              * and registering any user-implemented domain components such as commands, events, services and sagas.
+             *
+             * Normally this works correctly when a type from the `Skyhop.Domain` library had been referenced, but as
+             * that isn't the case, the library is not available through AppDomain.CurrentDomain.GetAssemblies() either.
+             * To work around this we can either:
+             * 
+             * 1. Manually load this assembly ahead of time
+             * 2. Manually load all relevant parts
+             *
+             * I'm lazy so I'd rather write a single line of code.
              */
+
+            Assembly.Load("Skyhop.Domain");
             builder.Services.AddDomain();
         
             var defaultHandler = builder
@@ -44,7 +56,7 @@ public class Program
              * This registers a custom AggregateHandlerFactory, retrieving IAggregateHandler instances from Orleans.
              */
             builder.Services.AddSingleton<IAggregateHandlerFactory, OrleansAggregateHandlerFactory>();
-        
+            
             /*
              * Add Marten for event persistence and projections.
              */

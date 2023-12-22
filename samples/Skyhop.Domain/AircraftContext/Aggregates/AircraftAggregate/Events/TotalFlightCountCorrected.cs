@@ -2,8 +2,9 @@
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events
 {
+    [Immutable]
+    [GenerateSerializer]
     public record TotalFlightCountCorrected(
-        Guid AggregateId,
         DateTime Timestamp,
         int Number) : IEvent;
 

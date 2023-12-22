@@ -18,7 +18,6 @@ namespace Skyhop.Domain.AircraftContext.Sagas
             context.StageCommand(
                 @event.AircraftId,
                 new SetFlightInfo(
-                    @event.AircraftId,
                     context.AggregateId!,
                     snapshot.DepartureTime,
                     snapshot.ArrivalTime));

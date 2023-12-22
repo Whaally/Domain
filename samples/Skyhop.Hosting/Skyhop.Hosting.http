@@ -1,6 +1,0 @@
-@Skyhop.Hosting_HostAddress = http://localhost:5103
-
-GET {{Skyhop.Hosting_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

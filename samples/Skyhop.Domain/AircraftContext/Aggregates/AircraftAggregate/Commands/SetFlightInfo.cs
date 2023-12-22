@@ -4,8 +4,9 @@ using Whaally.Domain.Abstractions.Command;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
 {
+    [Immutable]
+    [GenerateSerializer]
     internal record SetFlightInfo(
-        string AggregateId,
         string FlightId,
         DateTime? Departure,
         DateTime? Arrival) : ICommand;
@@ -15,7 +16,6 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
         public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
         {
             context.StageEvent(new FlightInfoSet(
-                command.AggregateId,
                 command.FlightId,
                 command.Departure,
                 command.Arrival));

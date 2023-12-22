@@ -4,6 +4,8 @@ using Whaally.Domain.Abstractions.Command;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
 {
+    [Immutable]
+    [GenerateSerializer]
     public record RemoveAircraft() : ICommand;
 
     public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>

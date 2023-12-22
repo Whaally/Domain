@@ -2,9 +2,9 @@
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events
 {
-    public record FlightRemoved(
-        string AggregateId,
-        string FlightId) : IEvent;
+    [Immutable]
+    [GenerateSerializer]
+    public record FlightRemoved(string FlightId) : IEvent;
 
     internal class FlightRemovedHandler : IEventHandler<Aircraft, FlightRemoved>
     {

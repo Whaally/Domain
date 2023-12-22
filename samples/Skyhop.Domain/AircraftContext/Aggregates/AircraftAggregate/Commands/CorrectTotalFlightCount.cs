@@ -3,8 +3,9 @@ using Whaally.Domain.Abstractions.Command;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
 {
+    [Immutable]
+    [GenerateSerializer]
     public record CorrectTotalFlightCount(
-        string AggregateId,
         int FlightCount,
         string Reason) : ICommand;
 

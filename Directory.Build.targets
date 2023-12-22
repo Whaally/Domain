@@ -27,7 +27,7 @@
 		<PackageReference Update="Microsoft.Orleans.Server" Version="7.2.4" />
 		<PackageReference Update="Microsoft.Orleans.Persistence.AzureStorage" Version="7.1.2" />
 		<PackageReference Update="Microsoft.Orleans.Clustering.AzureStorage" Version="7.2.1" />
-		<PackageReference Update="Microsoft.Orleans.Sdk" Version="7.2.1" />
+		<PackageReference Update="Microsoft.Orleans.Sdk" Version="7.2.4" />
 	</ItemGroup>
 
 </Project>

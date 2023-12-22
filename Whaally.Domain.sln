@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Infrastructu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Hosting", "samples\Skyhop.Hosting\Skyhop.Hosting.csproj", "{E7527165-0B5F-40C4-B267-CC41C41FF56F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Hosting.Tests", "samples\Skyhop.Hosting.Tests\Skyhop.Hosting.Tests.csproj", "{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{AE0B14B4-3D11-4854-B708-C5329FA273BF} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
 		{39DFF935-76E6-4626-AC3D-D6B7955ED167} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 		{E7527165-0B5F-40C4-B267-CC41C41FF56F} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68BCF0DD-5501-460A-B702-728C2A93C91C}

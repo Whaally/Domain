@@ -2,6 +2,8 @@
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
+    [Immutable]
+    [GenerateSerializer]
     public record ArrivalTimeSet(DateTime ArrivalTime) : IEvent;
 
     internal class ArrivalTimeSetHandler : IEventHandler<Flight, ArrivalTimeSet>

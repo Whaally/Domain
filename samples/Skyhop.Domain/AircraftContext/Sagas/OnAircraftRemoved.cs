@@ -12,7 +12,6 @@ namespace Skyhop.Domain.AircraftContext.Sagas
             context.StageCommand(
                 @event.AircraftId,
                 new RemoveFlight(
-                    @event.AircraftId,
                     context.AggregateId!));
 
             return Task.FromResult<IResultBase>(Result.Ok());

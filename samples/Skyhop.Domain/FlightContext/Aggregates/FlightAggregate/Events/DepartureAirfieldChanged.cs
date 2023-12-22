@@ -2,6 +2,8 @@
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
+    [Immutable]
+    [GenerateSerializer]
     public record DepartureAirfieldChanged(
         string PreviousAirfieldId,
         string CurrentAirfieldId) : IEvent;

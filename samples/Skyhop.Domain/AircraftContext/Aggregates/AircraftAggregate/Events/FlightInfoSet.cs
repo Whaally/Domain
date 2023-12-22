@@ -3,8 +3,9 @@ using Whaally.Domain.Abstractions.Event;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events
 {
+    [Immutable]
+    [GenerateSerializer]
     public record FlightInfoSet(
-        string AggregateId,
         string FlightId,
         DateTime? DepartureTime,
         DateTime? ArrivalTime) : IEvent;

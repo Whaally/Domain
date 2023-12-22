@@ -31,7 +31,8 @@ namespace Whaally.Domain
 
         private static IEnumerable<Assembly> GetAssemblies()
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
             {
                 yield return assembly;
             }
@@ -39,7 +40,6 @@ namespace Whaally.Domain
 
         private static IServiceCollection LoadCommandHandlers(this IServiceCollection services)
         {
-
             var handlers = GetAssemblies()
                 .SelectMany(q => q.GetTypes())
                 .Where(q => q.IsClass

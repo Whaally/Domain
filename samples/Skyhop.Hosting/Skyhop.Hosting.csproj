@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence.csproj" />
       <ProjectReference Include="..\..\src\Whaally.Domain.Infrastructure.OrleansHost\Whaally.Domain.Infrastructure.OrleansHost.csproj" />
       <ProjectReference Include="..\..\src\Whaally.Domain\Whaally.Domain.csproj" />
       <ProjectReference Include="..\Skyhop.Domain\Skyhop.Domain.csproj" />

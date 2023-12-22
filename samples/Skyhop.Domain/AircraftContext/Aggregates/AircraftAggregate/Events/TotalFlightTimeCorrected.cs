@@ -2,8 +2,9 @@
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events
 {
+    [Immutable]
+    [GenerateSerializer]
     public record TotalFlightTimeCorrected(
-        Guid AggregateId,
         DateTime Timestamp,
         TimeSpan FlightTime) : IEvent;
 
