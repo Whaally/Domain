@@ -27,7 +27,7 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
             var a1H = _factory.Instantiate<Aircraft>(_firstAircraftId);
             var a2H = _factory.Instantiate<Aircraft>(_secondAircraftId);
 
-            var c1 = new SetAircraft(_flightId, _firstAircraftId);
+            var c1 = new SetAircraft(_firstAircraftId);
 
             var events = await fH.Evaluate(c1);
 
@@ -40,7 +40,7 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
             Assert.Equal(1, a1HS.FlightCount);
             Assert.Equal(0, a2HS.FlightCount);
             
-            var c2 = new SetAircraft(_flightId, _secondAircraftId);
+            var c2 = new SetAircraft(_secondAircraftId);
 
             await fH.Confirm(
                 (await fH.Evaluate(c2))

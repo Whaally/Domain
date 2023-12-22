@@ -2,9 +2,7 @@
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
-    public record DepartureTimeSet(
-        string AggregateId,
-        DateTime DepartureTime) : IEvent;
+    public record DepartureTimeSet(DateTime DepartureTime) : IEvent;
 
     internal class DepartureTimeSetHandler : IEventHandler<Flight, DepartureTimeSet>
     {

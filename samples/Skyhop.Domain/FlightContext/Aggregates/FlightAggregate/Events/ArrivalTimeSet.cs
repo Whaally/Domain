@@ -2,9 +2,7 @@
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
-    public record ArrivalTimeSet(
-        string AggregateId,
-        DateTime ArrivalTime) : IEvent;
+    public record ArrivalTimeSet(DateTime ArrivalTime) : IEvent;
 
     internal class ArrivalTimeSetHandler : IEventHandler<Flight, ArrivalTimeSet>
     {

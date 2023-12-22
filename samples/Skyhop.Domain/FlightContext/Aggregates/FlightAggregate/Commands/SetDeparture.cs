@@ -5,7 +5,6 @@ using Whaally.Domain.Abstractions.Command;
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
 {
     public record SetDeparture(
-        string AggregateId,
         DateTime Time,
         string AirfieldId) : ICommand;
 
@@ -25,11 +24,9 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
             if (result.IsSuccess)
             {
                 context.StageEvent(new DepartureTimeSet(
-                    command.AggregateId,
                     command.Time));
 
                 context.StageEvent(new DepartureAirfieldSet(
-                    command.AggregateId,
                     command.AirfieldId));
             }
 

@@ -2,9 +2,7 @@
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
-    public record ArrivalAirfieldSet(
-        string AggregateId,
-        string AirfieldId) : IEvent;
+    public record ArrivalAirfieldSet(string AirfieldId) : IEvent;
 
     internal class ArrivalAirfieldSetHandler : IEventHandler<Flight, ArrivalAirfieldSet>
     {

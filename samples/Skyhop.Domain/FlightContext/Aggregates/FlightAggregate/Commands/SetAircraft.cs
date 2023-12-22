@@ -4,9 +4,7 @@ using Whaally.Domain.Abstractions.Command;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
 {
-    public record SetAircraft(
-        string AggregateId,
-        string AircraftId) : ICommand;
+    public record SetAircraft(string AircraftId) : ICommand;
 
     internal class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
     {
@@ -23,12 +21,11 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
                 {
                     context.StageEvent(
                         new AircraftRemoved(
-                            command.AggregateId, 
                             context.Aggregate.AircraftId));
                 }
 
                 context.StageEvent(
-                    new AircraftSet(command.AggregateId, command.AircraftId));
+                    new AircraftSet(command.AircraftId));
             }
 
             return result;

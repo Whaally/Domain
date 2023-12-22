@@ -23,9 +23,9 @@ namespace Skyhop.Domain.Benchmark
         public EvaluateApplyOperationBenchmark()
         {
             _c = new ICommand[] {
-                new SetDeparture(_g, DateTime.UtcNow.AddHours(-1), Guid.NewGuid().ToString()),
-                new SetArrival(_g, DateTime.UtcNow, Guid.NewGuid().ToString()),
-                new SetAircraft(_g, Guid.NewGuid().ToString())
+                new SetDeparture(DateTime.UtcNow.AddHours(-1), Guid.NewGuid().ToString()),
+                new SetArrival(DateTime.UtcNow, Guid.NewGuid().ToString()),
+                new SetAircraft(Guid.NewGuid().ToString())
             };
         }
 

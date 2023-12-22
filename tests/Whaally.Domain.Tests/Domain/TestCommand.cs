@@ -8,7 +8,7 @@ namespace Whaally.Domain.Tests.Domain
     {
         public string? AggregateId { get; init; }
         public IEnumerable<IEvent> Events { get; init; } = new IEvent[] { };
-        public Result? Result { get; init; }
+        public Result Result { get; init; } = Result.Ok();
     }
 
     internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
@@ -20,7 +20,7 @@ namespace Whaally.Domain.Tests.Domain
                 context.StageEvent(@event.GetType(), @event);
             }
 
-            return command.Result!;
+            return command.Result;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Whaally.Domain
 
             return result;
         }
-
+        
         public async Task<IResult<IEventEnvelope[]>> EvaluateService<TService>(TService service)
             where TService : class, IService
         {

@@ -15,15 +15,17 @@ namespace Whaally.Domain.Aggregate
         public IAggregateHandler<TAggregate> Instantiate<TAggregate>(string id)
             where TAggregate : class, IAggregate, new()
         {
-            if (!_dictionary.TryGetValue(id, out var handler))
+            if (id == null) throw new ArgumentNullException(nameof(id));
+            
+            if (_dictionary.TryGetValue(id, out var handler)) 
+                return (IAggregateHandler<TAggregate>)handler;
+            
+            handler = new DefaultAggregateHandler<TAggregate>(_serviceProvider, id)
             {
-                handler = new DefaultAggregateHandler<TAggregate>(_serviceProvider, id)
-                {
-                    Aggregate = new TAggregate()
-                };
+                Aggregate = new TAggregate()
+            };
 
-                _dictionary.Add(id, handler);
-            }
+            _dictionary.Add(id, handler);
 
             return (IAggregateHandler<TAggregate>)handler;
         }

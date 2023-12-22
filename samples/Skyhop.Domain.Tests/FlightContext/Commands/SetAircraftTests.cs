@@ -5,7 +5,6 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Command;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands
 {
@@ -25,9 +24,7 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
         {
             var aggregate = _factory.Instantiate<Flight>(_flightId.ToString());
 
-            var command = new SetAircraft(
-                _flightId,
-                _aircraftId);
+            var command = new SetAircraft(_aircraftId);
 
             var result = await aggregate.Evaluate(command);
 
@@ -41,9 +38,7 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
         {
             var aggregate = _factory.Instantiate<Flight>(_flightId.ToString());
 
-            var command = new SetAircraft(
-                _flightId,
-                "");
+            var command = new SetAircraft("");
 
             var result = await aggregate.Evaluate(command);
 

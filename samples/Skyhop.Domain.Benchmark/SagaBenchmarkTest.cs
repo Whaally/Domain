@@ -35,7 +35,7 @@ namespace Skyhop.Domain.Benchmark
             a2H = _factory.Instantiate<Aircraft>(_secondAircraftId);
             fH = _factory.Instantiate<Flight>(_flightId);
 
-            var c1 = new SetAircraft(_flightId, _firstAircraftId);
+            var c1 = new SetAircraft(_firstAircraftId);
 
             await fH.Confirm(
                 (await fH.Evaluate(c1))
@@ -45,7 +45,7 @@ namespace Skyhop.Domain.Benchmark
         [Benchmark]
         public async Task Test()
         {
-            var c2 = new SetAircraft(_flightId!, _secondAircraftId!);
+            var c2 = new SetAircraft(_secondAircraftId!);
 
             await fH!.Confirm(
                 (await fH.Evaluate(c2))

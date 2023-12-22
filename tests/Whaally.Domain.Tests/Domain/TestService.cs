@@ -5,7 +5,7 @@ namespace Whaally.Domain.Tests.Domain
 {
     internal class TestService : IService
     {
-        public string? Id { get; init; }
+        public string Id { get; init; } = Guid.NewGuid().ToString();
     }
 
     internal class TestServiceHandler : IServiceHandler<TestService>
@@ -13,7 +13,7 @@ namespace Whaally.Domain.Tests.Domain
         public Task<IResultBase> Handle(IServiceHandlerContext context, TestService service)
         {
             context.StageCommand(
-                service.Id!,
+                service.Id,
                 new TestCommand());
 
             return Task.FromResult<IResultBase>(Result.Ok());

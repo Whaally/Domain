@@ -3,7 +3,6 @@
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
 {
     public record DepartureAirfieldChanged(
-        string AggregateId,
         string PreviousAirfieldId,
         string CurrentAirfieldId) : IEvent;
 
