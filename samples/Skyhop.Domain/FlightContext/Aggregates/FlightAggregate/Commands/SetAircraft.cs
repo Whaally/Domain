@@ -8,7 +8,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
     [GenerateSerializer]
     public record SetAircraft(string AircraftId) : ICommand;
 
-    internal class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
+    public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
     {
         public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
         {

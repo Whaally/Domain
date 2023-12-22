@@ -10,7 +10,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events
         DateTime? DepartureTime,
         DateTime? ArrivalTime) : IEvent;
 
-    internal class FlightInfoSetHandler : IEventHandler<Aircraft, FlightInfoSet>
+    public class FlightInfoSetHandler : IEventHandler<Aircraft, FlightInfoSet>
     {
         public Aircraft Apply(IEventHandlerContext<Aircraft> context, FlightInfoSet @event)
         {

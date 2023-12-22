@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
@@ -15,7 +16,7 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
         string _secondAircraftId = Guid.NewGuid().ToString();
 
         IServiceProvider _services = new ServiceCollection()
-            .AddDomain()
+            .AddDomain("Skyhop.Domain")
             .BuildServiceProvider();
 
         IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();

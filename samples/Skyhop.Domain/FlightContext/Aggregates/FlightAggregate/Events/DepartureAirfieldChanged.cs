@@ -8,7 +8,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
         string PreviousAirfieldId,
         string CurrentAirfieldId) : IEvent;
 
-    internal class DepartureAirfieldChangedHandler : IEventHandler<Flight, DepartureAirfieldChanged>
+    public class DepartureAirfieldChangedHandler : IEventHandler<Flight, DepartureAirfieldChanged>
     {
         public Flight Apply(IEventHandlerContext<Flight> context, DepartureAirfieldChanged @event)
             => context.Aggregate with

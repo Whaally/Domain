@@ -9,7 +9,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
         int FlightCount,
         string Reason) : ICommand;
 
-    internal class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
+    public class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
     {
         public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
             => Result.Ok();

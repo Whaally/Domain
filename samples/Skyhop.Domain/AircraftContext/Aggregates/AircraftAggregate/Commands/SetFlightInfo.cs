@@ -6,12 +6,12 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
 {
     [Immutable]
     [GenerateSerializer]
-    internal record SetFlightInfo(
+    public record SetFlightInfo(
         string FlightId,
         DateTime? Departure,
         DateTime? Arrival) : ICommand;
 
-    internal class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
+    public class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
     {
         public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
         {

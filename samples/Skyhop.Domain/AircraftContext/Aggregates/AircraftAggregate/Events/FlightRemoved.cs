@@ -6,7 +6,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events
     [GenerateSerializer]
     public record FlightRemoved(string FlightId) : IEvent;
 
-    internal class FlightRemovedHandler : IEventHandler<Aircraft, FlightRemoved>
+    public class FlightRemovedHandler : IEventHandler<Aircraft, FlightRemoved>
     {
         public Aircraft Apply(IEventHandlerContext<Aircraft> context, FlightRemoved @event)
         {

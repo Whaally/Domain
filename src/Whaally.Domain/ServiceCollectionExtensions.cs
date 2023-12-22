@@ -14,8 +14,13 @@ namespace Whaally.Domain
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDomain(this IServiceCollection services)
+        public static IServiceCollection AddDomain(this IServiceCollection services, string assembly = "")
         {
+            if (!string.IsNullOrWhiteSpace(assembly))
+            {
+                Assembly.Load(assembly);
+            }
+            
             return services
                 .AddSingleton<Domain>()
                 .AddSingleton<IAggregateHandlerFactory, DefaultAggregateHandlerFactory>()

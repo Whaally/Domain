@@ -10,7 +10,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
         DateTime Time,
         string AirfieldId) : ICommand;
 
-    internal class SetArrivalHandler : ICommandHandler<Flight, SetArrival>
+    public class SetArrivalHandler : ICommandHandler<Flight, SetArrival>
     {
         public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetArrival command)
         {

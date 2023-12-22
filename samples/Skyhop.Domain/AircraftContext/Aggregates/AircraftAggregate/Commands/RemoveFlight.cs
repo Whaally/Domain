@@ -6,9 +6,9 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
 {
     [Immutable]
     [GenerateSerializer]
-    internal record RemoveFlight(string FlightId) : ICommand;
+    public record RemoveFlight(string FlightId) : ICommand;
 
-    internal class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
+    public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
     {
         public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
         {

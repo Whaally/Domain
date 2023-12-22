@@ -6,7 +6,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
     [GenerateSerializer]
     public record AircraftSet(string AircraftId) : IEvent;
 
-    internal class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
+    public class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
     {
         public Flight Apply(IEventHandlerContext<Flight> context, AircraftSet @event)
             => context.Aggregate with
