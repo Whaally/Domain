@@ -3,12 +3,12 @@ using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Abstractions.Service;
 
-namespace Whaally.Domain
+namespace Whaally.Domain;
+
+public static class ServiceProviderExtensions
 {
-    public static class ServiceProviderExtensions
+    public static Type? GetRelatedAggregateTypeForCommand(this IServiceProvider serviceProvider, Type commandType)
     {
-        public static Type? GetRelatedAggregateTypeForCommand(this IServiceProvider serviceProvider, Type commandType)
-        {
             Type serviceType = null!;
             Type genericTypeDefinition = null!;
 
@@ -41,14 +41,14 @@ namespace Whaally.Domain
                 .First();
         }
 
-        public static Type? GetRelatedAggregateTypeForCommand<TCommand>(this IServiceProvider serviceProvider)
-            where TCommand : class, ICommand
-        {
+    public static Type? GetRelatedAggregateTypeForCommand<TCommand>(this IServiceProvider serviceProvider)
+        where TCommand : class, ICommand
+    {
             return serviceProvider.GetRelatedAggregateTypeForCommand(typeof(TCommand));
         }
 
-        public static ICommandHandler GetCommandHandlerForCommand(this IServiceProvider serviceProvider, Type commandType)
-        {
+    public static ICommandHandler GetCommandHandlerForCommand(this IServiceProvider serviceProvider, Type commandType)
+    {
             var aggregateType = serviceProvider.GetRelatedAggregateTypeForCommand(commandType);
 
             if (aggregateType == null) throw new Exception("aggregate type not found in DI container");
@@ -60,14 +60,14 @@ namespace Whaally.Domain
                 .GetRequiredService(requestedCommandHandlerType);
         }
 
-        public static ICommandHandler GetCommandHandlerForCommand<TCommand>(this IServiceProvider serviceProvider)
-            where TCommand : class, ICommand
-        {
+    public static ICommandHandler GetCommandHandlerForCommand<TCommand>(this IServiceProvider serviceProvider)
+        where TCommand : class, ICommand
+    {
             return serviceProvider.GetCommandHandlerForCommand(typeof(TCommand));
         }
 
-        public static IServiceHandler GetServiceHandlerForService(this IServiceProvider serviceProvider, Type serviceType)
-        {
+    public static IServiceHandler GetServiceHandlerForService(this IServiceProvider serviceProvider, Type serviceType)
+    {
             return serviceProvider
                 .GetServices<IServiceHandler>()
                 .Single(q => q
@@ -76,5 +76,4 @@ namespace Whaally.Domain
                         .MakeGenericType(serviceType)
                         .Name) != null);
         }
-    }
 }

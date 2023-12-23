@@ -1,4 +1,3 @@
-﻿namespace Whaally.Domain.Abstractions.Service
-{
-    public interface IService : IOperation, IMessage { }
-}
+﻿namespace Whaally.Domain.Abstractions.Service;
+
+public interface IService : IOperation, IMessage { }

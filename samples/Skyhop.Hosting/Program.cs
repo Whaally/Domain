@@ -42,8 +42,7 @@ public class Program
              * I'm lazy so I'd rather write a single line of code.
              */
 
-            Assembly.Load("Skyhop.Domain");
-            builder.Services.AddDomain();
+            builder.Services.AddDomain("Skyhop.Domain");
         
             var defaultHandler = builder
                 .Services

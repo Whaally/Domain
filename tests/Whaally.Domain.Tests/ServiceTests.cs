@@ -1,15 +1,15 @@
 ﻿using Whaally.Domain.Service;
 using Whaally.Domain.Tests.Domain;
 
-namespace Whaally.Domain.Tests
-{
-    public class ServiceTests
-    {
-        readonly IServiceProvider _services = DependencyContainer.Create();
+namespace Whaally.Domain.Tests;
 
-        [Fact]
-        public async Task ServiceCanBeEvaluated()
-        {
+public class ServiceTests
+{
+    readonly IServiceProvider _services = DependencyContainer.Create();
+
+    [Fact]
+    public async Task ServiceCanBeEvaluated()
+    {
             var context = new ServiceHandlerContext(_services);
             var service = new TestService
             {
@@ -23,9 +23,9 @@ namespace Whaally.Domain.Tests
             Assert.Equal(service.Id, context.Commands.Single().Metadata.AggregateId);
         }
 
-        [Fact]
-        public async Task ServiceCanInvokeOtherServices()
-        {
+    [Fact]
+    public async Task ServiceCanInvokeOtherServices()
+    {
             var context = new ServiceHandlerContext(_services);
             var service = new TestParentService()
             {
@@ -40,5 +40,4 @@ namespace Whaally.Domain.Tests
             Assert.Equal(service.Id1, context.Commands.First().Metadata.AggregateId);
             Assert.Equal(service.Id2, context.Commands.Last().Metadata.AggregateId);
         }
-    }
 }

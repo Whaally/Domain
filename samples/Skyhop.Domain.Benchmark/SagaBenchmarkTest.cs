@@ -6,27 +6,27 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions.Aggregate;
 
-namespace Skyhop.Domain.Benchmark
+namespace Skyhop.Domain.Benchmark;
+
+public class SagaBenchmarkTest
 {
-    public class SagaBenchmarkTest
+    string? _flightId;
+    string? _firstAircraftId;
+    string? _secondAircraftId;
+
+    IServiceProvider _services = new ServiceCollection()
+        .AddDomain()
+        .BuildServiceProvider();
+
+    IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
+
+    IAggregateHandler<Flight>? fH;
+    IAggregateHandler<Aircraft>? a1H;
+    IAggregateHandler<Aircraft>? a2H;
+
+    [GlobalSetup]
+    public async Task Setup()
     {
-        string? _flightId;
-        string? _firstAircraftId;
-        string? _secondAircraftId;
-
-        IServiceProvider _services = new ServiceCollection()
-            .AddDomain()
-            .BuildServiceProvider();
-
-        IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
-
-        IAggregateHandler<Flight>? fH;
-        IAggregateHandler<Aircraft>? a1H;
-        IAggregateHandler<Aircraft>? a2H;
-
-        [GlobalSetup]
-        public async Task Setup()
-        {
             _flightId = Guid.NewGuid().ToString();
             _firstAircraftId = Guid.NewGuid().ToString();
             _secondAircraftId = Guid.NewGuid().ToString();
@@ -42,14 +42,13 @@ namespace Skyhop.Domain.Benchmark
                 .Value);
         }
 
-        [Benchmark]
-        public async Task Test()
-        {
+    [Benchmark]
+    public async Task Test()
+    {
             var c2 = new SetAircraft(_secondAircraftId!);
 
             await fH!.Confirm(
                 (await fH.Evaluate(c2))
                 .Value);
         }
-    }
 }

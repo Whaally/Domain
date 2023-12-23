@@ -8,25 +8,25 @@ using Whaally.Domain.Abstractions.Saga;
 using Whaally.Domain.Abstractions.Service;
 using Whaally.Domain.Saga;
 
-namespace Whaally.Domain
-{
-    public class DefaultEvaluationAgent : IEvaluationAgent
-    {
-        private readonly IServiceProvider _services;
+namespace Whaally.Domain;
 
-        public DefaultEvaluationAgent(IServiceProvider services)
-        {
+public class DefaultEvaluationAgent : IEvaluationAgent
+{
+    private readonly IServiceProvider _services;
+
+    public DefaultEvaluationAgent(IServiceProvider services)
+    {
             _services = services;
         }
 
-        private static void CheckSourceActivity(IMessageEnvelope[] envelopes)
-        {
+    private static void CheckSourceActivity(IMessageEnvelope[] envelopes)
+    {
             if (envelopes.DistinctBy(q => q.Metadata.SourceActivity).Count() > 1)
                 throw new Exception("All messages must originate from the same ActivityContext to evaluate them together");
         }
 
-        public async Task<IResult<IEventEnvelope[]>> EvaluateCommands(params ICommandEnvelope[] commandEnvelopes)
-        {
+    public async Task<IResult<IEventEnvelope[]>> EvaluateCommands(params ICommandEnvelope[] commandEnvelopes)
+    {
             CheckSourceActivity(commandEnvelopes);
 
             var handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
@@ -72,8 +72,8 @@ namespace Whaally.Domain
             return result;
         }
 
-        public async Task<IResultBase> EvaluateEvents(params IEventEnvelope[] eventEnvelopes)
-        {
+    public async Task<IResultBase> EvaluateEvents(params IEventEnvelope[] eventEnvelopes)
+    {
             CheckSourceActivity(eventEnvelopes);
 
             var handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
@@ -110,13 +110,17 @@ namespace Whaally.Domain
                 .WithReasons(results.SelectMany(q => q.Reasons));
         }
 
-        public async Task<IResult<ICommandEnvelope[]>> EvaluateSaga(IEventEnvelope eventEnvelope)
-        {
-            /*
-             * 1. Retrieve all relevant sagas
-             * 2. Evaluate all relevant sagas
-             * 3. Return resulting commands
-             */
+    public async Task<IResult<ICommandEnvelope[]>> EvaluateSaga(IEventEnvelope eventEnvelope)
+    {
+           /*
+
+      1. Retrieve all relevant sagas
+
+      2. Evaluate all relevant sagas
+
+      3. Return resulting commands
+
+     //
 
             var sagas = _services.GetServices(
                 typeof(ISaga<>)
@@ -159,9 +163,9 @@ namespace Whaally.Domain
                 .WithReasons(results.SelectMany(q => q.Reasons));
         }
 
-        public async Task<IResult<ICommandEnvelope[]>> EvaluateService<TService>(IServiceEnvelope<TService> serviceEnvelope)
-            where TService : class, IService
-        {
+    public async Task<IResult<ICommandEnvelope[]>> EvaluateService<TService>(IServiceEnvelope<TService> serviceEnvelope)
+        where TService : class, IService
+    {
             var serviceHandler = _services.GetRequiredService<IServiceHandler<TService>>();
             var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
 
@@ -176,5 +180,4 @@ namespace Whaally.Domain
                 .WithReasons(result.Reasons)
                 .WithValue(serviceHandlerContext.Commands.ToArray());
         }
-    }
 }

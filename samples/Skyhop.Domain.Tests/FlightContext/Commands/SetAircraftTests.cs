@@ -6,22 +6,22 @@ using Whaally.Domain;
 using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Event;
 
-namespace Skyhop.Domain.Tests.FlightContext.Commands
+namespace Skyhop.Domain.Tests.FlightContext.Commands;
+
+public class SetAircraftTests
 {
-    public class SetAircraftTests
+    string _flightId = Guid.NewGuid().ToString();
+    string _aircraftId = Guid.NewGuid().ToString();
+
+    IServiceProvider _services = new ServiceCollection()
+        .AddDomain()
+        .BuildServiceProvider();
+
+    IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
+
+    [Fact]
+    public async Task Test_AircraftSet()
     {
-        string _flightId = Guid.NewGuid().ToString();
-        string _aircraftId = Guid.NewGuid().ToString();
-
-        IServiceProvider _services = new ServiceCollection()
-            .AddDomain()
-            .BuildServiceProvider();
-
-        IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
-
-        [Fact]
-        public async Task Test_AircraftSet()
-        {
             var aggregate = _factory.Instantiate<Flight>(_flightId.ToString());
 
             var command = new SetAircraft(_aircraftId);
@@ -33,9 +33,9 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
             Assert.IsAssignableFrom<IEventEnvelope<AircraftSet>>(result.Value[0]);
         }
 
-        [Fact]
-        public async Task Test_AircraftSet_FailsWithoutAircraft()
-        {
+    [Fact]
+    public async Task Test_AircraftSet_FailsWithoutAircraft()
+    {
             var aggregate = _factory.Instantiate<Flight>(_flightId.ToString());
 
             var command = new SetAircraft("");
@@ -45,5 +45,4 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands
             Assert.True(result.IsFailed);
             Assert.Throws<InvalidOperationException>(() => result.Value);
         }
-    }
 }

@@ -7,31 +7,31 @@ using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Command;
 using Whaally.Domain.Event;
 
-namespace Whaally.Domain.Aggregate
+namespace Whaally.Domain.Aggregate;
+
+public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
+    where TAggregate : class, IAggregate, new()
 {
-    public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
-        where TAggregate : class, IAggregate, new()
+    private readonly IServiceProvider _services;
+
+    private TAggregate _aggregate = new();
+    public TAggregate Aggregate
     {
-        private readonly IServiceProvider _services;
+        get => _aggregate;
+        init => _aggregate = value;
+    }
 
-        private TAggregate _aggregate = new();
-        public TAggregate Aggregate
-        {
-            get => _aggregate;
-            init => _aggregate = value;
-        }
+    public string Id { get; init; }
 
-        public string Id { get; init; }
-
-        // ToDo: Use an options pattern to supply mandatory/optional parameters
-        public DefaultAggregateHandler(IServiceProvider services, string id)
-        {
+    // ToDo: Use an options pattern to supply mandatory/optional parameters
+    public DefaultAggregateHandler(IServiceProvider services, string id)
+    {
             _services = services;
             Id = id;
         }
 
-        public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
-        {
+    public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
+    {
             var events = new List<IEventEnvelope>(commands.Length);
             var results = new List<IResultBase>();
 
@@ -42,14 +42,20 @@ namespace Whaally.Domain.Aggregate
             foreach (var cmd in commands)
             {
                 // ToDo: Extract the command handler instantiation to some other component
-                /*
-                 * The following things happen:
-                 * 
-                 * 1. The aggregate ID is set on the command (must be refactored to remove dependency)
-                 * 2. Command handler is retrieved, and an appropriate command context instance is created for evaluation
-                 * 3. The command is evaluated
-                 * 4. Results are extracted from the context and evaluated against a temporary state of the aggregate.
-                 */
+               /*
+
+      The following things happen:
+
+      
+      1. The aggregate ID is set on the command (must be refactored to remove dependency)
+
+      2. Command handler is retrieved, and an appropriate command context instance is created for evaluation
+
+      3. The command is evaluated
+
+      4. Results are extracted from the context and evaluated against a temporary state of the aggregate.
+
+     //
 
                 ICommandEnvelope command = cmd;
 
@@ -105,13 +111,13 @@ namespace Whaally.Domain.Aggregate
                     : result);
         }
 
-        /*
-         * Note that in this method the continuation happens sequentially, and is awaited.
-         * In production environments the confirm method should likely return after the changes had been applied
-         * to free up the aggregate handler for other operations.
-         */
-        public async Task<IResultBase> Confirm(params IEventEnvelope[] events)
-        {
+    /*
+     * Note that in this method the continuation happens sequentially, and is awaited.
+     * In production environments the confirm method should likely return after the changes had been applied
+     * to free up the aggregate handler for other operations.
+     */
+    public async Task<IResultBase> Confirm(params IEventEnvelope[] events)
+    {
             await Apply(events);
 
             var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
@@ -135,8 +141,8 @@ namespace Whaally.Domain.Aggregate
             return Result.Ok();
         }
 
-        public Task<IResultBase> Apply(params IEventEnvelope[] events)
-        {
+    public Task<IResultBase> Apply(params IEventEnvelope[] events)
+    {
             if (events == null) return Task.FromResult<IResultBase>(Result.Ok());
 
             TAggregate intermediateState = _aggregate;
@@ -168,8 +174,7 @@ namespace Whaally.Domain.Aggregate
             return Task.FromResult<IResultBase>(Result.Ok());
         }
 
-        public Task<TSnapshot> Snapshot<TSnapshot>()
-            where TSnapshot : ISnapshot
-            => Task.FromResult(_services.GetRequiredService<ISnapshotFactory<TAggregate, TSnapshot>>().Instantiate(_aggregate));
-    }
+    public Task<TSnapshot> Snapshot<TSnapshot>()
+        where TSnapshot : ISnapshot
+        => Task.FromResult(_services.GetRequiredService<ISnapshotFactory<TAggregate, TSnapshot>>().Instantiate(_aggregate));
 }

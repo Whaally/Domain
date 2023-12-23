@@ -1,7 +1,6 @@
-﻿namespace Whaally.Domain.Abstractions
-{
-    public interface IMessage
-    {
+﻿namespace Whaally.Domain.Abstractions;
 
-    }
+public interface IMessage
+{
+
 }

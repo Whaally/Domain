@@ -1,17 +1,16 @@
 ﻿using Whaally.Domain.Abstractions.Event;
 
-namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events
-{
-    [Immutable]
-    [GenerateSerializer]
-    public record AircraftSet(string AircraftId) : IEvent;
+namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 
-    public class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
-    {
-        public Flight Apply(IEventHandlerContext<Flight> context, AircraftSet @event)
-            => context.Aggregate with
-            {
-                AircraftId = @event.AircraftId
-            };
-    }
+[Immutable]
+[GenerateSerializer]
+public record AircraftSet(string AircraftId) : IEvent;
+
+public class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
+{
+    public Flight Apply(IEventHandlerContext<Flight> context, AircraftSet @event)
+        => context.Aggregate with
+        {
+            AircraftId = @event.AircraftId
+        };
 }

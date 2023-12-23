@@ -3,13 +3,13 @@ using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Service;
 using Whaally.Domain.Tests.Domain;
 
-namespace Whaally.Domain.Tests
+namespace Whaally.Domain.Tests;
+
+public class ServiceProviderExtensionTests
 {
-    public class ServiceProviderExtensionTests
+    [Fact]
+    public void TestGetCommandAggregateType()
     {
-        [Fact]
-        public void TestGetCommandAggregateType()
-        {
             var serviceProvider = new ServiceCollection()
                 .AddTransient<ICommandHandler, TestCommandHandler>()
                 .AddTransient<ICommandHandler<TestAggregate, TestCommand>, TestCommandHandler>()
@@ -20,9 +20,9 @@ namespace Whaally.Domain.Tests
             Assert.Equal(typeof(TestAggregate), aggregateType);
         }
 
-        [Fact]
-        public void Test_GetCommandAggregateType_Fails_Without_Non_Generic_Interface()
-        {
+    [Fact]
+    public void Test_GetCommandAggregateType_Fails_Without_Non_Generic_Interface()
+    {
             var serviceProvider = new ServiceCollection()
                 .AddTransient<ICommandHandler<TestAggregate, TestCommand>, TestCommandHandler>()
                 .BuildServiceProvider();
@@ -32,9 +32,9 @@ namespace Whaally.Domain.Tests
             Assert.Null(aggregateType);
         }
 
-        [Fact]
-        public void Test_GetCommandAggregateType_Succeeds_Without_Generic_DI_Registration()
-        {
+    [Fact]
+    public void Test_GetCommandAggregateType_Succeeds_Without_Generic_DI_Registration()
+    {
             var serviceProvider = new ServiceCollection()
                 .AddTransient<ICommandHandler, TestCommandHandler>()
                 .BuildServiceProvider();
@@ -44,9 +44,9 @@ namespace Whaally.Domain.Tests
             Assert.Equal(typeof(TestAggregate), aggregateType);
         }
 
-        [Fact]
-        public void Test_GetCommandHandlerForCommand()
-        {
+    [Fact]
+    public void Test_GetCommandHandlerForCommand()
+    {
             var serviceProvider = new ServiceCollection()
                 .AddTransient<ICommandHandler, TestCommandHandler>()
                 .AddTransient<ICommandHandler<TestAggregate, TestCommand>, TestCommandHandler>()
@@ -57,23 +57,23 @@ namespace Whaally.Domain.Tests
             Assert.IsType<TestCommandHandler>(handler);
         }
 
-        //[Fact]
-        //public void Test_GetAggregateHandlerForAggregateType()
-        //{
-        //    var serviceProvider = new ServiceCollection()
-        //        .AddSingleton<IAggregateBehaviourProvider, DefaultAggregateBehaviourProvider>()
-        //        .AddTransient<IAggregateHandler, TestAggregateHandler<TestAggregate>>()
-        //        .AddTransient<IAggregateHandler<TestAggregate>, TestAggregateHandler<TestAggregate>>()
-        //        .BuildServiceProvider();
+    //[Fact]
+    //public void Test_GetAggregateHandlerForAggregateType()
+    //{
+    //    var serviceProvider = new ServiceCollection()
+    //        .AddSingleton<IAggregateBehaviourProvider, DefaultAggregateBehaviourProvider>()
+    //        .AddTransient<IAggregateHandler, TestAggregateHandler<TestAggregate>>()
+    //        .AddTransient<IAggregateHandler<TestAggregate>, TestAggregateHandler<TestAggregate>>()
+    //        .BuildServiceProvider();
 
-        //    var handler = serviceProvider.GetAggregateHandlerForAggregateType<TestAggregate>();
+    //    var handler = serviceProvider.GetAggregateHandlerForAggregateType<TestAggregate>();
 
-        //    Assert.IsType<TestAggregateHandler<TestAggregate>>(handler);
-        //}
+    //    Assert.IsType<TestAggregateHandler<TestAggregate>>(handler);
+    //}
 
-        [Fact]
-        public void TestGetServiceHandlerForService()
-        {
+    [Fact]
+    public void TestGetServiceHandlerForService()
+    {
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<IServiceHandler, TestServiceHandler>()
                 .AddSingleton<IServiceHandler<TestService>, TestServiceHandler>()
@@ -83,5 +83,4 @@ namespace Whaally.Domain.Tests
 
             Assert.IsType<TestServiceHandler>(serviceHandler);
         }
-    }
 }

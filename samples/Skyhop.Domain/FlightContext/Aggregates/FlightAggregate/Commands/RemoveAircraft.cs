@@ -2,19 +2,18 @@
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain.Abstractions.Command;
 
-namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
+namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
+
+[Immutable]
+[GenerateSerializer]
+public record RemoveAircraft() : ICommand;
+
+public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
 {
-    [Immutable]
-    [GenerateSerializer]
-    public record RemoveAircraft() : ICommand;
-
-    public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
+    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
     {
-        public IResultBase Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
-        {
-            context.StageEvent(new AircraftRemoved(context.Aggregate.AircraftId!));
+        context.StageEvent(new AircraftRemoved(context.Aggregate.AircraftId!));
 
-            return Result.Ok();
-        }
+        return Result.Ok();
     }
 }
