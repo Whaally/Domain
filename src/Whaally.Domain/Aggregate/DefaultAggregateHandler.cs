@@ -43,19 +43,13 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             {
                 // ToDo: Extract the command handler instantiation to some other component
                /*
-
-      The following things happen:
-
-      
-      1. The aggregate ID is set on the command (must be refactored to remove dependency)
-
-      2. Command handler is retrieved, and an appropriate command context instance is created for evaluation
-
-      3. The command is evaluated
-
-      4. Results are extracted from the context and evaluated against a temporary state of the aggregate.
-
-     //
+                * The following things happen:
+                * 1. The aggregate ID is set on the command (must be refactored to remove dependency)
+                * 2. Command handler is retrieved, and an appropriate command context instance is created for evaluation
+                * 3. The command is evaluated
+                * 4. Results are extracted from the context and evaluated against a temporary state of the aggregate.
+                * 
+                */
 
                 ICommandEnvelope command = cmd;
 

@@ -113,14 +113,10 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<ICommandEnvelope[]>> EvaluateSaga(IEventEnvelope eventEnvelope)
     {
            /*
-
-      1. Retrieve all relevant sagas
-
-      2. Evaluate all relevant sagas
-
-      3. Return resulting commands
-
-     //
+            * 1. Retrieve all relevant sagas
+            * 2. Evaluate all relevant sagas
+            * 3. Return resulting commands
+            */
 
             var sagas = _services.GetServices(
                 typeof(ISaga<>)
