@@ -18,7 +18,7 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
         var a1H = AggregateFactory.Instantiate<Aircraft>(_firstAircraftId);
         var a2H = AggregateFactory.Instantiate<Aircraft>(_secondAircraftId);
 
-        var c1 = new SetAircraftCommand(_firstAircraftId);
+        var c1 = new SetAircraft(_firstAircraftId);
 
         var events = await fH.Evaluate(c1);
 
@@ -31,7 +31,7 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
         Assert.Equal(1, a1HS.FlightCount);
         Assert.Equal(0, a2HS.FlightCount);
             
-        var c2 = new SetAircraftCommand(_secondAircraftId);
+        var c2 = new SetAircraft(_secondAircraftId);
 
         await fH.Confirm(
             (await fH.Evaluate(c2))

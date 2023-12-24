@@ -6,11 +6,11 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 
 [Immutable]
 [GenerateSerializer]
-public record SetAircraftCommand(string AircraftId) : ICommand;
+public record SetAircraft(string AircraftId) : ICommand;
 
-public class SetAircraftHandler : ICommandHandler<Flight, SetAircraftCommand>
+public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraftCommand command)
+    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
         var result = new Result();
 

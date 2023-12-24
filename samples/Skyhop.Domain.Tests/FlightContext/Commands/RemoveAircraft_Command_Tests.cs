@@ -1,6 +1,7 @@
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
+using Whaally.Domain;
 using Whaally.Domain.Event;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
@@ -34,13 +35,10 @@ public class RemoveAircraft_Command_Tests : DomainTest
     public async Task Aircraft_Can_Be_Removed()
     {
         var flight = AggregateFactory.Instantiate<Flight>("");
-        
-        // ToDo: Allow the evaluation and application of multiple commands in a "one liner".
-        await flight.Apply(
-            (await flight.Evaluate(new Create())).Value);
-        
-        await flight.Apply(
-            (await flight.Evaluate(new SetAircraftCommand("PH-ABC"))).Value);
+
+        await flight.EvaluateAndApply(
+            new Create(),
+            new SetAircraft(Guid.NewGuid().ToString()));
 
         var result = await flight.Evaluate(new RemoveAircraft());
 
