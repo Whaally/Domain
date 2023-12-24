@@ -2,22 +2,17 @@
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
-using Whaally.Domain;
 using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Event;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
 
-public class SetAircraftTests
+public class SetAircraftTests : DomainTest
 {
     string _flightId = Guid.NewGuid().ToString();
     string _aircraftId = Guid.NewGuid().ToString();
 
-    IServiceProvider _services = new ServiceCollection()
-        .AddDomain()
-        .BuildServiceProvider();
-
-    IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
+    IAggregateHandlerFactory _factory => Services.GetRequiredService<IAggregateHandlerFactory>();
 
     [Fact]
     public async Task Test_AircraftSet()

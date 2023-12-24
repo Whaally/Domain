@@ -20,7 +20,7 @@ public static class ServiceCollectionExtensions
         {
             Assembly.Load(assembly);
         }
-            
+        
         return services
             .AddSingleton<Domain>()
             .AddSingleton<IAggregateHandlerFactory, DefaultAggregateHandlerFactory>()

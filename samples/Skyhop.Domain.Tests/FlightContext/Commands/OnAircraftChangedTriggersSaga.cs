@@ -1,25 +1,19 @@
-﻿using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
-using Whaally.Domain;
 using Whaally.Domain.Abstractions.Aggregate;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
 
-public class OnAircraftChangedTriggersSaga
+public class OnAircraftChangedTriggersSaga : DomainTest
 {
     string _flightId = Guid.NewGuid().ToString();
     string _firstAircraftId = Guid.NewGuid().ToString();
     string _secondAircraftId = Guid.NewGuid().ToString();
 
-    IServiceProvider _services = new ServiceCollection()
-        .AddDomain("Skyhop.Domain")
-        .BuildServiceProvider();
-
-    IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
+    IAggregateHandlerFactory _factory => Services.GetRequiredService<IAggregateHandlerFactory>();
 
     [Fact]
     public async Task EvaluateTest()
