@@ -6,14 +6,17 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 
 [Immutable]
 [GenerateSerializer]
-public record SetAircraft(string AircraftId) : ICommand;
+public record SetAircraftCommand(string AircraftId) : ICommand;
 
-public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
+public class SetAircraftHandler : ICommandHandler<Flight, SetAircraftCommand>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
+    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraftCommand command)
     {
         var result = new Result();
 
+        if (!context.Aggregate.IsInitialized) 
+            result.WithError("Flight does not exist");
+        
         if (string.IsNullOrWhiteSpace(command.AircraftId))
             result.WithError("Aircraft was not provided");
 

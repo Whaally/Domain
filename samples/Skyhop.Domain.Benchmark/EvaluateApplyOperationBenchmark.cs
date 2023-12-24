@@ -25,7 +25,7 @@ public class EvaluateApplyOperationBenchmark
             _c = new ICommand[] {
                 new SetDeparture(DateTime.UtcNow.AddHours(-1), Guid.NewGuid().ToString()),
                 new SetArrival(DateTime.UtcNow, Guid.NewGuid().ToString()),
-                new SetAircraft(Guid.NewGuid().ToString())
+                new SetAircraftCommand(Guid.NewGuid().ToString())
             };
         }
 

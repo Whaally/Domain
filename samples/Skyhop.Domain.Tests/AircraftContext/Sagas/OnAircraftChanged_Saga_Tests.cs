@@ -1,28 +1,24 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
+﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
-using Whaally.Domain.Abstractions.Aggregate;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
 
-public class OnAircraftChangedTriggersSaga : DomainTest
+public class OnAircraftChanged_Saga_Tests : DomainTest
 {
     string _flightId = Guid.NewGuid().ToString();
     string _firstAircraftId = Guid.NewGuid().ToString();
     string _secondAircraftId = Guid.NewGuid().ToString();
 
-    IAggregateHandlerFactory _factory => Services.GetRequiredService<IAggregateHandlerFactory>();
-
     [Fact]
     public async Task EvaluateTest()
     {
-        var fH = _factory.Instantiate<Flight>(_flightId);
-        var a1H = _factory.Instantiate<Aircraft>(_firstAircraftId);
-        var a2H = _factory.Instantiate<Aircraft>(_secondAircraftId);
+        var fH = AggregateFactory.Instantiate<Flight>(_flightId);
+        var a1H = AggregateFactory.Instantiate<Aircraft>(_firstAircraftId);
+        var a2H = AggregateFactory.Instantiate<Aircraft>(_secondAircraftId);
 
-        var c1 = new SetAircraft(_firstAircraftId);
+        var c1 = new SetAircraftCommand(_firstAircraftId);
 
         var events = await fH.Evaluate(c1);
 
@@ -35,7 +31,7 @@ public class OnAircraftChangedTriggersSaga : DomainTest
         Assert.Equal(1, a1HS.FlightCount);
         Assert.Equal(0, a2HS.FlightCount);
             
-        var c2 = new SetAircraft(_secondAircraftId);
+        var c2 = new SetAircraftCommand(_secondAircraftId);
 
         await fH.Confirm(
             (await fH.Evaluate(c2))

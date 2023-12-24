@@ -4,6 +4,8 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 
 public record Flight : IAggregate
 {
+    public bool IsInitialized { get; init; } = false;
+    
     public string? AircraftId { get; init; }
     public string? DepartureAirfieldId { get; init; }
     public string? ArrivalAirfieldId { get; init; }

@@ -27,9 +27,9 @@ public class FlightController : ControllerBase
             .EvaluateAndApply(new RemoveAircraft());
 
     [HttpPost("{id}/aircraft/set")]
-    public Task<IResult> SetAircraft(string id, SetAircraft aircraft) =>
+    public Task<IResult> SetAircraft(string id, SetAircraftCommand aircraftCommand) =>
         _aggregateHandlerFactory.Instantiate<Flight>(id)
-            .EvaluateAndApply(aircraft);
+            .EvaluateAndApply(aircraftCommand);
 
     [HttpPost("{id}/departure/set")]
     public Task<IResult> SetDeparture(string id, SetDeparture departure) =>

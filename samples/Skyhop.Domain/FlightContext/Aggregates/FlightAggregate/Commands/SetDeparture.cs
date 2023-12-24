@@ -16,6 +16,9 @@ public class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
     {
         var result = new Result();
 
+        if (!context.Aggregate.IsInitialized) 
+            result.WithError("Flight does not exist");
+        
         if (string.IsNullOrWhiteSpace(command.AirfieldId))
             result.WithError("Airfield was not provided");
 

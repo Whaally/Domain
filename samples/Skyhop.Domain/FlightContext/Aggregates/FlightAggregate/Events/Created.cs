@@ -9,5 +9,8 @@ public record Created() : IEvent;
 public class CreatedHandler : IEventHandler<Flight, Created>
 {
     public Flight Apply(IEventHandlerContext<Flight> context, Created @event)
-        => context.Aggregate;
+        => context.Aggregate with
+        {
+            IsInitialized = true
+        };
 }
