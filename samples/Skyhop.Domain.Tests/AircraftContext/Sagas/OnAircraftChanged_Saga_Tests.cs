@@ -22,7 +22,7 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
 
         var events = await fH.Evaluate(c1);
 
-        await fH.Confirm(events.Value);
+        await fH.Continue(events.Value);
 
         // ToDo: Assert change on a1H but not on a2H
         var a1HS = await a1H.Snapshot<AircraftSnapshot>();
@@ -33,7 +33,7 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
             
         var c2 = new SetAircraft(_secondAircraftId);
 
-        await fH.Confirm(
+        await fH.Continue(
             (await fH.Evaluate(c2))
             .Value);
 

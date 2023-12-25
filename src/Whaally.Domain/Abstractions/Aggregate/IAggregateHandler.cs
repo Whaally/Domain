@@ -30,8 +30,12 @@ public interface IAggregateHandler
     /// <param name="events">The events to apply</param>
     /// <returns>async Task</returns>
     public Task<IResultBase> Apply(params IEventEnvelope[] events);
-        
-    public Task<IResultBase> Confirm(params IEventEnvelope[] events);
+
+    [Obsolete("The confirm method had been renamed to `Continue`. This method will be removed in a future version.")]
+    public Task<IResultBase> Confirm(params IEventEnvelope[] events)
+        => Continue(events);
+    
+    public Task<IResultBase> Continue(params IEventEnvelope[] events);
 
     public Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot;

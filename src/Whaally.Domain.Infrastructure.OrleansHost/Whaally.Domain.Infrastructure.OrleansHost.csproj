@@ -10,5 +10,9 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Whaally.Domain\Whaally.Domain.csproj" />
 	</ItemGroup>
+
+	<PropertyGroup>
+		<NoWarn>CS0618</NoWarn>
+	</PropertyGroup>
 	
 </Project>

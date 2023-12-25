@@ -51,7 +51,7 @@ public class Domain
 
         if (result.IsFailed) return result;
 
-        await handler.Confirm(result.Value);
+        await handler.Continue(result.Value);
 
         return result;
     }

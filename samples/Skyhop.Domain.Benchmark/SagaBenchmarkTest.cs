@@ -37,7 +37,7 @@ public class SagaBenchmarkTest
 
             var c1 = new SetAircraft(_firstAircraftId);
 
-            await fH.Confirm(
+            await fH.Continue(
                 (await fH.Evaluate(c1))
                 .Value);
         }
@@ -47,7 +47,7 @@ public class SagaBenchmarkTest
     {
             var c2 = new SetAircraft(_secondAircraftId!);
 
-            await fH!.Confirm(
+            await fH!.Continue(
                 (await fH.Evaluate(c2))
                 .Value);
         }

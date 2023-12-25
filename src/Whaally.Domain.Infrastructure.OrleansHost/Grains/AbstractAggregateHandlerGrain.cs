@@ -98,10 +98,8 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
         AggregateHandler.Apply(@event);
     }
 
-    public Task<IResultBase> Confirm(params IEventEnvelope[] events)
-    {
-        return AggregateHandler.Confirm();
-    }
+    public Task<IResultBase> Continue(params IEventEnvelope[] events) 
+        => AggregateHandler.Continue();
 
     [ReadOnly]
     public Task<TSnapshot> Snapshot<TSnapshot>() where TSnapshot : ISnapshot
