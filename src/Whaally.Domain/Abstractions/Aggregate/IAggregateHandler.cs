@@ -7,6 +7,11 @@ namespace Whaally.Domain.Abstractions.Aggregate;
 
 public interface IAggregateHandler
 {
+    /// <summary>
+    ///     Evaluate the provided commands against the current state.
+    /// </summary>
+    /// <param name="commands">The commands to evaluate</param>
+    /// <returns>async result containing events if successful</returns>
     public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommand[] commands)
         => Evaluate(commands
             .Select(q => new CommandEnvelope(
@@ -21,7 +26,7 @@ public interface IAggregateHandler
     ///     Evaluate the provided commands against the current state.
     /// </summary>
     /// <param name="commands">The commands to evaluate</param>
-    /// <returns>async result containing resulting events if successful</returns>
+    /// <returns>async result containing events if successful</returns>
     public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands);
 
     /// <summary>
@@ -35,6 +40,11 @@ public interface IAggregateHandler
     public Task<IResultBase> Confirm(params IEventEnvelope[] events)
         => Continue(events);
     
+    /// <summary>
+    ///     Asynchronously runs the sagas for the provided events.
+    /// </summary>
+    /// <param name="events">Events for which to evaluate the sagas</param>
+    /// <returns>Success state about saga evaluation</returns>
     public Task<IResultBase> Continue(params IEventEnvelope[] events);
 
     public Task<TSnapshot> Snapshot<TSnapshot>()
@@ -42,8 +52,8 @@ public interface IAggregateHandler
 }
 
 /// <summary>
-/// This interface exists because we want to retrieve actual implementations for the relevant handler
-/// from the DI container.
+///     This interface exists because we want to retrieve actual implementations for the relevant handler
+///     from the DI container.
 /// </summary>
 /// <typeparam name="TAggregate">The aggregate type for which this aggregate handler exists</typeparam>
 public interface IAggregateHandler<TAggregate> : IAggregateHandler

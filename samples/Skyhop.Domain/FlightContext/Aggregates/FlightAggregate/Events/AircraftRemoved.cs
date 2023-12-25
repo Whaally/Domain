@@ -8,8 +8,8 @@ public record AircraftRemoved(string AircraftId) : IEvent;
 
 public class AircraftRemovedHandler : IEventHandler<Flight, AircraftRemoved>
 {
-    public Flight Apply(IEventHandlerContext<Flight> context, AircraftRemoved @event)
-        => context.Aggregate with
+    public Flight Apply(IEventHandlerContext<Flight> context, AircraftRemoved @event) =>
+        context.Aggregate with
         {
             AircraftId = null,
             AircraftRegistration = null
