@@ -105,42 +105,9 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 : result);
     }
 
-    public Task<IResultBase> Confirm(params IEventEnvelope[] events)
-        => Continue(events);
-    
-    /*
-     * Note that in this method the continuation happens sequentially, and is awaited.
-     * In production environments the confirm method should likely return after the changes had been applied
-     * to free up the aggregate handler for other operations.
-     */
-    public async Task<IResultBase> Continue(params IEventEnvelope[] events)
+    public async Task<IResultBase> Apply(params IEventEnvelope[] events)
     {
-        await Apply(events);
-
-        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
-
-        foreach (var @event in events)
-        {
-            await Task.Run(async () =>
-            {
-                var commands = await evaluationAgent.EvaluateSaga(@event);
-
-                if (commands.IsFailed) return;
-
-                var events = await evaluationAgent.EvaluateCommands(commands.Value);
-
-                if (events.IsFailed) return;
-
-                await evaluationAgent.EvaluateEvents(events.Value);
-            });
-        }
-
-        return Result.Ok();
-    }
-
-    public Task<IResultBase> Apply(params IEventEnvelope[] events)
-    {
-        if (events == null) return Task.FromResult<IResultBase>(Result.Ok());
+        if (events == null) return Result.Ok();
 
         TAggregate intermediateState = _aggregate;
 
@@ -168,7 +135,38 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         _aggregate = intermediateState;
 
-        return Task.FromResult<IResultBase>(Result.Ok());
+        await Continue(events);
+        
+        return Result.Ok();
+    }
+    
+    /*
+     * Note that in this method the continuation happens sequentially, and is awaited.
+     * In production environments the confirm method should likely return after the changes had been applied
+     * to free up the aggregate handler for other operations.
+     */
+    public async Task<IResultBase> Continue(params IEventEnvelope[] events)
+    {
+        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
+
+        foreach (var @event in events)
+        {
+            // ToDo: Ensure these sagas are properly evaluated in the background
+            await Task.Run(async () =>
+            {
+                var commands = await evaluationAgent.EvaluateSaga(@event);
+
+                if (commands.IsFailed) return;
+
+                var events = await evaluationAgent.EvaluateCommands(commands.Value);
+
+                if (events.IsFailed) return;
+
+                await evaluationAgent.EvaluateEvents(events.Value);
+            });
+        }
+
+        return Result.Ok();
     }
 
     public Task<TSnapshot> Snapshot<TSnapshot>()
