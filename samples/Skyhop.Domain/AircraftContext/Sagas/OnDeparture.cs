@@ -7,7 +7,7 @@ using Whaally.Domain.Abstractions.Saga;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
 
-internal class OnDeparture : ISaga<DepartureTimeSet>
+public class OnDeparture : ISaga<DepartureTimeSet>
 {
     public async Task<IResultBase> Evaluate(ISagaContext context, DepartureTimeSet @event)
     {
