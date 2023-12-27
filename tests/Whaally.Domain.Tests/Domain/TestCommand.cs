@@ -2,25 +2,24 @@
 using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Event;
 
-namespace Whaally.Domain.Tests.Domain
+namespace Whaally.Domain.Tests.Domain;
+
+internal record TestCommand : ICommand
 {
-    internal record TestCommand : ICommand
-    {
-        public string? AggregateId { get; init; }
-        public IEnumerable<IEvent> Events { get; init; } = new IEvent[] { };
-        public Result? Result { get; init; }
-    }
+    public string? AggregateId { get; init; }
+    public IEnumerable<IEvent> Events { get; init; } = new IEvent[] { };
+    public Result Result { get; init; } = Result.Ok();
+}
 
-    internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
+internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
+{
+    public IResultBase Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
-        public IResultBase Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+        foreach (var @event in command.Events)
         {
-            foreach (var @event in command.Events)
-            {
-                context.StageEvent(@event.GetType(), @event);
-            }
-
-            return command.Result!;
+            context.StageEvent(@event.GetType(), @event);
         }
+
+        return command.Result;
     }
 }

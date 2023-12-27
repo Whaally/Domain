@@ -2,36 +2,37 @@
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain.Abstractions.Command;
 
-namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands
+namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
+
+[Immutable]
+[GenerateSerializer]
+public record SetAircraft(string AircraftId) : ICommand;
+
+public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
-    public record SetAircraft(
-        string AggregateId,
-        string AircraftId) : ICommand;
-
-    internal class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
+    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
-        public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
+        var result = new Result();
+
+        if (!context.Aggregate.IsInitialized) 
+            result.WithError("Flight does not exist");
+        
+        if (string.IsNullOrWhiteSpace(command.AircraftId))
+            result.WithError("Aircraft was not provided");
+
+        if (result.IsSuccess)
         {
-            var result = new Result();
-
-            if (string.IsNullOrWhiteSpace(command.AircraftId))
-                result.WithError("Aircraft was not provided");
-
-            if (result.IsSuccess)
+            if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
             {
-                if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
-                {
-                    context.StageEvent(
-                        new AircraftRemoved(
-                            command.AggregateId, 
-                            context.Aggregate.AircraftId));
-                }
-
                 context.StageEvent(
-                    new AircraftSet(command.AggregateId, command.AircraftId));
+                    new AircraftRemoved(
+                        context.Aggregate.AircraftId));
             }
 
-            return result;
+            context.StageEvent(
+                new AircraftSet(command.AircraftId));
         }
+
+        return result;
     }
 }

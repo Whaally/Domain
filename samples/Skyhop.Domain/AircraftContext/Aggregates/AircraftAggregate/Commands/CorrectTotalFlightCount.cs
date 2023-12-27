@@ -1,16 +1,16 @@
 ﻿using FluentResults;
 using Whaally.Domain.Abstractions.Command;
 
-namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands
-{
-    public record CorrectTotalFlightCount(
-        string AggregateId,
-        int FlightCount,
-        string Reason) : ICommand;
+namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 
-    internal class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
-    {
-        public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
-            => Result.Ok();
-    }
+[Immutable]
+[GenerateSerializer]
+public record CorrectTotalFlightCount(
+    int FlightCount,
+    string Reason) : ICommand;
+
+public class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
+{
+    public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
+        => Result.Ok();
 }

@@ -1,4 +1,3 @@
-﻿namespace Whaally.Domain.Abstractions.Aggregate
-{
-    public interface IAggregate { }
-}
+﻿namespace Whaally.Domain.Abstractions.Aggregate;
+
+public interface IAggregate { }

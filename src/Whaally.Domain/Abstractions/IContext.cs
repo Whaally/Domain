@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 
-namespace Whaally.Domain.Abstractions
+namespace Whaally.Domain.Abstractions;
+
+public interface IContext
 {
-    public interface IContext
-    {
-        public ActivityContext Activity { get; init; }
-    }
+    public ActivityContext Activity { get; init; }
 }
