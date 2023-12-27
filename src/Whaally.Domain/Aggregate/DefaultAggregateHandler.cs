@@ -170,6 +170,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     }
 
     public Task<TSnapshot> Snapshot<TSnapshot>()
-        where TSnapshot : ISnapshot
-        => Task.FromResult(_services.GetRequiredService<ISnapshotFactory<TAggregate, TSnapshot>>().Instantiate(_aggregate));
+        where TSnapshot : ISnapshot =>
+        Task.FromResult(_services.GetRequiredService<ISnapshotFactory<TAggregate, TSnapshot>>()
+            .Instantiate(_aggregate));
 }

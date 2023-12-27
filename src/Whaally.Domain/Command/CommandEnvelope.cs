@@ -12,8 +12,8 @@ public record CommandEnvelope<TCommand>(
     ICommandMetadata Metadata) : ICommandEnvelope<TCommand>
     where TCommand : class, ICommand
 {
-    public static implicit operator CommandEnvelope<TCommand>(TCommand command)
-        => new(
+    public static implicit operator CommandEnvelope<TCommand>(TCommand command) =>
+        new(
             command,
             new CommandMetadata
             {

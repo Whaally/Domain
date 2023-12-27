@@ -14,11 +14,11 @@ public interface IEventHandler<TAggregate, TEvent> : IEventHandler
 {
     T IEventHandler.Apply<T>(IEventHandlerContext<T> context, IEvent @event)
     {
-            // ToDo: Deal with the situation where @event.Message is IEvent and cannot be casted to TEvent.
-            var _context = context as IEventHandlerContext<TAggregate>;
+        // ToDo: Deal with the situation where @event.Message is IEvent and cannot be casted to TEvent.
+        var _context = context as IEventHandlerContext<TAggregate>;
 
-            return (Apply(_context!, (TEvent)@event) as T)!;
-        }
+        return (Apply(_context!, (TEvent)@event) as T)!;
+    }
 
     public TAggregate Apply(IEventHandlerContext<TAggregate> context, TEvent @event);
 }

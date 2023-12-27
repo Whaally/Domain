@@ -18,8 +18,8 @@ public class SagaContext : ISagaContext
     private SagaContext() { throw new Exception($"The private parameterless constructor for type `{nameof(SagaContext)}` should not be used."); }
     public SagaContext(IServiceProvider services)
     {
-            _services = services;
-        }
+        _services = services;
+    }
 
     public IReadOnlyCollection<ICommandEnvelope> Commands => _commands.AsReadOnly();
     private List<ICommandEnvelope> _commands = new();
@@ -33,32 +33,32 @@ public class SagaContext : ISagaContext
 
     public void StageCommand(string aggregateId, ICommand command)
     {
-            _commands.Add(new CommandEnvelope(
-                command,
-                new CommandMetadata
-                {
-                    SourceActivity = Activity,
-                    Timestamp = DateTime.UtcNow,
-                    AggregateId = aggregateId
-                }));
-        }
+        _commands.Add(new CommandEnvelope(
+            command,
+            new CommandMetadata
+            {
+                SourceActivity = Activity,
+                Timestamp = DateTime.UtcNow,
+                AggregateId = aggregateId
+            }));
+    }
 
     public async Task<IResultBase> EvaluateService(IService service)
     {
-            var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
+        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
 
-            var result = await evaluationAgent.EvaluateService(
-                new ServiceEnvelope<IService>(
-                    service,
-                    new ServiceMetadata
-                    {
-                        SourceActivity = Activity,
-                        Timestamp = DateTime.UtcNow
-                    }));
+        var result = await evaluationAgent.EvaluateService(
+            new ServiceEnvelope<IService>(
+                service,
+                new ServiceMetadata
+                {
+                    SourceActivity = Activity,
+                    Timestamp = DateTime.UtcNow
+                }));
 
-            if (result.IsSuccess)
-                _commands.AddRange(result.Value);
+        if (result.IsSuccess)
+            _commands.AddRange(result.Value);
 
-            return result.ToResult();
-        }
+        return result.ToResult();
+    }
 }

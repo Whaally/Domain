@@ -12,10 +12,10 @@ internal class TestServiceHandler : IServiceHandler<TestService>
 {
     public Task<IResultBase> Handle(IServiceHandlerContext context, TestService service)
     {
-            context.StageCommand(
-                service.Id,
-                new TestCommand());
+        context.StageCommand(
+            service.Id,
+            new TestCommand());
 
-            return Task.FromResult<IResultBase>(Result.Ok());
-        }
+        return Task.FromResult<IResultBase>(Result.Ok());
+    }
 }

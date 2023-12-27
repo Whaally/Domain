@@ -10,8 +10,8 @@ public record DepartureAirfieldChanged(
 
 public class DepartureAirfieldChangedHandler : IEventHandler<Flight, DepartureAirfieldChanged>
 {
-    public Flight Apply(IEventHandlerContext<Flight> context, DepartureAirfieldChanged @event)
-        => context.Aggregate with
+    public Flight Apply(IEventHandlerContext<Flight> context, DepartureAirfieldChanged @event) =>
+        context.Aggregate with
         {
             DepartureAirfieldId = @event.CurrentAirfieldId
         };

@@ -25,14 +25,14 @@ public interface ICommandHandlerContext<TAggregate>
 {
     // This method is merely a workaround to deal with IEvent objects.
     // Later on they cannot be dealt with.
-    public void StageEvent(Type eventType, IEvent @event)
-        => GetType()
+    public void StageEvent(Type eventType, IEvent @event) =>
+        GetType()
             .GetMethod(nameof(StageEvent))!
             .MakeGenericMethod(eventType)
             .Invoke(this, new object[] { @event });
 
-    void ICommandHandlerContext.StageEvent(IEvent @event)
-        => GetType()
+    void ICommandHandlerContext.StageEvent(IEvent @event) =>
+        GetType()
             .GetMethod(nameof(StageEvent))!
             .MakeGenericMethod(@event.GetType())
             .Invoke(this, new[] { @event });

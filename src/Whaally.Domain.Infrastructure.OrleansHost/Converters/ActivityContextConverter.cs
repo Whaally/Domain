@@ -7,14 +7,14 @@ namespace Whaally.Domain.Infrastructure.OrleansHost.Converters;
 [RegisterConverter]
 public sealed class ActivityContextConverter : IConverter<ActivityContext, ActivityContextSurrogate>
 {
-    public ActivityContext ConvertFromSurrogate(in ActivityContextSurrogate surrogate)
-        => new ActivityContext(
+    public ActivityContext ConvertFromSurrogate(in ActivityContextSurrogate surrogate) =>
+        new(
             ActivityTraceId.CreateFromUtf8String(surrogate.TraceId),
             ActivitySpanId.CreateFromUtf8String(surrogate.SpanId),
             surrogate.TraceFlags);
 
-    public ActivityContextSurrogate ConvertToSurrogate(in ActivityContext value)
-        => new()
+    public ActivityContextSurrogate ConvertToSurrogate(in ActivityContext value) =>
+        new()
         {
             TraceId = Encoding.UTF8.GetBytes(value.TraceId.ToHexString()),
             SpanId = Encoding.UTF8.GetBytes(value.SpanId.ToHexString()),

@@ -9,8 +9,8 @@ public record FlightSnapshot(
 
 public class FlightSnapshotFactory : ISnapshotFactory<Flight, FlightSnapshot>
 {
-    public FlightSnapshot Instantiate(Flight aggregate)
-        => new FlightSnapshot(
+    public FlightSnapshot Instantiate(Flight aggregate) =>
+        new(
             AircraftId: aggregate.AircraftId,
             DepartureTime: aggregate.DepartureTime,
             ArrivalTime: aggregate.ArrivalTime

@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Whaally.Domain.Abstractions.Command;
+﻿namespace Whaally.Domain.Abstractions.Command;
 
 public interface ICommandEnvelope : IMessageEnvelope
 {

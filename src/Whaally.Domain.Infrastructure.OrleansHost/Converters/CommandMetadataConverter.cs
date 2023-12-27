@@ -6,16 +6,16 @@ namespace Whaally.Domain.Infrastructure.OrleansHost.Converters;
 [RegisterConverter]
 public sealed class ICommandMetadataConverter : IConverter<CommandMetadata, CommandMetadataSurrogate>
 {
-    public CommandMetadata ConvertFromSurrogate(in CommandMetadataSurrogate surrogate)
-        => new CommandMetadata
+    public CommandMetadata ConvertFromSurrogate(in CommandMetadataSurrogate surrogate) =>
+        new()
         {
             AggregateId = surrogate.AggregateId,
             Timestamp = surrogate.Timestamp,
             SourceActivity = surrogate.SourceActivity
         };
 
-    public CommandMetadataSurrogate ConvertToSurrogate(in CommandMetadata value)
-        => new CommandMetadataSurrogate
+    public CommandMetadataSurrogate ConvertToSurrogate(in CommandMetadata value) =>
+        new()
         {
             AggregateId = value.AggregateId,
             Timestamp = value.Timestamp,

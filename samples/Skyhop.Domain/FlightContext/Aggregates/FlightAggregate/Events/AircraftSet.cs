@@ -8,8 +8,8 @@ public record AircraftSet(string AircraftId) : IEvent;
 
 public class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
 {
-    public Flight Apply(IEventHandlerContext<Flight> context, AircraftSet @event)
-        => context.Aggregate with
+    public Flight Apply(IEventHandlerContext<Flight> context, AircraftSet @event) =>
+        context.Aggregate with
         {
             AircraftId = @event.AircraftId
         };

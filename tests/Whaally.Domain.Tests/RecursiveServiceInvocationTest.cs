@@ -22,20 +22,20 @@ public class RecursiveServiceInvocationTest
     {
         public async Task<IResultBase> Handle(IServiceHandlerContext context, RecursiveService service)
         {
-                if (service.Depth == 0)
-                {
-                    return Result.Ok();
-                }
-                else
-                {
-                    var newService = new RecursiveService
-                    {
-                        Depth = service.Depth - 1
-                    };
-
-                    return await context.EvaluateService(newService);
-                }
+            if (service.Depth == 0)
+            {
+                return Result.Ok();
             }
+            else
+            {
+                var newService = new RecursiveService
+                {
+                    Depth = service.Depth - 1
+                };
+
+                return await context.EvaluateService(newService);
+            }
+        }
     }
 
     /*
@@ -53,16 +53,16 @@ public class RecursiveServiceInvocationTest
     [Fact]
     public async Task RecursiveServiceCanBeEvaluated()
     {
-            var service = new RecursiveService
-            {
-                Depth = 10
-            };
+        var service = new RecursiveService
+        {
+            Depth = 10
+        };
 
-            var serviceHandler = _services.GetRequiredService<IServiceHandler<RecursiveService>>();
-            var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
+        var serviceHandler = _services.GetRequiredService<IServiceHandler<RecursiveService>>();
+        var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
 
-            var result = await serviceHandler.Handle(serviceHandlerContext, service);
+        var result = await serviceHandler.Handle(serviceHandlerContext, service);
 
-            Assert.True(result.IsSuccess);
-        }
+        Assert.True(result.IsSuccess);
+    }
 }

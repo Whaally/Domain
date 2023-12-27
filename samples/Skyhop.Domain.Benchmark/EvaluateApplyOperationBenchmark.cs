@@ -22,27 +22,27 @@ public class EvaluateApplyOperationBenchmark
         
     public EvaluateApplyOperationBenchmark()
     {
-            _c = new ICommand[] {
-                new SetDeparture(DateTime.UtcNow.AddHours(-1), Guid.NewGuid().ToString()),
-                new SetArrival(DateTime.UtcNow, Guid.NewGuid().ToString()),
-                new SetAircraft(Guid.NewGuid().ToString())
-            };
-        }
+        _c = new ICommand[] {
+            new SetDeparture(DateTime.UtcNow.AddHours(-1), Guid.NewGuid().ToString()),
+            new SetArrival(DateTime.UtcNow, Guid.NewGuid().ToString()),
+            new SetAircraft(Guid.NewGuid().ToString())
+        };
+    }
 
     [GlobalSetup]
     public void Prepare()
     {
-            // ToDo: Ensure the aggregate is never null upon initialization!
-            _aggregateHandler = new DefaultAggregateHandler<Flight>(_services, "")
-            {
-                Aggregate = new()
-            };
-        }
+        // ToDo: Ensure the aggregate is never null upon initialization!
+        _aggregateHandler = new DefaultAggregateHandler<Flight>(_services, "")
+        {
+            Aggregate = new()
+        };
+    }
 
     [Benchmark]
     public async Task Run()
     {
-            await _aggregateHandler!.Apply(
-                (await _aggregateHandler.Evaluate(_c)).Value);
-        }
+        await _aggregateHandler!.Apply(
+            (await _aggregateHandler.Evaluate(_c)).Value);
+    }
 }

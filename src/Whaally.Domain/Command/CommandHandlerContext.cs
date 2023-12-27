@@ -11,8 +11,8 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
 {
     public CommandHandlerContext(string aggregateId)
     {
-            AggregateId = aggregateId;
-        }
+        AggregateId = aggregateId;
+    }
 
     public IReadOnlyCollection<IEventEnvelope> Events => _events.AsReadOnly();
     private List<IEventEnvelope> _events = new List<IEventEnvelope>();
@@ -24,13 +24,13 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public void StageEvent<TEvent>(TEvent @event)
         where TEvent : class, IEvent
     {
-            var envelope = new EventEnvelope<TEvent>(
-                @event,
-                new EventMetadata(AggregateId)
-                {
-                    SourceActivity = Activity
-                });
+        var envelope = new EventEnvelope<TEvent>(
+            @event,
+            new EventMetadata(AggregateId)
+            {
+                SourceActivity = Activity
+            });
 
-            _events.Add(envelope);
-        }
+        _events.Add(envelope);
+    }
 }

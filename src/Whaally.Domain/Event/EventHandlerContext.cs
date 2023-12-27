@@ -9,8 +9,8 @@ public class EventHandlerContext<TAggregate> : IEventHandlerContext<TAggregate>
 {
     public EventHandlerContext(string aggregateId)
     {
-            AggregateId = aggregateId;
-        }
+        AggregateId = aggregateId;
+    }
 
     public TAggregate Aggregate { get; init; } = new();
     public ActivityContext Activity { get; init; }

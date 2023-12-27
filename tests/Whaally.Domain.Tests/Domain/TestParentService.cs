@@ -13,9 +13,9 @@ public class TestParentServiceHandler : IServiceHandler<TestParentService>
 {
     public Task<IResultBase> Handle(IServiceHandlerContext context, TestParentService service)
     {
-            context.EvaluateService(new TestService { Id = service.Id1 });
-            context.EvaluateService(new TestService { Id = service.Id2 });
+        context.EvaluateService(new TestService { Id = service.Id1 });
+        context.EvaluateService(new TestService { Id = service.Id2 });
 
-            return Task.FromResult<IResultBase>(Result.Ok());
-        }
+        return Task.FromResult<IResultBase>(Result.Ok());
+    }
 }

@@ -8,8 +8,8 @@ public record ArrivalTimeSet(DateTime ArrivalTime) : IEvent;
 
 public class ArrivalTimeSetHandler : IEventHandler<Flight, ArrivalTimeSet>
 {
-    public Flight Apply(IEventHandlerContext<Flight> context, ArrivalTimeSet @event)
-        => context.Aggregate with
+    public Flight Apply(IEventHandlerContext<Flight> context, ArrivalTimeSet @event) =>
+        context.Aggregate with
         {
             ArrivalTime = @event.ArrivalTime
         };

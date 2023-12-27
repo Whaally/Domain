@@ -27,28 +27,28 @@ public class SagaBenchmarkTest
     [GlobalSetup]
     public async Task Setup()
     {
-            _flightId = Guid.NewGuid().ToString();
-            _firstAircraftId = Guid.NewGuid().ToString();
-            _secondAircraftId = Guid.NewGuid().ToString();
+        _flightId = Guid.NewGuid().ToString();
+        _firstAircraftId = Guid.NewGuid().ToString();
+        _secondAircraftId = Guid.NewGuid().ToString();
 
-            a1H = _factory.Instantiate<Aircraft>(_firstAircraftId);
-            a2H = _factory.Instantiate<Aircraft>(_secondAircraftId);
-            fH = _factory.Instantiate<Flight>(_flightId);
+        a1H = _factory.Instantiate<Aircraft>(_firstAircraftId);
+        a2H = _factory.Instantiate<Aircraft>(_secondAircraftId);
+        fH = _factory.Instantiate<Flight>(_flightId);
 
-            var c1 = new SetAircraft(_firstAircraftId);
+        var c1 = new SetAircraft(_firstAircraftId);
 
-            await fH.Continue(
-                (await fH.Evaluate(c1))
-                .Value);
-        }
+        await fH.Continue(
+            (await fH.Evaluate(c1))
+            .Value);
+    }
 
     [Benchmark]
     public async Task Test()
     {
-            var c2 = new SetAircraft(_secondAircraftId!);
+        var c2 = new SetAircraft(_secondAircraftId!);
 
-            await fH!.Continue(
-                (await fH.Evaluate(c2))
-                .Value);
-        }
+        await fH!.Continue(
+            (await fH.Evaluate(c2))
+            .Value);
+    }
 }
