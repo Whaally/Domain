@@ -6,13 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AircraftContext\Services\**" />
     <Compile Remove="AirfieldContext\**" />
     <Compile Remove="BoundedContext\**" />
-    <EmbeddedResource Remove="AircraftContext\Services\**" />
+    <Compile Include="AircraftContext\Services\Import.cs" />
     <EmbeddedResource Remove="AirfieldContext\**" />
     <EmbeddedResource Remove="BoundedContext\**" />
-    <None Remove="AircraftContext\Services\**" />
     <None Remove="AirfieldContext\**" />
     <None Remove="BoundedContext\**" />
   </ItemGroup>
