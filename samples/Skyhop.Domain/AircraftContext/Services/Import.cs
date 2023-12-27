@@ -7,10 +7,10 @@ public record Import() : IService;
 
 public class ImportHandler : IServiceHandler<Import>
 {
-    public async Task<IResultBase> Handle(IServiceHandlerContext context, Import service)
+    public Task<IResultBase> Handle(IServiceHandlerContext context, Import service)
     {
         // Import things from some external service
         
-        return Result.Ok();
+        return Task.FromResult<IResultBase>(Result.Ok());
     }
 }
