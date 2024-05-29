@@ -83,7 +83,7 @@ namespace Marten.Generated.EventStore
             }
             if (!reader.IsDBNull(11))
             {
-            var headers = reader.GetFieldValue<System.Collections.Generic.Dictionary<string, object>>(11);
+            var headers = _options.Serializer().FromJson<System.Collections.Generic.Dictionary<string, object>>(reader, 11);
             e.Headers = headers;
             }
             var isArchived = reader.GetFieldValue<bool>(12);
@@ -132,7 +132,7 @@ namespace Marten.Generated.EventStore
             }
             if (!(await reader.IsDBNullAsync(11, token).ConfigureAwait(false)))
             {
-            var headers = await reader.GetFieldValueAsync<System.Collections.Generic.Dictionary<string, object>>(11, token).ConfigureAwait(false);
+            var headers = await _options.Serializer().FromJsonAsync<System.Collections.Generic.Dictionary<string, object>>(reader, 11, token).ConfigureAwait(false);
             e.Headers = headers;
             }
             var isArchived = await reader.GetFieldValueAsync<bool>(12, token).ConfigureAwait(false);
@@ -160,7 +160,7 @@ namespace Marten.Generated.EventStore
         public const string SQL = "insert into public.mt_events (data, type, mt_dotnet_type, seq_id, id, stream_id, version, timestamp, tenant_id, correlation_id, causation_id, headers) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
-        public override void ConfigureCommand(Weasel.Postgresql.CommandBuilder builder, Marten.Internal.IMartenSession session)
+        public override void ConfigureCommand(Weasel.Postgresql.ICommandBuilder builder, Marten.Internal.IMartenSession session)
         {
             var parameters = builder.AppendWithParameters(SQL);
             parameters[0].NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Jsonb;
@@ -177,7 +177,7 @@ namespace Marten.Generated.EventStore
             parameters[5].NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Uuid;
             parameters[6].NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Bigint;
             parameters[6].Value = Event.Version;
-            parameters[7].NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.TimestampTZ;
+            parameters[7].NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.TimestampTz;
             parameters[7].Value = Event.Timestamp;
             parameters[8].Value = Stream.TenantId != null ? (object)Stream.TenantId : System.DBNull.Value;
             parameters[8].NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.Text;
@@ -208,7 +208,7 @@ namespace Marten.Generated.EventStore
         public const string SQL = "insert into public.mt_streams (id, type, version, tenant_id) values (?, ?, ?, ?)";
 
 
-        public override void ConfigureCommand(Weasel.Postgresql.CommandBuilder builder, Marten.Internal.IMartenSession session)
+        public override void ConfigureCommand(Weasel.Postgresql.ICommandBuilder builder, Marten.Internal.IMartenSession session)
         {
             var parameters = builder.AppendWithParameters(SQL);
             parameters[0].Value = Stream.Id;
@@ -240,7 +240,7 @@ namespace Marten.Generated.EventStore
         public const string SQL = "select id, version, type, timestamp, created as timestamp, is_archived from public.mt_streams where id = ?";
 
 
-        public override void ConfigureCommand(Weasel.Postgresql.CommandBuilder builder, Marten.Internal.IMartenSession session)
+        public override void ConfigureCommand(Weasel.Postgresql.ICommandBuilder builder, Marten.Internal.IMartenSession session)
         {
             var npgsqlParameterArray = builder.AppendWithParameters(SQL);
             npgsqlParameterArray[0].Value = _streamId;
@@ -302,7 +302,7 @@ namespace Marten.Generated.EventStore
         public const string SQL = "update public.mt_streams set version = ? where id = ? and version = ?";
 
 
-        public override void ConfigureCommand(Weasel.Postgresql.CommandBuilder builder, Marten.Internal.IMartenSession session)
+        public override void ConfigureCommand(Weasel.Postgresql.ICommandBuilder builder, Marten.Internal.IMartenSession session)
         {
             var parameters = builder.AppendWithParameters(SQL);
             parameters[0].Value = Stream.Version;

@@ -21,7 +21,7 @@ public abstract class IntegrationTest : IClassFixture<ApplicationFactory<Program
     protected async Task GenerateProjectionsAsync()
     {
         using var daemon = await DocumentStore.BuildProjectionDaemonAsync();
-        await daemon.StartAllShards();
+        await daemon.StartAllAsync();
         await daemon.WaitForNonStaleData(10.Seconds());
     }
 
