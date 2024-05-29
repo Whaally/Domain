@@ -1,13 +1,15 @@
-﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
-using Whaally.Domain.Abstractions.Aggregate;
+﻿using Whaally.Domain.Abstractions.Aggregate;
 
-namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots
+namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
+
+public record AircraftSnapshot(
+    int FlightCount,
+    IEnumerable<string> FlightsIds) : ISnapshot;
+
+public class AircraftSnapshotFactory : ISnapshotFactory<Aircraft, AircraftSnapshot>
 {
-    public record AircraftSnapshot(int FlightCount) : ISnapshot;
-
-    public class AircraftSnapshotFactory : ISnapshotFactory<Aircraft, AircraftSnapshot>
-    {
-        public AircraftSnapshot Instantiate(Aircraft aggregate)
-            => new AircraftSnapshot(aggregate.Flights.Count);
-    }
+    public AircraftSnapshot Instantiate(Aircraft aggregate) 
+        => new(
+            aggregate.Flights.Count, 
+            aggregate.Flights.Select(q => q.Key));
 }

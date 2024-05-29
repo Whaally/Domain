@@ -1,4 +1,3 @@
-﻿namespace Whaally.Domain.Abstractions
-{
-    public interface IOperation { }
-}
+﻿namespace Whaally.Domain.Abstractions;
+
+public interface IOperation { }

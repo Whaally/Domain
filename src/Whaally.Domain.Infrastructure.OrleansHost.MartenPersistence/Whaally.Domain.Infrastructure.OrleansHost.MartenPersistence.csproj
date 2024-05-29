@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <ProjectReference Include="..\Whaally.Domain.Infrastructure.OrleansHost\Whaally.Domain.Infrastructure.OrleansHost.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Marten" />
+    </ItemGroup>
+
+</Project>

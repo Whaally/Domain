@@ -1,13 +1,9 @@
-﻿using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Running;
 
-internal class Program
-{
-    private static void Main(string[] args)
-    {
-        Console.WriteLine("Hello, World!");
-
-        BenchmarkSwitcher
-            .FromAssembly(typeof(Program).Assembly)
-            .Run(args);
-    }
-}
+BenchmarkSwitcher
+    .FromAssembly(typeof(Program).Assembly)
+    .Run(args, config: ManualConfig
+        .Create(DefaultConfig.Instance)
+        .WithOptions(ConfigOptions.DisableOptimizationsValidator)); // Must be done because FluentResults is not optimized
+    
