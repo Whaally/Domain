@@ -21,12 +21,12 @@
     <PackageProjectUrl>https://github.com/whaally/domain</PackageProjectUrl>
     <RepositoryUrl>https://github.com/whaally/domain</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright (c) Whaally 2023</Copyright>
+    <Copyright>Copyright (c) Whaally 2024</Copyright>
     <RepositoryType>git</RepositoryType>
     <Authors>Corstian Boerman</Authors>
     <Company>Whaally</Company>
-    <PackageTags>ddd domain model abstraction orchestrator orchestration distributed framework
-        actor</PackageTags>
+    <PackageTags>ddd domain model abstraction distributed
+        actor framework</PackageTags>
     <PackageIcon>whaally-logo.png</PackageIcon>
   </PropertyGroup>
 

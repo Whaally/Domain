@@ -1,5 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\assets\whaally-logo.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\Whaally.Domain.Infrastructure.OrleansHost\Whaally.Domain.Infrastructure.OrleansHost.csproj" />
     </ItemGroup>
@@ -7,5 +15,20 @@
     <ItemGroup>
       <PackageReference Include="Marten" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <PackageId>Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence</PackageId>
+        <Description>Persistence provider for the Whaally Domain library in combination with the Orleans host.</Description>
+        <PackageProjectUrl>https://github.com/whaally/domain</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/whaally/domain</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) Whaally 2024</Copyright>
+        <RepositoryType>git</RepositoryType>
+        <Authors>Corstian Boerman</Authors>
+        <Company>Whaally</Company>
+        <PackageTags>ddd domain model abstraction distributed
+            actor framework orleans marten</PackageTags>
+        <PackageIcon>whaally-logo.png</PackageIcon>
+    </PropertyGroup>
 
 </Project>
