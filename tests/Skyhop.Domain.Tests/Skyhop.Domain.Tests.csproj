@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\samples\Skyhop.Domain\Skyhop.Domain.csproj" />
+    <ProjectReference Include="..\Whaally.Domain.Tests\Whaally.Domain.Tests.csproj" />
   </ItemGroup>
 
 </Project>
