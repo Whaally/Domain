@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\assets\whaally-logo.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" />
+		<PackageReference Include="Microsoft.Orleans.EventSourcing" />
+		<PackageReference Include="Microsoft.Orleans.Sdk" />
+		<PackageReference Include="System.Text.Json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Whaally.Domain\Whaally.Domain.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<NoWarn>CS0618</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageId>Whaally.Domain.Infrastructure.OrleansHost</PackageId>
+		<Description>Orleans infrastructure to run the Whaally Domain library with.</Description>
+		<PackageProjectUrl>https://github.com/whaally/domain</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/whaally/domain</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>Copyright (c) Whaally 2024</Copyright>
+		<RepositoryType>git</RepositoryType>
+		<Authors>Corstian Boerman</Authors>
+		<Company>Whaally</Company>
+		<PackageTags>ddd domain model abstraction distributed framework
+			actor orleans</PackageTags>
+		<PackageIcon>whaally-logo.png</PackageIcon>
+	</PropertyGroup>
+	
+</Project>

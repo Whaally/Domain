@@ -11,15 +11,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{675431A2-F61
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whaally.Domain.Infrastructure.OrleansMarten", "src\Whaally.Domain.Infrastructure.OrleansMarten\Whaally.Domain.Infrastructure.OrleansMarten.csproj", "{A2A8565F-FF0F-45C0-B209-C72B60547877}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Whaally.Domain.Infrastructure.OrleansHost", "src\Whaally.Domain.Infrastructure.OrleansHost\Whaally.Domain.Infrastructure.OrleansHost.csproj", "{A2A8565F-FF0F-45C0-B209-C72B60547877}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}"
+	ProjectSection(SolutionItems) = preProject
+		samples\Readme.md = samples\Readme.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skyhop.Domain", "samples\Skyhop.Domain\Skyhop.Domain.csproj", "{9F71CACB-BB61-4C16-9F62-8B84C57185C0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skyhop.Domain.Benchmark", "samples\Skyhop.Domain.Benchmark\Skyhop.Domain.Benchmark.csproj", "{A3B0AB61-3005-4F53-B7B6-785E5364C677}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skyhop.Domain.Tests", "samples\Skyhop.Domain.Tests\Skyhop.Domain.Tests.csproj", "{AE0B14B4-3D11-4854-B708-C5329FA273BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skyhop.Domain.Tests", "tests\Skyhop.Domain.Tests\Skyhop.Domain.Tests.csproj", "{AE0B14B4-3D11-4854-B708-C5329FA273BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence", "src\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence.csproj", "{39DFF935-76E6-4626-AC3D-D6B7955ED167}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Hosting", "samples\Skyhop.Hosting\Skyhop.Hosting.csproj", "{E7527165-0B5F-40C4-B267-CC41C41FF56F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Hosting.Tests", "tests\Skyhop.Hosting.Tests\Skyhop.Hosting.Tests.csproj", "{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +60,18 @@ Global
 		{AE0B14B4-3D11-4854-B708-C5329FA273BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE0B14B4-3D11-4854-B708-C5329FA273BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE0B14B4-3D11-4854-B708-C5329FA273BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39DFF935-76E6-4626-AC3D-D6B7955ED167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39DFF935-76E6-4626-AC3D-D6B7955ED167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39DFF935-76E6-4626-AC3D-D6B7955ED167}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39DFF935-76E6-4626-AC3D-D6B7955ED167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7527165-0B5F-40C4-B267-CC41C41FF56F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,8 +81,11 @@ Global
 		{A0550B59-00AA-40D4-A6F9-9317C1D7D0C7} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
 		{A2A8565F-FF0F-45C0-B209-C72B60547877} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 		{9F71CACB-BB61-4C16-9F62-8B84C57185C0} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
-		{A3B0AB61-3005-4F53-B7B6-785E5364C677} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
-		{AE0B14B4-3D11-4854-B708-C5329FA273BF} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
+		{39DFF935-76E6-4626-AC3D-D6B7955ED167} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
+		{E7527165-0B5F-40C4-B267-CC41C41FF56F} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
+		{AE0B14B4-3D11-4854-B708-C5329FA273BF} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
+		{A3B0AB61-3005-4F53-B7B6-785E5364C677} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
+		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68BCF0DD-5501-460A-B702-728C2A93C91C}

@@ -1,29 +1,28 @@
-﻿namespace Whaally.Domain.Abstractions.Event
+﻿namespace Whaally.Domain.Abstractions.Event;
+
+public interface IEventEnvelope : IMessageEnvelope
 {
-    public interface IEventEnvelope : IMessageEnvelope
+    public new IEvent Message { get; }
+    public new IEventMetadata Metadata { get; }
+
+    IMessage IMessageEnvelope.Message
     {
-        public new IEvent Message { get; }
-        public new IEventMetadata Metadata { get; }
-
-        IMessage IMessageEnvelope.Message
-        {
-            get => Message;
-        }
-
-        IMessageMetadata IMessageEnvelope.Metadata
-        {
-            get => Metadata;
-        }
+        get => Message;
     }
 
-    public interface IEventEnvelope<out TEvent> : IEventEnvelope
-        where TEvent : class, IEvent
+    IMessageMetadata IMessageEnvelope.Metadata
     {
-        public new TEvent Message { get; }
+        get => Metadata;
+    }
+}
 
-        IEvent IEventEnvelope.Message
-        {
-            get => Message;
-        }
+public interface IEventEnvelope<out TEvent> : IEventEnvelope
+    where TEvent : class, IEvent
+{
+    public new TEvent Message { get; }
+
+    IEvent IEventEnvelope.Message
+    {
+        get => Message;
     }
 }

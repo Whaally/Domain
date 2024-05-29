@@ -4,9 +4,11 @@ on:
   push:
     branches:
     - main
+    - beta
   pull_request:
     branches:
     - main
+    - beta
     
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
     - name: Restore
       run: dotnet restore /property:Configuration=Release
@@ -41,5 +43,5 @@ jobs:
       run: dotnet test /property:Configuration=Release --no-restore --no-build --verbosity normal
       
     - name: Publish
-      if: startsWith(github.ref, 'refs/heads/main')
+      if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/beta')
       run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate

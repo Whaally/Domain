@@ -4,8 +4,9 @@
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileDirectory)..\Directory.Build.props</MSBuildAllProjects>
     <ProjectCategory>tests</ProjectCategory>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
-
+  
   <Import Project="$(MSBuildThisFileDirectory)..\Directory.Build.props" />
 
 </Project>

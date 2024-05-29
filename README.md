@@ -158,4 +158,10 @@ Check out this talk by [@corstian](https://github.com/corstian) from NDC Oslo 20
 ## ⚠️ A work in progress
 This is the first public version of a library already running in production. Over time the documentation around this project will be slowly built up, and further documentation and examples will be added.
 
+These are some of the reasons why this project is not yet production ready:
+
+- No support for distributed commit protocols yet - no atomic operations across multiple aggregates
+- Mediocre test coverage
+- Slight changes to its APIs
+
 Hit the ⭐ button and file an issue if you want to move the documentation of a portion of this code base to the front of the queue.
