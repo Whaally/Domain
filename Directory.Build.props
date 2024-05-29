@@ -7,7 +7,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
     <BaseArtifactsPath>$(MSBuildThisFileDirectory)artifacts/$(BaseArtifactsPathSuffix)/</BaseArtifactsPath>
-    <BaseArtifactsPathSuffix>$(ProjectCategory)/$(MSBuildProjectName)/$(Configuration)</BaseArtifactsPathSuffix>
+    <BaseArtifactsPathSuffix>$(ProjectCategory)/$(MSBuildProjectName)</BaseArtifactsPathSuffix>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)build/$(BaseArtifactsPathSuffix)/</BaseIntermediateOutputPath>
     <BaseOutputPath>$(BaseArtifactsPath)/$(BaseArtifactsPathSuffix)/</BaseOutputPath>
     <PackageOutputPath>$(BaseArtifactsPath)pkg/</PackageOutputPath>
