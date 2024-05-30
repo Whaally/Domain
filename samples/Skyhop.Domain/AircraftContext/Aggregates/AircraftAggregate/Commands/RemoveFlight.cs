@@ -12,9 +12,12 @@ public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {
     public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {
-        context.StageEvent(new FlightRemoved(
-            command.FlightId));
+        var result = Result.Merge(
+            Result.FailIf(context.Aggregate.Flights.All(q => q.Key != command.FlightId), "Aircraft has not flown this flight"));
+        
+        if (result.IsSuccess)
+            context.StageEvent(new FlightRemoved(command.FlightId));
 
-        return Result.Ok();
+        return result;
     }
 }

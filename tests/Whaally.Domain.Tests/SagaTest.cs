@@ -3,9 +3,12 @@ using FluentResults;
 using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Abstractions.Saga;
+using Whaally.Domain.Event;
 using Whaally.Domain.Saga;
 
 namespace Whaally.Domain.Tests;
+
+// ToDo: Test whether the multiple evaluation of a saga does not meaningfully change the state
 
 public abstract class SagaTest<TEvent> : DomainTest
     where TEvent : class, IEvent
@@ -20,13 +23,28 @@ public abstract class SagaTest<TEvent> : DomainTest
     public SagaTest(
         ISaga<TEvent> saga,
         TEvent @event)
+        : this(default, saga, new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString()))) { }
+    
+    public SagaTest(
+        Action<Whaally.Domain.Domain>? initializer,
+        ISaga<TEvent> saga,
+        TEvent @event) : this(initializer, saga, new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString()))) { }
+    
+    public SagaTest(
+        ISaga<TEvent> saga,
+        IEventEnvelope<TEvent> @event) : this(default, saga, @event) { }
+    
+    public SagaTest(
+        Action<Whaally.Domain.Domain>? initializer,
+        ISaga<TEvent> saga,
+        IEventEnvelope<TEvent> @event) : base(initializer)
     {
         Saga = saga;
-        Event = @event;
+        Event = @event.Message;
 
-        // ToDo: Provide IServiceProvider
-        Context = new SagaContext(default!)
+        Context = new SagaContext(Services)
         {
+            AggregateId = @event.Metadata.AggregateId,
             Activity = default
         };
 

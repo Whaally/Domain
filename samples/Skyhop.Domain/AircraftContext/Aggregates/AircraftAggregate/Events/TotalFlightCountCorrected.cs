@@ -5,7 +5,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 [Immutable]
 [GenerateSerializer]
 public record TotalFlightCountCorrected(
-    DateTime Timestamp,
+    DateTimeOffset Timestamp,
     int Number) : IEvent;
 
 public class TotalFlightCountCorrectedHandler : IEventHandler<Aircraft, TotalFlightCountCorrected>

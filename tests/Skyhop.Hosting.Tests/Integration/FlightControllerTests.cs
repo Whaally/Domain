@@ -14,6 +14,5 @@ public class FlightControllerTests : IntegrationTest
         var result = await client.PostAsync("/flight/new", null);
         
         Assert.True(result.IsSuccessStatusCode);
-        
     }
 }

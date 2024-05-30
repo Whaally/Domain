@@ -2,9 +2,9 @@
 
 namespace Whaally.Domain.Aggregate;
 
-internal class DefaultAggregateHandlerFactory : IAggregateHandlerFactory
+public class DefaultAggregateHandlerFactory : IAggregateHandlerFactory
 {
-    private readonly Dictionary<string, IAggregateHandler> _dictionary = new();
+    protected readonly Dictionary<string, IAggregateHandler> _dictionary = new();
     private readonly IServiceProvider _serviceProvider;
 
     public DefaultAggregateHandlerFactory(IServiceProvider serviceProvider)

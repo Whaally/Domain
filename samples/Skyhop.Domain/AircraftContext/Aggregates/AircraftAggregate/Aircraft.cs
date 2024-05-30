@@ -12,7 +12,7 @@ public record Aircraft : IAggregate
     public int Starts { get; init; }
     public TimeSpan FlightTime { get; init; }
 
-    public Dictionary<string, (DateTime? Departure, DateTime? Arrival)>
+    public Dictionary<string, (DateTimeOffset? Departure, DateTimeOffset? Arrival)>
         Flights
     { get; init; } = new();
 }

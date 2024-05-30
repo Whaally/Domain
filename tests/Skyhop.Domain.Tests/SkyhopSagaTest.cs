@@ -7,7 +7,21 @@ namespace Skyhop.Domain.Tests;
 public abstract class SkyhopSagaTest<TEvent> : SagaTest<TEvent>
     where TEvent : class, IEvent
 {
-    protected SkyhopSagaTest(
+    public SkyhopSagaTest(
+        Action<Whaally.Domain.Domain> initializer,
+        ISaga<TEvent> saga,
+        IEventEnvelope<TEvent> @event) : base(initializer, saga, @event) { }
+    
+    public SkyhopSagaTest(
+        Action<Whaally.Domain.Domain> initializer,
+        ISaga<TEvent> saga,
+        TEvent @event) : base(initializer, saga, @event) { } 
+    
+    public SkyhopSagaTest(
+        ISaga<TEvent> saga, 
+        IEventEnvelope<TEvent> @event) : base(saga, @event) { }
+    
+    public SkyhopSagaTest(
         ISaga<TEvent> saga, 
         TEvent @event) : base(saga, @event) { }
     

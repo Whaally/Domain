@@ -29,6 +29,10 @@ public class SagaContext : ISagaContext
 
     // ToDo: I do not know about situations in which no aggregateId would be provided,
     // though I do not have a decent way to supply the aggregate id.
+    
+    /// <summary>
+    ///     The id of the aggregate on which the event resulting in this sagas evaluation had been applied. 
+    /// </summary>
     public string? AggregateId { get; init; }
 
     public void StageCommand(string aggregateId, ICommand command)

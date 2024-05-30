@@ -23,9 +23,7 @@ public abstract class ServiceTest<TService> : DomainTest
         Handler = handler;
         Service = service;
         
-        var id = Guid.NewGuid();
-        // ToDo: Provide IServiceProvider
-        Context = new ServiceHandlerContext(default!)
+        Context = new ServiceHandlerContext(Services)
         {
             Activity = default
         };

@@ -4,7 +4,7 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Whaally.Domain;
 
-namespace Skyhop.Domain.Tests.FlightContext.Commands;
+namespace Skyhop.Domain.Tests.FlightContext.Sagas;
 
 public class OnAircraftChanged_Saga_Tests : DomainTest
 {

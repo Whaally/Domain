@@ -5,6 +5,13 @@ namespace Whaally.Domain.Tests;
 
 public abstract class DomainTest : IDisposable
 {
+    public DomainTest() { }
+
+    public DomainTest(Action<Whaally.Domain.Domain>? domainInitializer)
+    {
+        domainInitializer?.Invoke(Domain);
+    }
+    
     public IServiceProvider Services = new ServiceCollection()
         .AddDomain()
         .BuildServiceProvider();

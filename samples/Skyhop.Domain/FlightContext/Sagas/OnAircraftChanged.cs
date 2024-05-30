@@ -7,9 +7,28 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
 using Whaally.Domain.Abstractions.Saga;
 
-namespace Skyhop.Domain.AircraftContext.Sagas;
+namespace Skyhop.Domain.FlightContext.Sagas;
 
-internal class OnAircraftChanged : ISaga<AircraftSet>
+/*
+ * Placement of this saga is tricky.
+ *
+ * While it responds to a change on the FlightAggregate, the change it triggers is on the AircraftAggregate.
+ * Which of the contexts is then responsible for holding this saga?
+ *
+ * Do we make upstream responsible for notifying downstream, or can downstream subscribe to whatever events they need?
+ * Decisions like these impact the way people interact with this codebase, and therefore should be thought about.
+ *
+ * Naming is also important here, as depending on the context it can imply different things.
+ *
+ * If we'd move this saga to the AircraftContext, it'd better be named something like "OnFlightsDeclaredAircraftChange"
+ * or something.
+ *
+ * Interestingly the saga doesn't have anything to do with the FlightContext whatsoever, so for this reason it would fit
+ * better with the AircraftContext.
+ */
+
+
+public class OnAircraftChanged : ISaga<AircraftSet>
 {
     public async Task<IResultBase> Evaluate(ISagaContext context, AircraftSet @event)
     {   
