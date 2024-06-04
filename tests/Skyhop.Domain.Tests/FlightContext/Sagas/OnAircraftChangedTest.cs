@@ -15,7 +15,7 @@ namespace Skyhop.Domain.Tests.FlightContext.Sagas;
  * To properly test we must instantiate the requested aggregates beforehand, which is why we allow tests to define
  * the initializer, allowing them to define aggregates.
  */
-public abstract class OnAircraftChangedTest(Action<Whaally.Domain.Domain> initializer, EventEnvelope<AircraftSet> @event) 
+public abstract class OnAircraftChangedTest(Action<DomainContext> initializer, EventEnvelope<AircraftSet> @event) 
     : SkyhopSagaTest<AircraftSet>(initializer, new OnAircraftChanged(), @event)
 {
     public class FromCleanSlate() : OnAircraftChangedTest(

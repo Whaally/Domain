@@ -9,6 +9,7 @@ using Whaally.Domain.Abstractions.Service;
 using Whaally.Domain.Aggregate;
 using Whaally.Domain.Saga;
 using Whaally.Domain.Service;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace Whaally.Domain;
 
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
         }
         
         return services
+            .AddSingleton<DomainContext>()
             .AddSingleton<Domain>()
             .AddSingleton<IAggregateHandlerFactory, DefaultAggregateHandlerFactory>()
             .AddTransient<IServiceHandlerContext, ServiceHandlerContext>()

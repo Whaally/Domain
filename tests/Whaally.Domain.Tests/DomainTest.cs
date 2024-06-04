@@ -7,7 +7,7 @@ public abstract class DomainTest : IDisposable
 {
     public DomainTest() { }
 
-    public DomainTest(Action<Whaally.Domain.Domain>? domainInitializer)
+    public DomainTest(Action<DomainContext>? domainInitializer)
     {
         domainInitializer?.Invoke(Domain);
     }
@@ -16,7 +16,7 @@ public abstract class DomainTest : IDisposable
         .AddDomain()
         .BuildServiceProvider();
 
-    public Whaally.Domain.Domain Domain => Services.GetRequiredService<Whaally.Domain.Domain>();
+    public DomainContext Domain => Services.GetRequiredService<DomainContext>();
     public IAggregateHandlerFactory Factory => Services.GetRequiredService<IAggregateHandlerFactory>();
 
     public void Dispose()

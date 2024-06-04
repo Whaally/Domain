@@ -10,7 +10,7 @@ namespace Skyhop.Domain.Benchmark.Aggregate;
 public class DefaultAggregateHandlerFactoryBenchmark
 {
     private IServiceProvider? _services;
-    private Whaally.Domain.Domain? _domain;
+    private Whaally.Domain.DomainContext? _domain;
     
     [GlobalSetup]
     public void Setup()
@@ -19,7 +19,7 @@ public class DefaultAggregateHandlerFactoryBenchmark
             .AddDomain()
             .BuildServiceProvider();
 
-        _domain = _services.GetRequiredService<Whaally.Domain.Domain>();
+        _domain = _services.GetRequiredService<Whaally.Domain.DomainContext>();
     }
 
     // 1.185 us

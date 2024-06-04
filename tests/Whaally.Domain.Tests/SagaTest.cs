@@ -26,7 +26,7 @@ public abstract class SagaTest<TEvent> : DomainTest
         : this(default, saga, new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString()))) { }
     
     public SagaTest(
-        Action<Whaally.Domain.Domain>? initializer,
+        Action<DomainContext>? initializer,
         ISaga<TEvent> saga,
         TEvent @event) : this(initializer, saga, new EventEnvelope<TEvent>(@event, new EventMetadata(Guid.NewGuid().ToString()))) { }
     
@@ -35,7 +35,7 @@ public abstract class SagaTest<TEvent> : DomainTest
         IEventEnvelope<TEvent> @event) : this(default, saga, @event) { }
     
     public SagaTest(
-        Action<Whaally.Domain.Domain>? initializer,
+        Action<DomainContext>? initializer,
         ISaga<TEvent> saga,
         IEventEnvelope<TEvent> @event) : base(initializer)
     {
