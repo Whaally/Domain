@@ -32,9 +32,11 @@ jobs:
       run: dotnet restore /property:Configuration=Release
 
     - name: Build for Publish
+      env:
+          RELEASE_NOTES: ${{ steps.semantic.outputs.new_release_notes }}
       run: |
         if [ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]; then
-          dotnet build --configuration Release /property:Version="${{ steps.semantic.outputs.new_release_version }}" /property:AssemblyVersion="${{steps.semantic.outputs.new_release_major_version}}" /property:AssemblyFileVersion="${{ steps.semantic.outputs.new_release_version }}" /property:PackageReleaseNotes="${{ steps.semantic.outputs.new_release_notes }}"  --no-restore
+          dotnet build --configuration Release /property:Version="${{ steps.semantic.outputs.new_release_version }}" /property:AssemblyVersion="${{steps.semantic.outputs.new_release_major_version}}" /property:AssemblyFileVersion="${{ steps.semantic.outputs.new_release_version }}" /property:PackageReleaseNotes="$(printf "%q" $RELEASE_NOTES)"  --no-restore
         else
           dotnet build --configuration Release --no-restore
         fi
