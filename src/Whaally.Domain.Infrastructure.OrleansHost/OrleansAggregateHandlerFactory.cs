@@ -12,6 +12,11 @@ public class OrleansAggregateHandlerFactory : IAggregateHandlerFactory
         _clusterClient = clusterClient;
     }
 
+    IAggregateHandler IAggregateHandlerFactory.Instantiate(Type aggregateType, string id)
+        => (GetType()
+            .GetMethod(nameof(IAggregateHandlerFactory.Instantiate))!
+            .MakeGenericMethod(aggregateType)
+            .Invoke(this, [id]) as IAggregateHandler)!;
 
     IAggregateHandler<TAggregate> IAggregateHandlerFactory.Instantiate<TAggregate>(string id)
         => _clusterClient.GetGrain<IAggregateHandlerGrain<TAggregate>>(Guid.Parse(id));
