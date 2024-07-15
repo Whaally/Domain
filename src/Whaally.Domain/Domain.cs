@@ -5,6 +5,7 @@ using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Abstractions.Service;
+using Whaally.Domain.Command;
 using Whaally.Domain.Service;
 
 namespace Whaally.Domain;
@@ -39,16 +40,28 @@ public class Domain
         where TCommand : class, ICommand
     {
         var factory = _services.GetRequiredService<IAggregateHandlerFactory>();
+        
+        // ToDo: Refactor this to use some internal resolver rather than the global DI
         var aggregateType = _services.GetRelatedAggregateTypeForCommand(command.GetType());
-
+        
         if (aggregateType == null) throw new Exception($"Aggregate type could not be resolved for command {command.GetType().FullName}");
 
         var handler = factory.Instantiate(
             aggregateType,
             aggregateId);
 
-        var result = await handler.Evaluate(command);
-
+        if (handler == null)
+            throw new Exception($"Command handler could not be resolved from command {command.GetType().FullName}");
+        
+        var result = await handler.Evaluate(
+            new CommandEnvelope(
+                command, 
+                new CommandMetadata()
+                {
+                    AggregateId = aggregateId,
+                    Timestamp = DateTime.UtcNow
+                }));
+        
         if (result.IsFailed) return result;
 
         await handler.Continue(result.Value);
