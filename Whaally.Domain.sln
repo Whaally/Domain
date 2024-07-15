@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Hosting", "samples\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Hosting.Tests", "tests\Skyhop.Hosting.Tests\Skyhop.Hosting.Tests.csproj", "{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Domain.AzureFunctions", "samples\Skyhop.Domain.AzureFunctions\Skyhop.Domain.AzureFunctions.csproj", "{3A38035D-3BD2-4D75-8724-5B614C60901D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skyhop.Domain.AzureFunctions.Tests", "tests\Skyhop.Domain.AzureFunctions.Tests\Skyhop.Domain.AzureFunctions.Tests.csproj", "{F5195793-2606-4412-9233-48E5C49DA0BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +76,14 @@ Global
 		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A38035D-3BD2-4D75-8724-5B614C60901D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A38035D-3BD2-4D75-8724-5B614C60901D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A38035D-3BD2-4D75-8724-5B614C60901D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A38035D-3BD2-4D75-8724-5B614C60901D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5195793-2606-4412-9233-48E5C49DA0BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5195793-2606-4412-9233-48E5C49DA0BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5195793-2606-4412-9233-48E5C49DA0BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5195793-2606-4412-9233-48E5C49DA0BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +98,8 @@ Global
 		{AE0B14B4-3D11-4854-B708-C5329FA273BF} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
 		{A3B0AB61-3005-4F53-B7B6-785E5364C677} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
 		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
+		{3A38035D-3BD2-4D75-8724-5B614C60901D} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
+		{F5195793-2606-4412-9233-48E5C49DA0BF} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68BCF0DD-5501-460A-B702-728C2A93C91C}

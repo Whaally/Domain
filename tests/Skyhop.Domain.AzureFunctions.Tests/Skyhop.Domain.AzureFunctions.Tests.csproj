@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\samples\Skyhop.Domain.AzureFunctions\Skyhop.Domain.AzureFunctions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Testcontainers">
+        <HintPath>..\..\..\..\..\.nuget\packages\testcontainers\3.8.0\lib\net8.0\Testcontainers.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Docker.DotNet" Version="3.125.15" />
+      <PackageReference Include="Testcontainers" Version="3.9.0" />
+      <PackageReference Include="Testcontainers.Azurite" Version="3.9.0" />
+    </ItemGroup>
+
+</Project>
