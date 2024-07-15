@@ -14,7 +14,7 @@ public class DomainTests
     [Fact]
     public async Task CanEvaluateServiceThroughDomainObject()
     {
-        var domain = _services.GetRequiredService<Whaally.Domain.Domain>();
+        var domain = _services.GetRequiredService<DomainContext>();
 
         var result = await domain.EvaluateService(new TestService());
         
@@ -24,7 +24,7 @@ public class DomainTests
     [Fact]
     public async Task CanEvaluateServiceThroughEvaluationAgent()
     {
-        var domain = _services.GetRequiredService<Whaally.Domain.Domain>();
+        var domain = _services.GetRequiredService<DomainContext>();
         var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
 
         var events = await domain.EvaluateService(new TestService());

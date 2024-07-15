@@ -22,7 +22,10 @@ public static class ServiceCollectionExtensions
         }
         
         return services
+#pragma warning disable CS0618 // Type or member is obsolete
             .AddSingleton<Domain>()
+#pragma warning restore CS0618 // Type or member is obsolete
+            .AddSingleton<DomainContext>()
             .AddSingleton<IAggregateHandlerFactory, DefaultAggregateHandlerFactory>()
             .AddTransient<IServiceHandlerContext, ServiceHandlerContext>()
             .AddTransient<IEvaluationAgent, DefaultEvaluationAgent>()

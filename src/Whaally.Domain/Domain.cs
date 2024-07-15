@@ -10,11 +10,19 @@ using Whaally.Domain.Service;
 
 namespace Whaally.Domain;
 
-public class Domain
+[Obsolete("Use the `DomainContext` instead")]
+public class Domain : DomainContext
+{
+    public Domain(IServiceProvider services) : base(services)
+    {
+    }
+}
+
+public class DomainContext
 {
     readonly IServiceProvider _services;
 
-    public Domain(IServiceProvider services)
+    public DomainContext(IServiceProvider services)
     {
         _services = services;
     }
