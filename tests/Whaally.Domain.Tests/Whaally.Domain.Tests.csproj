@@ -2,9 +2,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="8.2.0" />
+    <PackageReference Include="Microsoft.Orleans.Serialization.Protobuf" Version="8.2.0" />
+    <PackageReference Include="Microsoft.Orleans.TestingHost" Version="8.2.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence.csproj" />
+    <ProjectReference Include="..\..\src\Whaally.Domain.Infrastructure.OrleansHost\Whaally.Domain.Infrastructure.OrleansHost.csproj" />
     <ProjectReference Include="..\..\src\Whaally.Domain\Whaally.Domain.csproj" />
   </ItemGroup>
 

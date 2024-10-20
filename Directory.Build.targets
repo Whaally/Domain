@@ -34,7 +34,7 @@
 		<PackageReference Update="Serilog.Extensions.Hosting" Version="5.0.1" />
 		<PackageReference Update="Serilog.Sinks.Console" Version="4.1.0" />
 		<PackageReference Update="Swashbuckle.AspNetCore" Version="6.6.2"/>
-		<PackageReference Update="System.Text.Json" Version="8.0.3" />
+		<PackageReference Update="System.Text.Json" Version="8.0.4" />
 	</ItemGroup>
 
 </Project>

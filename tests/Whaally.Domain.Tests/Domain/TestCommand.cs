@@ -4,6 +4,7 @@ using Whaally.Domain.Abstractions.Event;
 
 namespace Whaally.Domain.Tests.Domain;
 
+[Immutable, GenerateSerializer]
 internal record TestCommand : ICommand
 {
     public string? AggregateId { get; init; }

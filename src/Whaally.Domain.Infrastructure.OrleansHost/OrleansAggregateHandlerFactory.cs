@@ -2,22 +2,11 @@
 
 namespace Whaally.Domain.Infrastructure.OrleansHost;
 
-public class OrleansAggregateHandlerFactory : IAggregateHandlerFactory
+public class OrleansAggregateHandlerFactory(IClusterClient clusterClient) : IAggregateHandlerFactory
 {
-    private readonly IClusterClient _clusterClient;
-
-    public OrleansAggregateHandlerFactory(
-        IClusterClient clusterClient)
-    {
-        _clusterClient = clusterClient;
-    }
-
-    IAggregateHandler IAggregateHandlerFactory.Instantiate(Type aggregateType, string id)
-        => (GetType()
-            .GetMethod(nameof(IAggregateHandlerFactory.Instantiate))!
-            .MakeGenericMethod(aggregateType)
-            .Invoke(this, [id]) as IAggregateHandler)!;
-
-    IAggregateHandler<TAggregate> IAggregateHandlerFactory.Instantiate<TAggregate>(string id)
-        => _clusterClient.GetGrain<IAggregateHandlerGrain<TAggregate>>(Guid.Parse(id));
+    // Bug: Implementing the interface like this does not work!
+    // IAggregateHandler<TAggregate> IAggregateHandlerFactory.Instantiate<TAggregate>(string id)
+         
+    public IAggregateHandler<TAggregate> Instantiate<TAggregate>(string id) where TAggregate : class, IAggregate, new()
+        => clusterClient.GetGrain<IAggregateHandlerGrain<TAggregate>>(Guid.Parse(id));
 }
