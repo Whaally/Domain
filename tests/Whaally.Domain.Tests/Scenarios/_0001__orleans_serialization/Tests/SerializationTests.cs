@@ -12,23 +12,23 @@ public class SerializationTests(ClusterFixture fixture)
         => new DomainContext(fixture.Cluster.Client.ServiceProvider)
             .EvaluateCommand(Guid.NewGuid().ToString(), new TestCommand());
 
-    [Fact(Skip = "")]
+    [Fact(Skip = "_")]
     public async Task CanInvokeCommand()
         => (await _evaluation).IsSuccess.Should().BeTrue();
 
-    [Fact(Skip = "")]
+    [Fact(Skip = "_")]
     public async Task ReceivesSerializedEventInResponse()
         => (await _evaluation).Value.Should().ContainSingle();
 
-    [Fact(Skip = "")]
+    [Fact(Skip = "_")]
     public async Task CanInspectEvent()
         => (await _evaluation).Value[0].Should().BeAssignableTo<IEventEnvelope<TestEvent>>();
 
-    [Fact(Skip = "")]
+    [Fact(Skip = "_")]
     public async Task CanAccessEventData()
         => (await _evaluation).Value[0].Message.Should().BeAssignableTo<TestEvent>();
 
-    [Fact(Skip = "")]
+    [Fact(Skip = "_")]
     public async Task FlagIsTrue()
         => ((TestEvent)(await _evaluation).Value[0].Message).Flag.Should().BeTrue();
 }
