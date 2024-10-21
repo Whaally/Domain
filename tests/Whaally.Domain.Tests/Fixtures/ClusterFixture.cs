@@ -9,16 +9,24 @@ using Whaally.Domain.Infrastructure.OrleansHost;
 
 namespace Whaally.Domain.Tests.Fixtures;
 
-public sealed class ClusterFixture : IDisposable
+public sealed class ClusterFixture : IAsyncLifetime
 {
     public TestCluster Cluster { get; } = new TestClusterBuilder()
         .AddClientBuilderConfigurator<TestClientConfigurations>()
         .AddSiloBuilderConfigurator<TestSiloConfigurations>()
         .Build();
     
-    public ClusterFixture() => Cluster.Deploy();
+    public Task InitializeAsync()
+    {
+        Cluster.Deploy();
+        return Task.CompletedTask;
+    }
 
-    void IDisposable.Dispose() => Cluster.StopAllSilos();
+    public Task DisposeAsync()
+    {
+        Cluster.StopAllSilos();
+        return Task.CompletedTask;
+    }
 }
 
 file sealed class TestClientConfigurations : IClientBuilderConfigurator
