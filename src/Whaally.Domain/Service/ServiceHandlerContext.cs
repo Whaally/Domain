@@ -9,9 +9,8 @@ using Whaally.Domain.Command;
 
 namespace Whaally.Domain.Service;
 
-public class ServiceHandlerContext : IServiceHandlerContext
+public class ServiceHandlerContext(IServiceProvider services) : IServiceHandlerContext
 {
-    readonly IServiceProvider _services;
     private List<ICommandEnvelope> _commands = new List<ICommandEnvelope>(0);
 
     /// <summary>
@@ -27,14 +26,9 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// Note that commands directly issued to the <c>IAggregateHandler</c> are evaluated directly and as such do
     /// not benefit from the compositional system services use.
     /// </remarks>
-    public IAggregateHandlerFactory Factory => _services.GetRequiredService<IAggregateHandlerFactory>();
+    public IAggregateHandlerFactory Factory => services.GetRequiredService<IAggregateHandlerFactory>();
 
     public ActivityContext Activity { get; init; }
-
-    public ServiceHandlerContext(IServiceProvider services)
-    {
-        _services = services;
-    }
 
     /// <summary>
     /// Evaluates a service and when successfull, adds the resulting operations to the current commands basket.
@@ -44,7 +38,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
     public async Task<IResultBase> EvaluateService<TService>(TService service)
         where TService : class, IService
     {
-        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
+        var evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
 
         var result = await evaluationAgent.EvaluateService(
             new ServiceEnvelope<TService>(

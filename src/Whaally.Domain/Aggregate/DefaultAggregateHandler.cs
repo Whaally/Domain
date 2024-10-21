@@ -60,6 +60,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
             var commandHandler = (ICommandHandler)_services.GetRequiredService(commandHandlerType);
             var commandContext = new CommandHandlerContext<TAggregate>(
+                _services,
                 !string.IsNullOrWhiteSpace(command.Metadata.AggregateId)
                     ? command.Metadata.AggregateId
                     : Id)

@@ -32,7 +32,7 @@ public class TypeInferenceTests
     [Fact]
     public void CommandHandlerContext_Can_Be_Generalized()
     {
-        var context = new CommandHandlerContext<TestAggregate>("")
+        var context = new CommandHandlerContext<TestAggregate>(null!, "")
         {
             Aggregate = new TestAggregate()
         };
