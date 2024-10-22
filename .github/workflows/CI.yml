@@ -33,7 +33,7 @@ jobs:
 
     - name: Write release notes
       env:
-        RELEASE_NOTES: "$(printf %s ${{ steps.semantic.outputs.new_release_notes}})"
+        RELEASE_NOTES: "${{ steps.semantic.outputs.new_release_notes}}"
       run: echo "$RELEASE_NOTES" > "./src/Whaally.Domain/release-notes.txt"
 
     - name: Build for Publish
