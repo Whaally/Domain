@@ -33,7 +33,7 @@ jobs:
 
     - name: Build for Publish
       env:
-        RELEASE_NOTES: "${{steps.semantic.outputs.new_release_notes}"
+        RELEASE_NOTES: "${{steps.semantic.outputs.new_release_notes}}"
       run: |
         if [ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]; then
           dotnet build --configuration Release /property:Version="${{ steps.semantic.outputs.new_release_version }}" /property:AssemblyVersion="${{steps.semantic.outputs.new_release_major_version}}" /property:AssemblyFileVersion="${{ steps.semantic.outputs.new_release_version }}" /property:PackageReleaseNotes="$(printf "%s" "$RELEASE_NOTES")"  --no-restore
