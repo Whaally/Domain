@@ -28,6 +28,7 @@
     <PackageTags>ddd domain model abstraction distributed
         actor framework</PackageTags>
     <PackageIcon>whaally-logo.png</PackageIcon>
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)\release-notes.txt"))</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
