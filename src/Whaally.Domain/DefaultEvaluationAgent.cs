@@ -34,7 +34,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         // group commands by aggregate type and id to batch operations
         var commandCollections = commandEnvelopes
             .GroupBy(q => (
-                aggregateType: _services.GetRelatedAggregateTypeForCommand(q.Message.GetType()),
+                aggregateType: _services.GetRelatedAggregateTypeForOperation(q.Message.GetType()),
                 aggregateId: q.Metadata.AggregateId
             ))
             .Select(q => (
@@ -81,7 +81,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         // group commands by aggregate type and id to batch operations
         var eventCollections = eventEnvelopes
             .GroupBy(q => (
-                aggregateType: _services.GetRelatedAggregateTypeForCommand(q.Message.GetType()),
+                aggregateType: _services.GetRelatedAggregateTypeForOperation(q.Message.GetType()),
                 aggregateId: q.Metadata.AggregateId
             ))
             .Select(q => (

@@ -15,7 +15,13 @@ public class CommandHandlerContext<TAggregate>(IServiceProvider services, string
     
     private List<IEventEnvelope> _events = new List<IEventEnvelope>();
 
-    public TAggregate Aggregate { get; init; } = new();
+    private TAggregate _aggregate = new();
+
+    public TAggregate Aggregate
+    {
+        get => _aggregate; 
+        init => _aggregate = value;
+    }
     public ActivityContext Activity { get; init; }
     public string AggregateId { get; init; } = aggregateId;
 
@@ -35,19 +41,35 @@ public class CommandHandlerContext<TAggregate>(IServiceProvider services, string
     public IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
-        var handler = services.GetCommandHandlerForCommand<TCommand>();
-
+        var commandHandler = services.GetCommandHandlerForCommand<TCommand>();
+        
         // ToDo: Assert the aggregate types of the command and this context do match.
 
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
         // staged events, or there is otherwise a trace of this command being called by another command.
         var context = new CommandHandlerContext<TAggregate>(services, AggregateId);
         
-        var result = handler.Evaluate(context, command);
-        
+        var result = commandHandler.Evaluate(context, command);
+
         if (result.IsSuccess)
+        {
+            foreach (var eventEnvelope in context.Events)
+            {
+                var @event = eventEnvelope.Message;
+                _aggregate = services
+                    .GetEventHandlerForEvent(@event.GetType())
+                    .Apply(new EventHandlerContext<TAggregate>(AggregateId)
+                    {
+                        Aggregate = Aggregate,
+                        Activity = Activity
+                    }, @event);
+                
+                _events.Add(eventEnvelope);
+            }
+            
             _events.AddRange(context.Events);
-        
+        }
+
         return result;
     }
 }

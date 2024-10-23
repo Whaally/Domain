@@ -7,7 +7,7 @@ namespace Whaally.Domain;
 
 public static class ServiceProviderExtensions
 {
-    public static Type? GetRelatedAggregateTypeForCommand(this IServiceProvider serviceProvider, Type commandType)
+    public static Type? GetRelatedAggregateTypeForOperation(this IServiceProvider serviceProvider, Type commandType)
     {
         Type serviceType = null!;
         Type genericTypeDefinition = null!;
@@ -41,13 +41,30 @@ public static class ServiceProviderExtensions
             .First();
     }
 
+    public static Type? GetRelatedAggregateTypeForEvent<TEvent>(this IServiceProvider services)
+        where TEvent : class, IEvent =>
+        services.GetRelatedAggregateTypeForOperation(typeof(TEvent));
+    
+    public static IEventHandler GetEventHandlerForEvent(this IServiceProvider serviceProvider, Type eventType)
+    {
+        var aggregateType = serviceProvider.GetRelatedAggregateTypeForOperation(eventType);
+
+        if (aggregateType == null) throw new Exception("aggregate type not found in DI container");
+
+        var requestedCommandHandlerType = typeof(IEventHandler<,>)
+            .MakeGenericType(aggregateType, eventType);
+
+        return (IEventHandler)serviceProvider
+            .GetRequiredService(requestedCommandHandlerType);
+    }
+    
     public static Type? GetRelatedAggregateTypeForCommand<TCommand>(this IServiceProvider serviceProvider)
         where TCommand : class, ICommand =>
-        serviceProvider.GetRelatedAggregateTypeForCommand(typeof(TCommand));
+        serviceProvider.GetRelatedAggregateTypeForOperation(typeof(TCommand));
 
     public static ICommandHandler GetCommandHandlerForCommand(this IServiceProvider serviceProvider, Type commandType)
     {
-        var aggregateType = serviceProvider.GetRelatedAggregateTypeForCommand(commandType);
+        var aggregateType = serviceProvider.GetRelatedAggregateTypeForOperation(commandType);
 
         if (aggregateType == null) throw new Exception("aggregate type not found in DI container");
 

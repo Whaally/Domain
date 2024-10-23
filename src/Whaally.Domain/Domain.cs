@@ -50,7 +50,7 @@ public class DomainContext
         var factory = _services.GetRequiredService<IAggregateHandlerFactory>();
         
         // ToDo: Refactor this to use some internal resolver rather than the global DI
-        var aggregateType = _services.GetRelatedAggregateTypeForCommand(command.GetType());
+        var aggregateType = _services.GetRelatedAggregateTypeForOperation(command.GetType());
         
         if (aggregateType == null) throw new Exception($"Aggregate type could not be resolved for command {command.GetType().FullName}");
 

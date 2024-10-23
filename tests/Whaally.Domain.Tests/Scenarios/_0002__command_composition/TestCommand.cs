@@ -13,7 +13,9 @@ public class TestCommandHandler : ICommandHandler<Aggregate, TestCommand>
     public IResultBase Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
     {
         context.EvaluateCommand(new AnotherCommand());
-        
-        return Result.Ok();
+
+        return context.Aggregate.EventApplicationCount != 1 
+            ? Result.Fail("Event application count is not 1") 
+            : Result.Ok();
     }
 }

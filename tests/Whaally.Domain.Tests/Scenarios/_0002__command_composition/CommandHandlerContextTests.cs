@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Command;
+using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Command;
 
 namespace Whaally.Domain.Tests.Scenarios._0002__command_composition;
@@ -14,7 +15,7 @@ public class CommandHandlerContextTests
      * Doing so immediately invokes the specified command, and add its output to the output of the current handler.
      */
     
-    public ICommandHandlerContext Context 
+    public ICommandHandlerContext<Aggregate> Context 
         = new CommandHandlerContext<Aggregate>(
             new ServiceCollection()
                 .AddSingleton<IAggregate, Aggregate>()
@@ -24,6 +25,8 @@ public class CommandHandlerContextTests
                 .AddTransient<ICommandHandler, AnotherCommandHandler>()
                 .AddTransient<ICommandHandler<Aggregate, TestCommand>, TestCommandHandler>()
                 .AddTransient<ICommandHandler<Aggregate, AnotherCommand>, AnotherCommandHandler>()
+                .AddTransient<IEventHandler, TestEventHandler>()
+                .AddTransient<IEventHandler<Aggregate, TestEvent>, TestEventHandler>()
                 .BuildServiceProvider(), 
             "");
     
@@ -36,5 +39,13 @@ public class CommandHandlerContextTests
     {
         Context.EvaluateCommand(new TestCommand());
         Context.Events.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void RunFromHandler()
+    {
+        new TestCommandHandler()
+            .Evaluate(Context, new TestCommand())
+            .IsSuccess.Should().BeTrue();
     }
 }
