@@ -1,4 +1,5 @@
-﻿using Whaally.Domain.Abstractions.Aggregate;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Command;
@@ -32,7 +33,8 @@ public class TypeInferenceTests
     [Fact]
     public void CommandHandlerContext_Can_Be_Generalized()
     {
-        var context = new CommandHandlerContext<TestAggregate>(null!, "")
+        var context = new CommandHandlerContext<TestAggregate>(
+            new ServiceCollection().BuildServiceProvider(), "")
         {
             Aggregate = new TestAggregate()
         };

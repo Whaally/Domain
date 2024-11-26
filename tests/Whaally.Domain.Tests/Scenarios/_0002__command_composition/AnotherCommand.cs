@@ -10,7 +10,7 @@ public class AnotherCommandHandler : ICommandHandler<Aggregate, AnotherCommand>
     public IResultBase Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
     {
         context.StageEvent(new TestEvent());
-
+        
         return Result.Ok();
     }
 }

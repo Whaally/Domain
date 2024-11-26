@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<IServiceHandlerContext, ServiceHandlerContext>()
             .AddTransient<IEvaluationAgent, DefaultEvaluationAgent>()
             .AddTransient<ISagaContext, SagaContext>()
+            .AddSingleton<IAggregateFactory, DefaultAggregateFactory>()
             .LoadCommandHandlers()
             .LoadEventHandlers()
             .LoadServiceHandlers()

@@ -13,7 +13,13 @@
     <PackageReference Include="FluentResults" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Whaally.Domain.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
   <PropertyGroup>
     <PackageId>Whaally.Domain</PackageId>
     <Description>Decouple domain model from infrastructure allowing independent evolution of

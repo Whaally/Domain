@@ -5,14 +5,15 @@ using Whaally.Domain.Abstractions.Event;
 namespace Whaally.Domain.Event;
 
 public class EventHandlerContext<TAggregate> : IEventHandlerContext<TAggregate>
-    where TAggregate : class, IAggregate, new()
+    where TAggregate : class, IAggregate
 {
     public EventHandlerContext(string aggregateId)
     {
         AggregateId = aggregateId;
     }
 
-    public TAggregate Aggregate { get; init; } = new();
+    // Warning; we're assuming aggregate is not null for end user convenience. Make this more explicit in a new version.
+    public TAggregate Aggregate { get; init; } = null!;
     public ActivityContext Activity { get; init; }
     public string AggregateId { get; init; }
 }

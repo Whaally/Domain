@@ -10,26 +10,30 @@ using Whaally.Domain.Event;
 namespace Whaally.Domain.Aggregate;
 
 public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
-    where TAggregate : class, IAggregate, new()
+    where TAggregate : class, IAggregate
 {
     private readonly IServiceProvider _services;
 
-    private TAggregate _aggregate = new();
+    private TAggregate _aggregate;
     public TAggregate Aggregate
     {
         get => _aggregate;
         init => _aggregate = value;
     }
-
+    
     public string Id { get; init; }
-
+    
     // ToDo: Use an options pattern to supply mandatory/optional parameters
     public DefaultAggregateHandler(IServiceProvider services, string id)
     {
         _services = services;
         Id = id;
+        
+        _aggregate ??= services
+            .GetRequiredService<IAggregateFactory>()
+            .Instantiate<TAggregate>();
     }
-
+    
     public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
     {
         var events = new List<IEventEnvelope>(commands.Length);
@@ -50,15 +54,16 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             * 4. Results are extracted from the context and evaluated against a temporary state of the aggregate.
             * 
             */
-
+            
             ICommandEnvelope command = cmd;
-
+            
             var commandHandlerType = typeof(ICommandHandler<,>)
                 .MakeGenericType(
                     typeof(TAggregate),
                     command.Message.GetType());
-
+            
             var commandHandler = (ICommandHandler)_services.GetRequiredService(commandHandlerType);
+            
             var commandContext = new CommandHandlerContext<TAggregate>(
                 _services,
                 !string.IsNullOrWhiteSpace(command.Metadata.AggregateId)
