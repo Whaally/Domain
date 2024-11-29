@@ -6,8 +6,8 @@ public interface IAggregateHandlerFactory
         => (GetType()
             .GetMethod(nameof(Instantiate))!
             .MakeGenericMethod(aggregateType)
-            .Invoke(this, new object[] { id }) as IAggregateHandler)!;
+            .Invoke(this, [ id ]) as IAggregateHandler)!;
 
     public IAggregateHandler<TAggregate> Instantiate<TAggregate>(string id)
-        where TAggregate : class, IAggregate, new();
+        where TAggregate : class, IAggregate;
 }

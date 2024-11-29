@@ -125,10 +125,11 @@ public class DomainContext
     // ReSharper disable once UnusedMember.Global
     public Task<IAggregateHandler<TAggregate>> GetAggregate<TAggregate>(string id)
         where TAggregate : class, IAggregate, new()
-        => Task.FromResult(
-            _services
-                .GetRequiredService<IAggregateHandlerFactory>()
-                .Instantiate<TAggregate>(id));
+    {
+        var factory = _services.GetRequiredService<IAggregateHandlerFactory>();
+        
+        return Task.FromResult(factory.Instantiate<TAggregate>(id));
+    }
 
     public async Task<IResult<IEventEnvelope[]>> EvaluateCommand<TCommand>(string aggregateId, TCommand command)
         where TCommand : class, ICommand

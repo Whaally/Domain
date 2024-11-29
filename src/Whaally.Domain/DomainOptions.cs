@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Abstractions.Aggregate;
 using Whaally.Domain.Abstractions.Command;
@@ -32,7 +33,9 @@ public class DomainOptions
     ///     Has a singleton lifetime.
     /// </summary>
     public Func<IServiceProvider, IAggregateHandlerFactory> AggregateHandlerFactory 
-        = services => new DefaultAggregateHandlerFactory(services);
+        = services => new DefaultAggregateHandlerFactory(
+            services, 
+            services.GetRequiredService<IAggregateFactory>());
 
     /// <summary>
     ///     Instantiates a service handler context, used when evaluating a service handler.
