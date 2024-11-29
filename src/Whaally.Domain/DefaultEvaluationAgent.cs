@@ -13,10 +13,12 @@ namespace Whaally.Domain;
 public class DefaultEvaluationAgent : IEvaluationAgent
 {
     private readonly IServiceProvider _services;
+    private readonly DomainContext _domainContext;
 
     public DefaultEvaluationAgent(IServiceProvider services)
     {
         _services = services;
+        _domainContext = _services.GetRequiredService<DomainContext>();
     }
 
     private static void CheckSourceActivity(IMessageEnvelope[] envelopes)
@@ -34,7 +36,9 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         // group commands by aggregate type and id to batch operations
         var commandCollections = commandEnvelopes
             .GroupBy(q => (
-                aggregateType: _services.GetRelatedAggregateTypeForOperation(q.Message.GetType()),
+                aggregateType: _domainContext.CommandHandlers
+                    .Single(w => w.CommandType == q.Message.GetType())
+                    .AggregateType,
                 aggregateId: q.Metadata.AggregateId
             ))
             .Select(q => (
@@ -81,7 +85,9 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         // group commands by aggregate type and id to batch operations
         var eventCollections = eventEnvelopes
             .GroupBy(q => (
-                aggregateType: _services.GetRelatedAggregateTypeForOperation(q.Message.GetType()),
+                aggregateType: _domainContext.EventHandlers
+                    .Single(w => w.EventType == q.Message.GetType())
+                    .AggregateType,
                 aggregateId: q.Metadata.AggregateId
             ))
             .Select(q => (
@@ -118,11 +124,10 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         * 3. Return resulting commands
         */
 
-        var sagas = _services.GetServices(
-            typeof(ISaga<>)
-                .MakeGenericType(eventEnvelope.Message.GetType()))
-            .Cast<ISaga>();
-
+        var sagas = _domainContext.Sagas
+           .Where(q => q.EventType == eventEnvelope.Message.GetType())
+           .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
+        
         List<IResult<ICommandEnvelope[]>> results = new();
 
         foreach (var saga in sagas)
@@ -162,7 +167,10 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<ICommandEnvelope[]>> EvaluateService<TService>(IServiceEnvelope<TService> serviceEnvelope)
         where TService : class, IService
     {
-        var serviceHandler = _services.GetRequiredService<IServiceHandler<TService>>();
+        var serviceHandler = (IServiceHandler<TService>)_services.GetRequiredService(_domainContext.ServiceHandlers
+            .Single(q => q.ServiceType == typeof(TService))
+            .HandlerType);
+        
         var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
 
         var result = await serviceHandler.Handle<TService>(

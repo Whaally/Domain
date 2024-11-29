@@ -6,12 +6,12 @@ internal class DefaultAggregateHandlerFactory : IAggregateHandlerFactory
 {
     private readonly Dictionary<string, IAggregateHandler> _dictionary = new();
     private readonly IServiceProvider _serviceProvider;
-
+    
     public DefaultAggregateHandlerFactory(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
-
+    
     public IAggregateHandler<TAggregate> Instantiate<TAggregate>(string id)
         where TAggregate : class, IAggregate, new()
     {

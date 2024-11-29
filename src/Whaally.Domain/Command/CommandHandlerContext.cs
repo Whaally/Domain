@@ -16,12 +16,14 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     private List<IEventEnvelope> _events = [];
 
     private readonly IServiceProvider _services;
-
+    private readonly DomainContext _domainContext;
+    
     public CommandHandlerContext(
         IServiceProvider services, 
         string aggregateId)
     {
         _services = services;
+        _domainContext = services.GetRequiredService<DomainContext>();
         AggregateId = aggregateId;
 
         // Stuff like this would require me to rethink what I am doing.
@@ -57,7 +59,10 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
-        var commandHandler = _services.GetCommandHandlerForCommand<TCommand>();
+        var commandHandler = (ICommandHandler) _services.GetRequiredService(
+            _domainContext.CommandHandlers
+                .Single(q => q.CommandType == typeof(TCommand))
+                .HandlerType);
         
         // ToDo: Assert the aggregate types of the command and this context do match.
 
@@ -72,8 +77,11 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             foreach (var eventEnvelope in context.Events)
             {
                 var @event = eventEnvelope.Message;
-                _aggregate = _services
-                    .GetEventHandlerForEvent(@event.GetType())
+                _aggregate =
+                    ((IEventHandler)_services.GetRequiredService(
+                        _domainContext.EventHandlers
+                            .Single(q => q.EventType == @event.GetType())
+                            .HandlerType))
                     .Apply(new EventHandlerContext<TAggregate>(AggregateId)
                     {
                         Aggregate = Aggregate,

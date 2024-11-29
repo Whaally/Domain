@@ -34,7 +34,9 @@ public class TypeInferenceTests
     public void CommandHandlerContext_Can_Be_Generalized()
     {
         var context = new CommandHandlerContext<TestAggregate>(
-            new ServiceCollection().BuildServiceProvider(), "")
+            new ServiceCollection()
+                .AddSingleton<DomainContext>()
+                .BuildServiceProvider(), "")
         {
             Aggregate = new TestAggregate()
         };

@@ -72,7 +72,10 @@ public class _0004__aggregate_interfaces
 
     [Fact]
     public void CanCreateNewCommandContext() 
-        => new CommandHandlerContext<ITestAggregate>(new ServiceCollection().BuildServiceProvider(), "");
+        => new CommandHandlerContext<ITestAggregate>(
+            new ServiceCollection()
+                .AddSingleton<DomainContext>()
+                .BuildServiceProvider(), "");
 
     [Fact]
     public void CanCreateNewEventContext()
@@ -82,6 +85,7 @@ public class _0004__aggregate_interfaces
     public void CanCreateNewDefaultAggregateHandler()
         => new DefaultAggregateHandler<ITestAggregate>(
             new ServiceCollection()
+                .AddSingleton<DomainContext>()
                 .AddSingleton<IAggregateFactory, TestAggregateFactory>()
                 .BuildServiceProvider(), "");
 }

@@ -13,7 +13,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     where TAggregate : class, IAggregate
 {
     private readonly IServiceProvider _services;
-
+    private readonly DomainContext _domainContext;
+    
     private TAggregate _aggregate;
     public TAggregate Aggregate
     {
@@ -27,6 +28,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     public DefaultAggregateHandler(IServiceProvider services, string id)
     {
         _services = services;
+        _domainContext = _services.GetRequiredService<DomainContext>();
+        
         Id = id;
         
         _aggregate ??= services
@@ -56,13 +59,13 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             */
             
             ICommandEnvelope command = cmd;
-            
-            var commandHandlerType = typeof(ICommandHandler<,>)
-                .MakeGenericType(
-                    typeof(TAggregate),
-                    command.Message.GetType());
-            
-            var commandHandler = (ICommandHandler)_services.GetRequiredService(commandHandlerType);
+
+            // ToDo: provide more helpful exception methods
+            var commandHandler = (ICommandHandler)_services.GetRequiredService(
+                _domainContext.CommandHandlers
+                    .Single(q => q.AggregateType == typeof(TAggregate) 
+                                 && q.CommandType == command.Message.GetType())
+                    .HandlerType);
             
             var commandContext = new CommandHandlerContext<TAggregate>(
                 _services,
@@ -81,13 +84,12 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             {
                 IEventEnvelope @event = intermediateEvent;
 
-                var eventHandlerType = typeof(IEventHandler<,>)
-                    .MakeGenericType(
-                        typeof(TAggregate),
-                        @event.Message.GetType());
-
-                var eventHandler = (IEventHandler)_services.GetRequiredService(eventHandlerType);
-
+                var eventHandler = (IEventHandler)_services.GetRequiredService(
+                    _domainContext.EventHandlers
+                        .Single(q => q.AggregateType == typeof(TAggregate)
+                                     && q.EventType == @event.Message.GetType())
+                        .HandlerType);
+                
                 var eventContext = new EventHandlerContext<TAggregate>(
                     !string.IsNullOrWhiteSpace(command.Metadata.AggregateId)
                         ? command.Metadata.AggregateId
@@ -119,12 +121,11 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         foreach (var @event in events)
         {
-            var eventHandlerType = typeof(IEventHandler<,>)
-                .MakeGenericType(
-                    typeof(TAggregate),
-                    @event.Message.GetType());
-
-            var eventHandler = (IEventHandler)_services.GetRequiredService(eventHandlerType);
+            var eventHandler = (IEventHandler)_services.GetRequiredService(
+                _domainContext.EventHandlers
+                    .Single(q => q.AggregateType == typeof(TAggregate)
+                                 && q.EventType == @event.Message.GetType())
+                    .HandlerType);
 
             var eventContext = new EventHandlerContext<TAggregate>(
                 !string.IsNullOrWhiteSpace(@event.Metadata.AggregateId)
@@ -177,6 +178,12 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
     public Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot =>
-        Task.FromResult(_services.GetRequiredService<ISnapshotFactory<TAggregate, TSnapshot>>()
+        Task.FromResult(
+            ((ISnapshotFactory<TAggregate, TSnapshot>)_services.GetRequiredService(
+                _domainContext
+                    .SnapshotFactories
+                    .Single(q => q.AggregateType == typeof(TAggregate)
+                                 && q.SnapshotType == typeof(TSnapshot))
+                    .FactoryType))
             .Instantiate(_aggregate));
 }
