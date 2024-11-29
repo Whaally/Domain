@@ -42,17 +42,6 @@ public static class ServiceCollectionExtensions
             .ForEach(type => services.AddTransient(type));
         
         services
-#pragma warning disable CS0618 // Type or member is obsolete
-            .AddSingleton<Domain>(services => 
-                new Domain(services)
-                {
-                    CommandHandlerTypes = commandHandlers,
-                    EventHandlerTypes = eventHandlers,
-                    ServiceHandlerTypes = serviceHandlers,
-                    SagaTypes = sagaHandlers,
-                    SnapshotFactoryTypes = snapshotFactories
-                })
-#pragma warning restore CS0618 // Type or member is obsolete
             .AddSingleton<DomainContext>(services => 
                 new DomainContext(services)
                 {

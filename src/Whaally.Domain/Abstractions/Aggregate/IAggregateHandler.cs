@@ -35,10 +35,6 @@ public interface IAggregateHandler
     /// <param name="events">The events to apply</param>
     /// <returns>async Task</returns>
     public Task<IResultBase> Apply(params IEventEnvelope[] events);
-
-    [Obsolete("The confirm method had been renamed to `Continue`. This method will be removed in a future version.")]
-    public Task<IResultBase> Confirm(params IEventEnvelope[] events)
-        => Continue(events);
     
     /// <summary>
     ///     Asynchronously runs the sagas for the provided events.
