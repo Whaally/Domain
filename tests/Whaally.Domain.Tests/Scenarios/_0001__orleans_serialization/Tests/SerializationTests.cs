@@ -1,5 +1,6 @@
 using FluentAssertions;
 using FluentResults;
+using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions.Event;
 using Whaally.Domain.Tests.Fixtures;
 
@@ -9,7 +10,7 @@ namespace Whaally.Domain.Tests.Scenarios._0001__orleans_serialization.Tests;
 public class SerializationTests(ClusterFixture fixture)
 {
     private Task<IResult<IEventEnvelope[]>> _evaluation 
-        => new DomainContext(fixture.Cluster.Client.ServiceProvider)
+        => fixture.Cluster.Client.ServiceProvider.GetRequiredService<DomainContext>()
             .EvaluateCommand(Guid.NewGuid().ToString(), new TestCommand());
 
     private const string _skipReason = "Fails when running on GitHub Actions";

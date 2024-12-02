@@ -14,11 +14,13 @@ namespace Whaally.Domain.Saga;
 public class SagaContext : ISagaContext
 {
     private readonly IServiceProvider _services;
-
+    private readonly IEvaluationAgent _evaluationAgent;
+    
     private SagaContext() { throw new Exception($"The private parameterless constructor for type `{nameof(SagaContext)}` should not be used."); }
     public SagaContext(IServiceProvider services)
     {
         _services = services;
+        _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
     }
 
     public IReadOnlyCollection<ICommandEnvelope> Commands => _commands.AsReadOnly();
@@ -45,9 +47,7 @@ public class SagaContext : ISagaContext
 
     public async Task<IResultBase> EvaluateService(IService service)
     {
-        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
-
-        var result = await evaluationAgent.EvaluateService(
+        var result = await _evaluationAgent.EvaluateService(
             new ServiceEnvelope<IService>(
                 service,
                 new ServiceMetadata

@@ -43,7 +43,9 @@ public class DomainOptions
     ///     Has a transient lifetime.
     /// </summary>
     public Func<IServiceProvider, IServiceHandlerContext> ServiceHandlerContext
-        = services => new ServiceHandlerContext(services);
+        = services => new ServiceHandlerContext(
+            services,
+            services.GetRequiredService<IEvaluationAgent>());
 
     /// <summary>
     ///     Instantiates an evaluate agent, coordinating operations across nodes.

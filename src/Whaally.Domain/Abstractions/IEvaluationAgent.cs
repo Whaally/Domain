@@ -1,27 +1,26 @@
 ﻿using FluentResults;
 using Whaally.Domain.Abstractions.Command;
 using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Abstractions.Saga;
 using Whaally.Domain.Abstractions.Service;
 
 namespace Whaally.Domain.Abstractions;
 
 /// <summary>
-/// Central component providing behaviour for the high-level interaction between different domain components.
+///     Central component providing behaviour for the high-level interaction between different domain components.
 /// </summary>
 public interface IEvaluationAgent
 {
     /// <summary>
-    /// Applies provided events to their respective aggregates.
+    ///     Applies provided events to their respective aggregates.
     /// 
-    /// If successfull this operation has side effects against aggregates involved!
+    ///     If successful this operation has side effects against aggregates involved!
     /// </summary>
     /// <param name="eventEnvelopes">The event envelopes to apply</param>
     /// <returns>Result object indicating success status</returns>
     public Task<IResultBase> EvaluateEvents(params IEventEnvelope[] eventEnvelopes);
 
     /// <summary>
-    /// Evaluates the provided commands against their respective aggregates
+    ///     Evaluates the provided commands against their respective aggregates
     /// </summary>
     /// <param name="commandEnvelopes">The command envelopes to evaluate</param>
     /// <returns>A result object indicating success status and resulting events</returns>
@@ -36,7 +35,7 @@ public interface IEvaluationAgent
      */
 
     /// <summary>
-    /// Evaluates the supplied services
+    ///     Evaluates the supplied services
     /// </summary>
     /// <typeparam name="TService">The service to evaluate</typeparam>
     /// <param name="serviceEnvelope"></param>
@@ -45,7 +44,7 @@ public interface IEvaluationAgent
         where TService : class, IService;
 
     /// <summary>
-    /// Evaluates the sagas relevant for the supplied event
+    ///     Evaluates the sagas relevant for the supplied event
     /// </summary>
     /// <typeparam name="TEvent">The event for which to evaluate sagas</typeparam>
     /// <param name="eventEnvelope">The event envelope for which to continue evaluation</param>

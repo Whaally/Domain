@@ -14,6 +14,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 {
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
+    private readonly IEvaluationAgent _evaluationAgent;
     
     private TAggregate _aggregate;
     public TAggregate Aggregate
@@ -29,6 +30,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
+        _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
         
         Id = id;
         
@@ -154,22 +156,20 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
      */
     public async Task<IResultBase> Continue(params IEventEnvelope[] events)
     {
-        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
-
         foreach (var @event in events)
         {
             // ToDo: Ensure these sagas are properly evaluated in the background
             await Task.Run(async () =>
             {
-                var commands = await evaluationAgent.EvaluateSaga(@event);
+                var commands = await _evaluationAgent.EvaluateSaga(@event);
 
                 if (commands.IsFailed) return;
 
-                var events = await evaluationAgent.EvaluateCommands(commands.Value);
+                var events = await _evaluationAgent.EvaluateCommands(commands.Value);
 
                 if (events.IsFailed) return;
 
-                await evaluationAgent.EvaluateEvents(events.Value);
+                await _evaluationAgent.EvaluateEvents(events.Value);
             });
         }
 

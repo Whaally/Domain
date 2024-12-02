@@ -10,10 +10,17 @@ using Whaally.Domain.Service;
 
 namespace Whaally.Domain;
 
-public class DomainContext
+/*
+ * DEVELOPMENT NOTE:
+ * - Do not inject dependencies to this class (IAggregateHandlerFactory & IEvaluationAgent) as concrete instances.
+ *   Doing so causes an infinite loop as this class is often injected as dependency to those.
+ */
+
+// ToDo: in this class, create a mapping from operations to the evaluation agent. This way we can already involve it at early stage.
+// This allows us to go from large scale to small scale structures. E.g. cluster -> service -> command -> event
+public class DomainContext(IServiceProvider services)
 {
-    readonly IServiceProvider _services;
-    
+    #region handler metadata
     /// <summary>
     ///     Metadata about the command handlers registered with this domain instance.
     ///
@@ -98,11 +105,7 @@ public class DomainContext
     {
         init => SnapshotFactories = value.Select(SnapshotFactoryMeta.From).ToList().AsReadOnly();
     } 
-    
-    public DomainContext(IServiceProvider services)
-    {
-        _services = services;
-    }
+    #endregion
 
     /*
      * Operations:
@@ -114,26 +117,61 @@ public class DomainContext
      * - Preview(Service)
      */
 
-    // ReSharper disable once UnusedMember.Global
-    public Task<IAggregateHandler<TAggregate>> GetAggregate<TAggregate>(string id)
-        where TAggregate : class, IAggregate, new()
+    internal IAggregateHandler GetAggregate(Type type, string id)
     {
-        var factory = _services.GetRequiredService<IAggregateHandlerFactory>();
+        var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
         
-        return Task.FromResult(factory.Instantiate<TAggregate>(id));
+        if (type.IsAssignableTo(typeof(IAggregate)))
+        {
+            return aggregateHandlerFactory.Instantiate(type, id);
+        }
+
+        Type? aggregateType = null;
+        
+        if (type.IsAssignableTo(typeof(ICommand)))
+            aggregateType = CommandHandlers
+                .SingleOrDefault(q => q.CommandType == type)
+                ?.AggregateType;
+        else if (type.IsAssignableTo(typeof(IEvent)))
+            aggregateType = EventHandlers
+                .SingleOrDefault(q => q.EventType == type)
+                ?.AggregateType;
+        
+        
+        if (aggregateType == null) 
+            throw new Exception($"Aggregate type could not be resolved for {type.FullName}");
+            
+        var handler = aggregateHandlerFactory.Instantiate(
+            aggregateType,
+            id);
+        
+        if (handler == null)
+            throw new Exception($"Command handler could not be resolved for {type.FullName}");
+
+        return handler;
     }
 
+    public IAggregateHandler<TAggregate> GetAggregateHandler<TAggregate>(string id)
+        where TAggregate : class, IAggregate 
+        => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
+
+    public Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(string aggregateId, TCommand command)
+        where TCommand : class, ICommand
+        => GetAggregate(typeof(TCommand), aggregateId).Evaluate(command);
+    
+    
+    
     public async Task<IResult<IEventEnvelope[]>> EvaluateCommand<TCommand>(string aggregateId, TCommand command)
         where TCommand : class, ICommand
     {
-        var factory = _services.GetRequiredService<IAggregateHandlerFactory>();
-
+        var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
+        
         var aggregateType = CommandHandlers.Single(q => q.CommandType == command.GetType())
             .AggregateType;
         
         if (aggregateType == null) throw new Exception($"Aggregate type could not be resolved for command {command.GetType().FullName}");
 
-        var handler = factory.Instantiate(
+        var handler = aggregateHandlerFactory.Instantiate(
             aggregateType,
             aggregateId);
 
@@ -159,8 +197,8 @@ public class DomainContext
     public async Task<IResult<IEventEnvelope[]>> EvaluateService<TService>(TService service)
         where TService : class, IService
     {
-        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
-
+        var evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
+        
         var evalResult = await evaluationAgent.EvaluateService(
             new ServiceEnvelope<TService>(
                 service,

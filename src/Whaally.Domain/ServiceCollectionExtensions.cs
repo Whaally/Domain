@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Whaally.Domain.Abstractions;
+using Whaally.Domain.Abstractions.Aggregate;
 
 namespace Whaally.Domain;
 

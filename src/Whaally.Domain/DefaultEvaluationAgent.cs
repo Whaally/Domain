@@ -14,11 +14,13 @@ public class DefaultEvaluationAgent : IEvaluationAgent
 {
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
+    private readonly IAggregateHandlerFactory _handlerFactory;
 
     public DefaultEvaluationAgent(IServiceProvider services)
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
+        _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
     }
 
     private static void CheckSourceActivity(IMessageEnvelope[] envelopes)
@@ -30,8 +32,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<IEventEnvelope[]>> EvaluateCommands(params ICommandEnvelope[] commandEnvelopes)
     {
         CheckSourceActivity(commandEnvelopes);
-
-        var handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
 
         // group commands by aggregate type and id to batch operations
         var commandCollections = commandEnvelopes
@@ -55,7 +55,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         {
             if (operation.aggregateType == null) throw new Exception($"Aggregate type could not be resolved for command batch");
 
-            var handler = handlerFactory.Instantiate(
+            var handler = _handlerFactory.Instantiate(
                 operation.aggregateType,
                 operation.aggregateId);
 
@@ -70,7 +70,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             result.WithValue(results
                 .SelectMany(q => q.ValueOrDefault != null
                     ? q.Value
-                    : new IEventEnvelope[] { })
+                    : [])
                 .ToArray());
 
         return result;
@@ -79,8 +79,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResultBase> EvaluateEvents(params IEventEnvelope[] eventEnvelopes)
     {
         CheckSourceActivity(eventEnvelopes);
-
-        var handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
 
         // group commands by aggregate type and id to batch operations
         var eventCollections = eventEnvelopes
@@ -104,7 +102,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         {
             if (operation.aggregateType == null) throw new Exception($"Aggregate type could not be resolved for event {operation.aggregateType!.FullName}");
 
-            var handler = handlerFactory.Instantiate(
+            var handler = _handlerFactory.Instantiate(
                 operation.aggregateType,
                 operation.aggregateId);
 

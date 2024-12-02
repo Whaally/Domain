@@ -35,7 +35,7 @@ public class TypeInferenceTests
     {
         var context = new CommandHandlerContext<TestAggregate>(
             new ServiceCollection()
-                .AddSingleton<DomainContext>()
+                .AddDomain()
                 .BuildServiceProvider(), "")
         {
             Aggregate = new TestAggregate()

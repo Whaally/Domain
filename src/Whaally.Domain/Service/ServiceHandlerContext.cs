@@ -9,9 +9,11 @@ using Whaally.Domain.Command;
 
 namespace Whaally.Domain.Service;
 
-public class ServiceHandlerContext(IServiceProvider services) : IServiceHandlerContext
+public class ServiceHandlerContext(
+    IServiceProvider services,
+    IEvaluationAgent evaluationAgent) : IServiceHandlerContext
 {
-    private List<ICommandEnvelope> _commands = new List<ICommandEnvelope>(0);
+    private List<ICommandEnvelope> _commands = new(0);
 
     /// <summary>
     /// Access to the commands which have previously been issued. Includes the commands
@@ -38,8 +40,6 @@ public class ServiceHandlerContext(IServiceProvider services) : IServiceHandlerC
     public async Task<IResultBase> EvaluateService<TService>(TService service)
         where TService : class, IService
     {
-        var evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
-
         var result = await evaluationAgent.EvaluateService(
             new ServiceEnvelope<TService>(
                 service,
