@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
-using Whaally.Domain.Abstractions.Aggregate;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Hosting.Controllers;
 

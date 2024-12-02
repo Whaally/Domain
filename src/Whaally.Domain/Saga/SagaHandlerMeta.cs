@@ -1,4 +1,4 @@
-using Whaally.Domain.Abstractions.Saga;
+using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 

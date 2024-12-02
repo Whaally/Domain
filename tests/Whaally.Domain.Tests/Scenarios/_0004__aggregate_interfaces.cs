@@ -1,12 +1,7 @@
 using FluentAssertions;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Aggregate;
-using Whaally.Domain.Command;
-using Whaally.Domain.Event;
+using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios;
 

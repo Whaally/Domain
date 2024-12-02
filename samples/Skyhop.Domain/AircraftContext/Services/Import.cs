@@ -1,5 +1,5 @@
 using FluentResults;
-using Whaally.Domain.Abstractions.Service;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.AircraftContext.Services;
 

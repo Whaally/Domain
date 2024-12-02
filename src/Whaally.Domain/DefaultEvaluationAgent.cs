@@ -1,12 +1,6 @@
 ﻿using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Abstractions.Saga;
-using Whaally.Domain.Abstractions.Service;
-using Whaally.Domain.Saga;
 
 namespace Whaally.Domain;
 

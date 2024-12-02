@@ -1,7 +1,7 @@
 using FluentAssertions;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Whaally.Domain.Abstractions.Event;
+using Whaally.Domain.Abstractions;
 using Whaally.Domain.Tests.Fixtures;
 
 namespace Whaally.Domain.Tests.Scenarios._0001__orleans_serialization.Tests;

@@ -1,4 +1,4 @@
-﻿using Whaally.Domain.Abstractions.Aggregate;
+﻿using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Domain;
 

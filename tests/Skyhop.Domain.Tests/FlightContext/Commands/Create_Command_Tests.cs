@@ -1,7 +1,7 @@
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
-using Whaally.Domain.Event;
+using Whaally.Domain;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
 

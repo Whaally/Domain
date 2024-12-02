@@ -1,13 +1,9 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 using Whaally.Domain.Abstractions;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Service;
-using Whaally.Domain.Command;
 
-namespace Whaally.Domain.Service;
+namespace Whaally.Domain;
 
 public class ServiceHandlerContext(
     IServiceProvider services,

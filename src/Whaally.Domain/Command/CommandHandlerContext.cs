@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Event;
+using Whaally.Domain.Abstractions;
 
-namespace Whaally.Domain.Command;
+namespace Whaally.Domain;
 
 public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggregate>
     where TAggregate : class, IAggregate

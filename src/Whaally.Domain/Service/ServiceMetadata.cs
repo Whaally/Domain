@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Whaally.Domain.Abstractions;
 
-namespace Whaally.Domain.Service;
+namespace Whaally.Domain;
 
 public record ServiceMetadata : IServiceMetadata
 {

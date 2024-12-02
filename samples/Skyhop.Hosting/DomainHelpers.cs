@@ -1,6 +1,5 @@
 using System.Text.Json;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Hosting;
 

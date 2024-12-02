@@ -1,7 +1,6 @@
 ﻿using FluentResults;
-using Whaally.Domain.Abstractions.Aggregate;
 
-namespace Whaally.Domain.Abstractions.Command;
+namespace Whaally.Domain.Abstractions;
 
 public interface ICommandHandler : IMessageHandler
 {

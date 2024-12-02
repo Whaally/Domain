@@ -1,8 +1,6 @@
 ﻿using FluentResults;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Event;
 
-namespace Whaally.Domain.Abstractions.Saga;
+namespace Whaally.Domain.Abstractions;
 
 public interface ISaga
 {

@@ -3,10 +3,7 @@ using Microsoft.Extensions.Logging;
 using Orleans.Concurrency;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Aggregate;
+using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Infrastructure.OrleansHost.Grains;
 

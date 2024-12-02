@@ -1,4 +1,4 @@
-﻿using Whaally.Domain.Abstractions.Event;
+﻿using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 

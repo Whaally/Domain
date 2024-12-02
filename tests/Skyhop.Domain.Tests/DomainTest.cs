@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain;
-using Whaally.Domain.Abstractions.Aggregate;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.Tests;
 

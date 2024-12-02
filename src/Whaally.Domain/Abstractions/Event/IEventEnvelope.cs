@@ -1,4 +1,4 @@
-﻿namespace Whaally.Domain.Abstractions.Event;
+﻿namespace Whaally.Domain.Abstractions;
 
 public interface IEventEnvelope : IMessageEnvelope
 {

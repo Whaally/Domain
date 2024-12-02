@@ -1,8 +1,6 @@
 ﻿using FluentResults;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Event;
 
-namespace Whaally.Domain.Abstractions.Command;
+namespace Whaally.Domain.Abstractions;
 
 public interface ICommandHandlerContext : IContext, IProvideAggregateInstance
 {

@@ -1,7 +1,6 @@
 ﻿using Whaally.Domain.Abstractions;
-using Whaally.Domain.Abstractions.Event;
 
-namespace Whaally.Domain.Event;
+namespace Whaally.Domain;
 
 public record EventEnvelope(
     IEvent Message,

@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Event;
+using Whaally.Domain.Abstractions;
 
-namespace Whaally.Domain.Event;
+namespace Whaally.Domain;
 
 public class EventHandlerContext<TAggregate> : IEventHandlerContext<TAggregate>
     where TAggregate : class, IAggregate

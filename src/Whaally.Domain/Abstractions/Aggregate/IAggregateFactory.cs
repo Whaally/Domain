@@ -1,4 +1,4 @@
-namespace Whaally.Domain.Abstractions.Aggregate;
+namespace Whaally.Domain.Abstractions;
 
 /// <summary>
 ///     The aggregate factory is responsible for providing new instances of a given aggregate type T

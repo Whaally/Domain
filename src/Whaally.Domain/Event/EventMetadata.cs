@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Whaally.Domain.Abstractions;
 
-namespace Whaally.Domain.Event;
+namespace Whaally.Domain;
 
 public record EventMetadata(string AggregateId) : IEventMetadata
 {

@@ -1,4 +1,4 @@
-﻿namespace Whaally.Domain.Abstractions.Command;
+﻿namespace Whaally.Domain.Abstractions;
 
 public interface ICommandEnvelope : IMessageEnvelope
 {

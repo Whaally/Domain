@@ -3,7 +3,7 @@ using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
-using Whaally.Domain.Abstractions.Saga;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
 

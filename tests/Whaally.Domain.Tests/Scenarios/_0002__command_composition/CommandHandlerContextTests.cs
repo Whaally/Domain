@@ -1,7 +1,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Command;
+using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios._0002__command_composition;
 

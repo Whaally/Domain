@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Orleans.TestingHost;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans.Serialization;
-using Whaally.Domain.Abstractions.Aggregate;
+using Whaally.Domain.Abstractions;
 using Whaally.Domain.Infrastructure.OrleansHost;
 
 namespace Whaally.Domain.Tests.Fixtures;

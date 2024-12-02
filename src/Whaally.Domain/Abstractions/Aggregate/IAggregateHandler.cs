@@ -1,9 +1,6 @@
 ﻿using FluentResults;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Command;
 
-namespace Whaally.Domain.Abstractions.Aggregate;
+namespace Whaally.Domain.Abstractions;
 
 // ToDo: Add an "EvaluateAndApply" method with a default implementation, ready to be overriden for whatever reason.
 public interface IAggregateHandler

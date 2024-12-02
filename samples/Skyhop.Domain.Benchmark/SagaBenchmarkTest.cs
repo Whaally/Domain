@@ -4,7 +4,7 @@ using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Whaally.Domain;
-using Whaally.Domain.Abstractions.Aggregate;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.Benchmark;
 

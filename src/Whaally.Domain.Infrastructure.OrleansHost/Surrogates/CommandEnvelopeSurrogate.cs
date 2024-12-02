@@ -1,5 +1,4 @@
 ﻿using Whaally.Domain.Abstractions;
-using Whaally.Domain.Abstractions.Command;
 
 namespace Whaally.Domain.Infrastructure.OrleansHost.Surrogates;
 

@@ -1,4 +1,4 @@
-using Whaally.Domain.Abstractions.Event;
+using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios._0002__command_composition;
 

@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 
-namespace Whaally.Domain.Abstractions.Service;
+namespace Whaally.Domain.Abstractions;
 
 public interface IServiceHandler : IMessageHandler
 {

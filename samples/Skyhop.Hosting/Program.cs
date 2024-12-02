@@ -5,7 +5,7 @@ using Orleans.EventSourcing;
 using Orleans.Runtime;
 using Serilog;
 using Whaally.Domain;
-using Whaally.Domain.Abstractions.Aggregate;
+using Whaally.Domain.Abstractions;
 using Whaally.Domain.Infrastructure.OrleansHost;
 
 namespace Skyhop.Hosting;

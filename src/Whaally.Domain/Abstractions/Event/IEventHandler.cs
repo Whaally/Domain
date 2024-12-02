@@ -1,6 +1,4 @@
-﻿using Whaally.Domain.Abstractions.Aggregate;
-
-namespace Whaally.Domain.Abstractions.Event;
+﻿namespace Whaally.Domain.Abstractions;
 
 public interface IEventHandler : IMessageHandler
 {

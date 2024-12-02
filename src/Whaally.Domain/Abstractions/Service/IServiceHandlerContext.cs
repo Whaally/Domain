@@ -1,8 +1,6 @@
 ﻿using FluentResults;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
 
-namespace Whaally.Domain.Abstractions.Service;
+namespace Whaally.Domain.Abstractions;
 
 public interface IServiceHandlerContext : IContext
 {

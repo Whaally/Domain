@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
-using Whaally.Domain.Abstractions.Command;
+using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 

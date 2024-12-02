@@ -1,9 +1,7 @@
 ﻿using Marten;
 using Microsoft.Extensions.Logging;
 using Orleans.Providers;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Event;
-using Whaally.Domain.Event;
+using Whaally.Domain.Abstractions;
 using Whaally.Domain.Infrastructure.OrleansHost.Grains;
 
 namespace Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence;

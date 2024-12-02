@@ -1,7 +1,6 @@
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Command;
+using Whaally.Domain.Abstractions;
 using Whaally.Domain.Tests.Domain;
 
 namespace Whaally.Domain.Tests;

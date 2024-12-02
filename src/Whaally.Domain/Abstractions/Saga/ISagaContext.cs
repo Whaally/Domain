@@ -1,9 +1,6 @@
 ﻿using FluentResults;
-using Whaally.Domain.Abstractions.Aggregate;
-using Whaally.Domain.Abstractions.Command;
-using Whaally.Domain.Abstractions.Service;
 
-namespace Whaally.Domain.Abstractions.Saga;
+namespace Whaally.Domain.Abstractions;
 
 public interface ISagaContext : IContext
 {

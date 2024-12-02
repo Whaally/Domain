@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
-using Whaally.Domain.Service;
 using Whaally.Domain.Tests.Domain;
 
 namespace Whaally.Domain.Tests;

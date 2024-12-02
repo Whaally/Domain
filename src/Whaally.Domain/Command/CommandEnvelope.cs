@@ -1,7 +1,6 @@
 ﻿using Whaally.Domain.Abstractions;
-using Whaally.Domain.Abstractions.Command;
 
-namespace Whaally.Domain.Command;
+namespace Whaally.Domain;
 
 public record CommandEnvelope(
     ICommand Message,

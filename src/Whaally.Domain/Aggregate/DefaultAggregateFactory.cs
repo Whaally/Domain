@@ -1,6 +1,6 @@
-using Whaally.Domain.Abstractions.Aggregate;
+using Whaally.Domain.Abstractions;
 
-namespace Whaally.Domain.Aggregate;
+namespace Whaally.Domain;
 
 public class DefaultAggregateFactory : IAggregateFactory
 {

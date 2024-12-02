@@ -1,7 +1,6 @@
 ﻿using Whaally.Domain.Abstractions;
-using Whaally.Domain.Abstractions.Service;
 
-namespace Whaally.Domain.Service;
+namespace Whaally.Domain;
 
 public record ServiceEnvelope<TService>(
     TService Message,

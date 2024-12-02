@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Whaally.Domain.Abstractions;
 
-namespace Whaally.Domain.Command;
+namespace Whaally.Domain;
 
 public record CommandMetadata : ICommandMetadata
 {

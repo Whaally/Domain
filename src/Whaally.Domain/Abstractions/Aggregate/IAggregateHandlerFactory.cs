@@ -1,4 +1,4 @@
-﻿namespace Whaally.Domain.Abstractions.Aggregate;
+﻿namespace Whaally.Domain.Abstractions;
 
 public interface IAggregateHandlerFactory
 {
