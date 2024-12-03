@@ -10,8 +10,9 @@ namespace Whaally.Domain.Tests.Scenarios._0001__orleans_serialization.Tests;
 public class SerializationTests(ClusterFixture fixture)
 {
     private Task<IResult<IEventEnvelope[]>> _evaluation 
-        => fixture.Cluster.Client.ServiceProvider.GetRequiredService<DomainContext>()
-            .EvaluateCommand(Guid.NewGuid().ToString(), new TestCommand());
+        => fixture.Cluster.Client.ServiceProvider
+            .GetRequiredService<DomainContext>()
+            .Evaluate(Guid.NewGuid().ToString(), new TestCommand());
 
     private const string _skipReason = "Fails when running on GitHub Actions";
     

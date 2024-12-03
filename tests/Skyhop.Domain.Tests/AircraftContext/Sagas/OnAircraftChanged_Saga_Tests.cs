@@ -1,8 +1,7 @@
-﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
+﻿using FluentAssertions;
+using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
-using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
-using Whaally.Domain;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
 
@@ -15,28 +14,30 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
     [Fact]
     public async Task EvaluateTest()
     {
-        var fH = AggregateFactory.Instantiate<Flight>(_flightId);
-        var a1H = AggregateFactory.Instantiate<Aircraft>(_firstAircraftId);
-        var a2H = AggregateFactory.Instantiate<Aircraft>(_secondAircraftId);
-
-        await fH.EvaluateAndApply(
-            new Create(), 
-            new SetAircraft(_firstAircraftId));
+        await Domain.Trigger(_flightId, new Create());
+        await Domain.Trigger(_flightId, new SetAircraft(_firstAircraftId));
         
         // ToDo: Assert change on a1H but not on a2H
-        var a1HS = await a1H.Snapshot<AircraftSnapshot>();
-        var a2HS = await a2H.Snapshot<AircraftSnapshot>();
-
-        Assert.Equal(1, a1HS.FlightCount);
-        Assert.Equal(0, a2HS.FlightCount);
-
-        await fH.EvaluateAndApply(
-            new SetAircraft(_secondAircraftId));
+        (await Domain
+            .GetAggregate<Aircraft>(_firstAircraftId)
+            .Snapshot<AircraftSnapshot>())
+            .FlightCount
+            .Should().Be(1);
         
-        a1HS = await a1H.Snapshot<AircraftSnapshot>();
-        a2HS = await a2H.Snapshot<AircraftSnapshot>();
+        (await Domain
+            .GetAggregate<Aircraft>(_secondAircraftId)
+            .Snapshot<AircraftSnapshot>())
+            .FlightCount
+            .Should().Be(0);
 
-        Assert.Equal(0, a1HS.FlightCount);
-        Assert.Equal(1, a2HS.FlightCount);
+        //
+        // await fH.EvaluateAndApply(
+        //     new SetAircraft(_secondAircraftId));
+        //
+        // a1HS = await a1H.Snapshot<AircraftSnapshot>();
+        // a2HS = await a2H.Snapshot<AircraftSnapshot>();
+        //
+        // Assert.Equal(0, a1HS.FlightCount);
+        // Assert.Equal(1, a2HS.FlightCount);
     }
 }

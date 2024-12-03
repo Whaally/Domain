@@ -111,6 +111,8 @@ public class DomainContext(IServiceProvider services)
      * - Preview(Service)
      */
 
+    private IEvaluationAgent _evaluationAgent => services.GetRequiredService<IEvaluationAgent>();
+    
     internal IAggregateHandler GetAggregate(Type type, string id)
     {
         var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
@@ -145,64 +147,39 @@ public class DomainContext(IServiceProvider services)
         return handler;
     }
 
-    public IAggregateHandler<TAggregate> GetAggregateHandler<TAggregate>(string id)
+    public IAggregateHandler<TAggregate> GetAggregate<TAggregate>(string id)
         where TAggregate : class, IAggregate 
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
 
+    
     public Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(string aggregateId, TCommand command)
         where TCommand : class, ICommand
-        => GetAggregate(typeof(TCommand), aggregateId).Evaluate(command);
+        => _evaluationAgent.Evaluate(new CommandEnvelope(
+            command,
+            new CommandMetadata
+            {
+                AggregateId = aggregateId,
+                Timestamp = DateTime.UtcNow
+            }));
+
     
+    public Task<IResult<IEventEnvelope[]>> Trigger<TCommand>(string aggregateId, TCommand command)
+        where TCommand : class, ICommand => 
+        _evaluationAgent.Trigger(new CommandEnvelope(
+            command,
+            new CommandMetadata
+            {
+                AggregateId = aggregateId,
+                Timestamp = DateTime.UtcNow
+            }));
+
     
-    
-    public async Task<IResult<IEventEnvelope[]>> EvaluateCommand<TCommand>(string aggregateId, TCommand command)
-        where TCommand : class, ICommand
-    {
-        var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
-        
-        var aggregateType = CommandHandlers.Single(q => q.CommandType == command.GetType())
-            .AggregateType;
-        
-        if (aggregateType == null) throw new Exception($"Aggregate type could not be resolved for command {command.GetType().FullName}");
-
-        var handler = aggregateHandlerFactory.Instantiate(
-            aggregateType,
-            aggregateId);
-
-        if (handler == null)
-            throw new Exception($"Command handler could not be resolved from command {command.GetType().FullName}");
-        
-        var result = await handler.Evaluate(
-            new CommandEnvelope(
-                command, 
-                new CommandMetadata
-                {
-                    AggregateId = aggregateId,
-                    Timestamp = DateTime.UtcNow
-                }));
-        
-        if (result.IsFailed) return result;
-
-        await handler.Continue(result.Value);
-        
-        return result;
-    }
-    
-    public async Task<IResult<IEventEnvelope[]>> EvaluateService<TService>(TService service)
-        where TService : class, IService
-    {
-        var evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
-        
-        var evalResult = await evaluationAgent.EvaluateService(
-            new ServiceEnvelope<TService>(
-                service,
-                new ServiceMetadata()));
-
-        if (evalResult.IsFailed) 
-            return Result.Fail<IEventEnvelope[]>(evalResult.Errors);
-
-        var applyResult = await evaluationAgent.EvaluateCommands(evalResult.Value);
-
-        return applyResult;
-    }
+    public async Task<IResult<IEventEnvelope[]>> Trigger<TService>(TService service)
+        where TService : class, IService =>
+        await _evaluationAgent.Trigger(new ServiceEnvelope<TService>(
+            service, 
+            new ServiceMetadata
+            {
+                Timestamp = DateTime.UtcNow
+            }));
 }

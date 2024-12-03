@@ -41,7 +41,7 @@ public class SagaContext : ISagaContext
 
     public async Task<IResultBase> EvaluateService(IService service)
     {
-        var result = await _evaluationAgent.EvaluateService(
+        var result = await _evaluationAgent.Run(
             new ServiceEnvelope<IService>(
                 service,
                 new ServiceMetadata

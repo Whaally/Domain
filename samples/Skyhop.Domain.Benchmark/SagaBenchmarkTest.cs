@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using OrleansCodeGen.SkyhopDomainBenchmark;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
@@ -18,6 +19,7 @@ public class SagaBenchmarkTest
         .AddDomain()
         .BuildServiceProvider();
 
+    DomainContext _domain => _services.GetRequiredService<DomainContext>();   
     IAggregateHandlerFactory _factory => _services.GetRequiredService<IAggregateHandlerFactory>();
 
     IAggregateHandler<Flight>? fH;
@@ -37,9 +39,7 @@ public class SagaBenchmarkTest
 
         var c1 = new SetAircraft(_firstAircraftId);
 
-        await fH.Continue(
-            (await fH.Evaluate(c1))
-            .Value);
+        await _domain.Trigger("", c1);
     }
 
     [Benchmark]
@@ -47,8 +47,6 @@ public class SagaBenchmarkTest
     {
         var c2 = new SetAircraft(_secondAircraftId!);
 
-        await fH!.Continue(
-            (await fH.Evaluate(c2))
-            .Value);
+        await _domain.Trigger("", c2);
     }
 }

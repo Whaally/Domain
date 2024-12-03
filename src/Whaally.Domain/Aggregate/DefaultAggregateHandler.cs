@@ -139,35 +139,10 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         _aggregate = intermediateState;
 
-        await Continue(events);
-        
-        return Result.Ok();
-    }
-    
-    /*
-     * Note that in this method the continuation happens sequentially, and is awaited.
-     * In production environments the confirm method should likely return after the changes had been applied
-     * to free up the aggregate handler for other operations.
-     */
-    public async Task<IResultBase> Continue(params IEventEnvelope[] events)
-    {
+        // Implicitly continue the operations
         foreach (var @event in events)
-        {
-            // ToDo: Ensure these sagas are properly evaluated in the background
-            await Task.Run(async () =>
-            {
-                var commands = await _evaluationAgent.EvaluateSaga(@event);
-
-                if (commands.IsFailed) return;
-
-                var events = await _evaluationAgent.EvaluateCommands(commands.Value);
-
-                if (events.IsFailed) return;
-
-                await _evaluationAgent.EvaluateEvents(events.Value);
-            });
-        }
-
+            await _evaluationAgent.Continue(@event);
+        
         return Result.Ok();
     }
 

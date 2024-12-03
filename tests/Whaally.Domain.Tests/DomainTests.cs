@@ -13,9 +13,10 @@ public class DomainTests
     [Fact]
     public async Task CanEvaluateServiceThroughDomainObject()
     {
-        var domain = _services.GetRequiredService<DomainContext>();
+        var domain = _services
+            .GetRequiredService<DomainContext>();
 
-        var result = await domain.EvaluateService(new TestService());
+        var result = await domain.Trigger(new TestService());
         
         Assert.True(result.IsSuccess);
     }
@@ -24,12 +25,9 @@ public class DomainTests
     public async Task CanEvaluateServiceThroughEvaluationAgent()
     {
         var domain = _services.GetRequiredService<DomainContext>();
-        var evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
 
-        var events = await domain.EvaluateService(new TestService());
+        var result = await domain.Trigger(new TestService());
 
-        var evalResult = await evaluationAgent.EvaluateEvents(events.Value);
-        
-        Assert.True(evalResult.IsSuccess);
+        Assert.True(result.IsSuccess);
     }
 }

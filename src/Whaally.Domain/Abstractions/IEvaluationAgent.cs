@@ -7,44 +7,46 @@ namespace Whaally.Domain.Abstractions;
 /// </summary>
 public interface IEvaluationAgent
 {
-    /// <summary>
-    ///     Applies provided events to their respective aggregates.
-    /// 
-    ///     If successful this operation has side effects against aggregates involved!
-    /// </summary>
-    /// <param name="eventEnvelopes">The event envelopes to apply</param>
-    /// <returns>Result object indicating success status</returns>
-    public Task<IResultBase> EvaluateEvents(params IEventEnvelope[] eventEnvelopes);
-
-    /// <summary>
-    ///     Evaluates the provided commands against their respective aggregates
-    /// </summary>
-    /// <param name="commandEnvelopes">The command envelopes to evaluate</param>
-    /// <returns>A result object indicating success status and resulting events</returns>
-    public Task<IResult<IEventEnvelope[]>> EvaluateCommands(params ICommandEnvelope[] commandEnvelopes);
-
-    /*
-     * Commands and events can be evaluated in batches because they are staged for evaluation.
-     *
-     * Sagas and events should be evaluated one by one because:
-     * - Sagas have the potential to branch out evaluation. Partitioning that by event source prevents a single point of failure halting all continuations of an operation.
-     * - Services are immediately evaluated upon invocation, only for the resulting commands to be staged. This gives some wiggle room for initiating compensatory actions.
-     */
-
-    /// <summary>
-    ///     Evaluates the supplied services
-    /// </summary>
-    /// <typeparam name="TService">The service to evaluate</typeparam>
-    /// <param name="serviceEnvelope"></param>
-    /// <returns>Commands representing the intended side effects of the service</returns>
-    public Task<IResult<ICommandEnvelope[]>> EvaluateService<TService>(IServiceEnvelope<TService> serviceEnvelope)
+    public Task<IResult<ICommandEnvelope[]>> Run<TService>(IServiceEnvelope<TService> service)
         where TService : class, IService;
+    
+    public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands);
+    
+    public Task<IResultBase> Apply(params IEventEnvelope[] events);
+    
+    public Task<IResultBase> Continue(IEventEnvelope @event);
+    
+    
+    public async Task<IResult<IEventEnvelope[]>> Trigger(params ICommandEnvelope[] commands)
+    {
+        // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
+        
+        var commandResult = await Evaluate(commands);
 
-    /// <summary>
-    ///     Evaluates the sagas relevant for the supplied event
-    /// </summary>
-    /// <typeparam name="TEvent">The event for which to evaluate sagas</typeparam>
-    /// <param name="eventEnvelope">The event envelope for which to continue evaluation</param>
-    /// <returns>The resulting commands representing the intended side effects of the saga</returns>
-    public Task<IResult<ICommandEnvelope[]>> EvaluateSaga(IEventEnvelope eventEnvelope);
+        if (commandResult.IsFailed)
+            return Result.Fail<IEventEnvelope[]>(commandResult.Errors);
+
+        var eventResult = await Apply(commandResult.Value);
+
+        if (eventResult.IsFailed)
+            return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
+
+        foreach (var @event in commandResult.Value)
+        {
+            await Continue(@event);
+        }
+
+        return commandResult;
+    }
+    
+    public async Task<IResult<IEventEnvelope[]>> Trigger<TService>(IServiceEnvelope<TService> service)
+        where TService : class, IService
+    {
+        var serviceResult = await Run(service);
+
+        if (serviceResult.IsFailed)
+            return Result.Fail<IEventEnvelope[]>(serviceResult.Errors);
+
+        return await Trigger(serviceResult.Value);
+    }
 }

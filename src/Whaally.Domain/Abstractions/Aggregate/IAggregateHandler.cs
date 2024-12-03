@@ -2,9 +2,37 @@
 
 namespace Whaally.Domain.Abstractions;
 
-// ToDo: Add an "EvaluateAndApply" method with a default implementation, ready to be overriden for whatever reason.
 public interface IAggregateHandler
 {
+    public Task<IResult<IEventEnvelope[]>> Trigger(params ICommand[] commands)
+        => Trigger(commands
+            .Select(q => new CommandEnvelope(
+                q,
+                new CommandMetadata
+                {
+                    Timestamp = DateTime.UtcNow
+                }))
+            .ToArray());
+
+    /// <summary>
+    ///     Trigger a command to evaluate the command and applying all related side effects when applicable.
+    /// </summary>
+    /// <param name="commands">The commands to trigger evaluation and application of side effects for</param>
+    /// <returns>Events which had been applied to the aggregate</returns>
+    public async Task<IResult<IEventEnvelope[]>> Trigger(params ICommandEnvelope[] commands)
+    {
+        var commandResult = await Evaluate(commands);
+
+        if (commandResult.IsFailed)
+            return commandResult;
+
+        var eventResult = await Apply(commandResult.Value);
+
+        return eventResult.IsFailed 
+            ? Result.Fail<IEventEnvelope[]>(eventResult.Errors) 
+            : commandResult;
+    }
+    
     /// <summary>
     ///     Evaluate the provided commands against the current state.
     /// </summary>
@@ -19,14 +47,14 @@ public interface IAggregateHandler
                     Timestamp = DateTime.UtcNow
                 }))
             .ToArray());
-
+    
     /// <summary>
     ///     Evaluate the provided commands against the current state.
     /// </summary>
     /// <param name="commands">The commands to evaluate</param>
     /// <returns>async result containing events if successful</returns>
     public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands);
-
+    
     /// <summary>
     ///     Apply the provided events to the current state.
     /// </summary>
@@ -34,13 +62,6 @@ public interface IAggregateHandler
     /// <returns>async Task</returns>
     public Task<IResultBase> Apply(params IEventEnvelope[] events);
     
-    /// <summary>
-    ///     Asynchronously runs the sagas for the provided events.
-    /// </summary>
-    /// <param name="events">Events for which to evaluate the sagas</param>
-    /// <returns>Success state about saga evaluation</returns>
-    public Task<IResultBase> Continue(params IEventEnvelope[] events);
-
     public Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot;
 }

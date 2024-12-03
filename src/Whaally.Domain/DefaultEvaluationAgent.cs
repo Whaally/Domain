@@ -9,21 +9,42 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IAggregateHandlerFactory _handlerFactory;
-
+    
     public DefaultEvaluationAgent(IServiceProvider services)
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
         _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
     }
-
+    
     private static void CheckSourceActivity(IMessageEnvelope[] envelopes)
     {
         if (envelopes.DistinctBy(q => q.Metadata.SourceActivity).Count() > 1)
             throw new Exception("All messages must originate from the same ActivityContext to evaluate them together");
     }
+    
+    public async Task<IResult<ICommandEnvelope[]>> Run<TService>(IServiceEnvelope<TService> serviceEnvelope)
+        where TService : class, IService
+    {
+        var serviceHandler = (IServiceHandler<TService>)_services.GetRequiredService(_domainContext.ServiceHandlers
+            .Single(q => q.ServiceType == typeof(TService))
+            .HandlerType);
+        
+        var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
 
-    public async Task<IResult<IEventEnvelope[]>> EvaluateCommands(params ICommandEnvelope[] commandEnvelopes)
+        var result = await serviceHandler.Handle<TService>(
+            serviceHandlerContext,
+            serviceEnvelope.Message);
+
+        if (result.IsFailed) return Result.Fail<ICommandEnvelope[]>(result.Errors);
+
+        return Result
+            .Ok(new ICommandEnvelope[] { })
+            .WithReasons(result.Reasons)
+            .WithValue(serviceHandlerContext.Commands.ToArray());
+    }
+    
+    public async Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commandEnvelopes)
     {
         CheckSourceActivity(commandEnvelopes);
 
@@ -70,7 +91,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         return result;
     }
 
-    public async Task<IResultBase> EvaluateEvents(params IEventEnvelope[] eventEnvelopes)
+    public async Task<IResultBase> Apply(params IEventEnvelope[] eventEnvelopes)
     {
         CheckSourceActivity(eventEnvelopes);
 
@@ -107,8 +128,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             .Ok()
             .WithReasons(results.SelectMany(q => q.Reasons));
     }
-
-    public async Task<IResult<ICommandEnvelope[]>> EvaluateSaga(IEventEnvelope eventEnvelope)
+    
+    public async Task<IResultBase> Continue(IEventEnvelope eventEnvelope)
     {
        /*
         * 1. Retrieve all relevant sagas
@@ -120,60 +141,43 @@ public class DefaultEvaluationAgent : IEvaluationAgent
            .Where(q => q.EventType == eventEnvelope.Message.GetType())
            .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
         
-        List<IResult<ICommandEnvelope[]>> results = new();
+        List<IResultBase> results = new();
 
-        foreach (var saga in sagas)
-        {
-            // There is no relevant saga registered. That's ok.
-            if (saga == null) continue;
-
-            var context = new SagaContext(_services)
-            {
-                AggregateId = eventEnvelope.Metadata.AggregateId,
-                Activity = eventEnvelope.Metadata.SourceActivity
-                    .Continue(saga.GetType().Name)
-                    .Context
-            };
-
-            var sagaResult = await saga.Evaluate(
-                context, 
-                eventEnvelope.Message);
-
-            var result = new Result<ICommandEnvelope[]>()
-                .WithReasons(sagaResult.Reasons);
-
-            if (sagaResult.IsSuccess)
-                result.WithValue(context.Commands.ToArray());
-
-            results.Add(result);
-        }
-
-        return new Result<ICommandEnvelope[]>()
-            .WithValue(results
-                .SelectMany(q => q.ValueOrDefault)
-                .Where(q => q != null)
-                .ToArray())
+        foreach (var saga in sagas) 
+            results.Add(await RunSaga(saga, eventEnvelope));
+        
+        return new Result()
             .WithReasons(results.SelectMany(q => q.Reasons));
     }
-
-    public async Task<IResult<ICommandEnvelope[]>> EvaluateService<TService>(IServiceEnvelope<TService> serviceEnvelope)
-        where TService : class, IService
+    
+    private async Task<IResultBase> RunSaga(ISaga saga, IEventEnvelope eventEnvelope)
     {
-        var serviceHandler = (IServiceHandler<TService>)_services.GetRequiredService(_domainContext.ServiceHandlers
-            .Single(q => q.ServiceType == typeof(TService))
-            .HandlerType);
+        var context = new SagaContext(_services)
+        {
+            AggregateId = eventEnvelope.Metadata.AggregateId,
+            Activity = eventEnvelope.Metadata.SourceActivity
+                .Continue(saga.GetType().Name)
+                .Context
+        };
         
-        var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
+        var sagaResult = await saga.Evaluate(
+            context, 
+            eventEnvelope.Message);
+        
+        if (sagaResult.IsFailed)
+            return sagaResult;
+        
+        var evaluation = await Evaluate(context.Commands.ToArray());
+        if (evaluation.IsFailed)
+            return evaluation;
+        
+        var application = await Apply(evaluation.Value);
+        if (application.IsFailed)
+            return application;
 
-        var result = await serviceHandler.Handle<TService>(
-            serviceHandlerContext,
-            serviceEnvelope.Message);
+        foreach (var @event in evaluation.Value) 
+            await Continue(@event);
 
-        if (result.IsFailed) return Result.Fail<ICommandEnvelope[]>(result.Errors);
-
-        return Result
-            .Ok(new ICommandEnvelope[] { })
-            .WithReasons(result.Reasons)
-            .WithValue(serviceHandlerContext.Commands.ToArray());
+        return Result.Ok();
     }
 }

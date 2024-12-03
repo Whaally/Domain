@@ -36,7 +36,7 @@ public class ServiceHandlerContext(
     public async Task<IResultBase> EvaluateService<TService>(TService service)
         where TService : class, IService
     {
-        var result = await evaluationAgent.EvaluateService(
+        var result = await evaluationAgent.Run(
             new ServiceEnvelope<TService>(
                 service,
                 new ServiceMetadata
@@ -46,7 +46,7 @@ public class ServiceHandlerContext(
 
         if (result.IsSuccess)
             _commands.AddRange(result.Value);
-
+        
         return result.ToResult();
     }
 
