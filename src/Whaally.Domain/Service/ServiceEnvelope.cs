@@ -12,6 +12,6 @@ public record ServiceEnvelope<TService>(
             service,
             new ServiceMetadata
             {
-                Timestamp = DateTime.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow
             });
 }

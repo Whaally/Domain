@@ -30,15 +30,13 @@ public class DomainOptions
             services.GetRequiredService<IAggregateFactory>());
 
     /// <summary>
-    ///     Instantiates a service handler context, used when evaluating a service handler.
+    ///     Supplies a context object to the various domain operations.
     ///
-    ///     Has a transient lifetime.
+    ///     Has a singleton lifetime.
     /// </summary>
-    public Func<IServiceProvider, IServiceHandlerContext> ServiceHandlerContext
-        = services => new ServiceHandlerContext(
-            services,
-            services.GetRequiredService<IEvaluationAgent>());
-
+    public Func<IServiceProvider, IContextFactory> ContextFactory
+        = services => new DefaultContextFactory(services);
+    
     /// <summary>
     ///     Instantiates an evaluate agent, coordinating operations across nodes.
     ///
@@ -46,14 +44,6 @@ public class DomainOptions
     /// </summary>
     public Func<IServiceProvider, IEvaluationAgent> EvaluationAgent
         = services => new DefaultEvaluationAgent(services);
-
-    /// <summary>
-    ///     Instantiates a saga context, used when evaluating sagas.
-    ///
-    ///     Has a transient lifetime.
-    /// </summary>
-    public Func<IServiceProvider, ISagaContext> SagaContext
-        = services => new SagaContext(services);
 
     /// <summary>
     ///     Supplies command handlers used in this domain.

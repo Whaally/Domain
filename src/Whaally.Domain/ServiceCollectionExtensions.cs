@@ -54,9 +54,8 @@ public static class ServiceCollectionExtensions
                 })
             .AddSingleton(options.AggregateHandlerFactory)
             .AddSingleton(options.AggregateFactory)
-            .AddTransient(options.ServiceHandlerContext)
             .AddTransient(options.EvaluationAgent)
-            .AddTransient(options.SagaContext);
+            .AddSingleton(options.ContextFactory);
         
         return services;
     }

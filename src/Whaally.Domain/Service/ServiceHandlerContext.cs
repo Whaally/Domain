@@ -5,11 +5,30 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class ServiceHandlerContext(
-    IServiceProvider services,
-    IEvaluationAgent evaluationAgent) : IServiceHandlerContext
+public class ServiceHandlerContext : IServiceHandlerContext
 {
     private List<ICommandEnvelope> _commands = new(0);
+    private readonly IServiceProvider _services;
+    private readonly IEvaluationAgent _evaluationAgent;
+    
+    public ServiceHandlerContext(
+        IServiceProvider services,
+        IEvaluationAgent evaluationAgent)
+    {
+        _services = services;
+        _evaluationAgent = evaluationAgent;
+        
+        using var activity = DomainContext.ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: $"run service",
+            parentContext: ParentContext ?? default,
+            tags: new Dictionary<string, object?>
+            {
+                // { "messaging.message.type", typeof(TService).FullName },
+                { "messaging.operation.name", "run" },
+                { "messaging.operation.type", "process" }
+            });
+    }
 
     /// <summary>
     /// Access to the commands which have previously been issued. Includes the commands
@@ -24,24 +43,25 @@ public class ServiceHandlerContext(
     /// Note that commands directly issued to the <c>IAggregateHandler</c> are evaluated directly and as such do
     /// not benefit from the compositional system services use.
     /// </remarks>
-    public IAggregateHandlerFactory Factory => services.GetRequiredService<IAggregateHandlerFactory>();
+    public IAggregateHandlerFactory Factory => _services.GetRequiredService<IAggregateHandlerFactory>();
 
-    public ActivityContext Activity { get; init; }
+    public IDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
+    public ActivityContext? ParentContext { get; init; }
 
     /// <summary>
     /// Evaluates a service and when successfull, adds the resulting operations to the current commands basket.
     /// </summary>
     /// <param name="service">The service to evaluate</param>
     /// <returns>An <c>IResultBase</c> signalling evaluation state</returns>
-    public async Task<IResultBase> EvaluateService<TService>(TService service)
+    public virtual async Task<IResultBase> EvaluateService<TService>(TService service)
         where TService : class, IService
-    {
-        var result = await evaluationAgent.Run(
+    {       
+        var result = await _evaluationAgent.Evaluate(
             new ServiceEnvelope<TService>(
                 service,
                 new ServiceMetadata
                 {
-                    SourceActivity = Activity
+                    CreatedAt = DateTimeOffset.UtcNow
                 }));
 
         if (result.IsSuccess)
@@ -54,14 +74,13 @@ public class ServiceHandlerContext(
     /// Adds a command to the commands basket for future evaluation.
     /// </summary>
     /// <param name="command">The command to add to the current commands basket</param>
-    public void StageCommand<TCommand>(string aggregateId, TCommand command)
+    public virtual void StageCommand<TCommand>(string aggregateId, TCommand command)
         where TCommand : class, ICommand =>
         _commands.Add(new CommandEnvelope(
             command,
             new CommandMetadata
             {
                 AggregateId = aggregateId,
-                Timestamp = DateTime.UtcNow,
-                SourceActivity = Activity
+                CreatedAt = DateTimeOffset.UtcNow
             }));
 }

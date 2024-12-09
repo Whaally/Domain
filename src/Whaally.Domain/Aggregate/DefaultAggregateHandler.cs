@@ -10,6 +10,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IEvaluationAgent _evaluationAgent;
+    private readonly IContextFactory _contextFactory;
     
     private TAggregate _aggregate;
     public TAggregate Aggregate
@@ -19,13 +20,14 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     }
     
     public string Id { get; init; }
-    
+
     // ToDo: Use an options pattern to supply mandatory/optional parameters
     public DefaultAggregateHandler(IServiceProvider services, string id)
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
-        _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
+        _evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
+        _contextFactory = _services.GetRequiredService<IContextFactory>();
         
         Id = id;
         
@@ -36,12 +38,12 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
     {
+        // ToDo: Check whether the commands have in fact been intended for the present aggregate
+        
         var events = new List<IEventEnvelope>(commands.Length);
         var results = new List<IResultBase>();
 
         TAggregate intermediateState = _aggregate;
-
-        // ToDo: Check whether the commands have in fact been intended for the present aggregate
 
         foreach (var cmd in commands)
         {
@@ -57,22 +59,20 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             
             ICommandEnvelope command = cmd;
 
+            if (string.IsNullOrWhiteSpace(command.Metadata.AggregateId)) command.Metadata.AggregateId = Id;
+            // ToDo: Assert we are not executing commands not meant for this instance.
+
             // ToDo: provide more helpful exception methods
             var commandHandler = (ICommandHandler)_services.GetRequiredService(
                 _domainContext.CommandHandlers
                     .Single(q => q.AggregateType == typeof(TAggregate) 
                                  && q.CommandType == command.Message.GetType())
                     .HandlerType);
-            
-            var commandContext = new CommandHandlerContext<TAggregate>(
-                _services,
-                !string.IsNullOrWhiteSpace(command.Metadata.AggregateId)
-                    ? command.Metadata.AggregateId
-                    : Id)
-            {
-                Aggregate = intermediateState
-            };
 
+            var commandContext = _contextFactory.CreateCommandHandlerContext(
+                intermediateState,
+                command.Metadata);
+            
             results.Add(commandHandler.Evaluate(commandContext, command.Message));
 
             var intermediateEvents = commandContext.Events.ToList();
@@ -101,15 +101,14 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 events.Add(@event);
             }
         }
-
+        
         var result = Result.Ok().WithReasons(results.SelectMany(result => result.Reasons));
-
-        return Task.FromResult<IResult<IEventEnvelope[]>>(
-            result.IsSuccess
+        
+        return Task.FromResult<IResult<IEventEnvelope[]>>(result.IsSuccess
                 ? result.ToResult(events.ToArray())
                 : result);
     }
-
+    
     public async Task<IResultBase> Apply(params IEventEnvelope[] events)
     {
         if (events == null) return Result.Ok();
@@ -118,20 +117,18 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         foreach (var @event in events)
         {
+            // ToDo: Assert whether the events are intended to be applied to this aggregate instance.
+            
             var eventHandler = (IEventHandler)_services.GetRequiredService(
                 _domainContext.EventHandlers
                     .Single(q => q.AggregateType == typeof(TAggregate)
                                  && q.EventType == @event.Message.GetType())
                     .HandlerType);
 
-            var eventContext = new EventHandlerContext<TAggregate>(
-                !string.IsNullOrWhiteSpace(@event.Metadata.AggregateId)
-                    ? @event.Metadata.AggregateId
-                    : Id)
-            {
-                Aggregate = intermediateState
-            };
-
+            var eventContext = _contextFactory.CreateEventHandlerContext(
+                intermediateState,
+                @event.Metadata);
+            
             intermediateState = eventHandler.Apply(
                 eventContext,
                 @event.Message);

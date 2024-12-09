@@ -1,4 +1,5 @@
-﻿using Whaally.Domain.Abstractions;
+﻿using System.Diagnostics;
+using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
@@ -12,6 +13,10 @@ internal class DefaultAggregateHandlerFactory(
     public IAggregateHandler<TAggregate> Instantiate<TAggregate>(string id)
         where TAggregate : class, IAggregate
     {
+        // using var activity = DomainContext.ActivitySource.StartActivity(
+        //     ActivityKind.Internal,
+        //     name: $"instantiate {typeof(TAggregate).Name}");
+        
         if (id == null) throw new ArgumentNullException(nameof(id));
         
         if (_dictionary.TryGetValue(id, out var handler)) 

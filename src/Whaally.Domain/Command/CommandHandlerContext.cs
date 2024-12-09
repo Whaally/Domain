@@ -11,9 +11,11 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public IReadOnlyCollection<IEventEnvelope> Events => _events.AsReadOnly();
     
     private List<IEventEnvelope> _events = [];
-
+    
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
+
+    private readonly Activity? _activity;
     
     public CommandHandlerContext(
         IServiceProvider services, 
@@ -22,12 +24,26 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         _services = services;
         _domainContext = services.GetRequiredService<DomainContext>();
         AggregateId = aggregateId;
-
+        
         // Stuff like this would require me to rethink what I am doing.
         // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
         _aggregate ??= services
             .GetService<IAggregateFactory>()
             ?.Instantiate<TAggregate>() ?? null!;
+        
+        _activity = DomainContext.ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: $"evaluate {typeof(TAggregate).Name}",
+            parentContext: ParentContext ?? default,
+            tags: new Dictionary<string, object?>
+            {
+                // { "messaging.batch.message_count", operation.commands.Length },
+                // { "messaging.batch.types", $"[{string.Join(';', operation.commands.Select(q => q.Message.GetType().FullName))}]" },
+                { "messaging.operation.name", "evaluate" },
+                { "messaging.operation.type", "process" },
+                // { "messaging.destination.id", operation.aggregateId },
+                // { "messaging.destination.name", operation.aggregateType.FullName }
+            });
     }
 
     private TAggregate _aggregate = null!;
@@ -36,24 +52,25 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         get => _aggregate; 
         init => _aggregate = value;
     }
-    
-    public ActivityContext Activity { get; init; }
-    public string AggregateId { get; init; }
 
-    public void StageEvent<TEvent>(TEvent @event)
+    public IDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
+    public ActivityContext? ParentContext { get; init; }
+    public string AggregateId { get; init; }
+    
+    public virtual void StageEvent<TEvent>(TEvent @event)
         where TEvent : class, IEvent
     {
         var envelope = new EventEnvelope<TEvent>(
             @event,
-            new EventMetadata(AggregateId)
+            new EventMetadata
             {
-                SourceActivity = Activity
+                AggregateId = AggregateId
             });
-
+        
         _events.Add(envelope);
     }
-
-    public IResultBase EvaluateCommand<TCommand>(TCommand command)
+    
+    public virtual IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
         var commandHandler = (ICommandHandler) _services.GetRequiredService(
@@ -65,7 +82,12 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
 
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
         // staged events, or there is otherwise a trace of this command being called by another command.
-        var context = new CommandHandlerContext<TAggregate>(_services, AggregateId);
+        var context = _services.GetRequiredService<IContextFactory>()
+            .CreateCommandHandlerContext(_aggregate, new CommandMetadata
+            {
+                AggregateId = AggregateId,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
         
         var result = commandHandler.Evaluate(context, command);
 
@@ -82,7 +104,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                     .Apply(new EventHandlerContext<TAggregate>(AggregateId)
                     {
                         Aggregate = Aggregate,
-                        Activity = Activity
+                        ParentContext = ParentContext
                     }, @event);
                 
                 _events.Add(eventEnvelope);

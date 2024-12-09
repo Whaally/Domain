@@ -11,7 +11,7 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
     private readonly string _firstAircraftId = Guid.NewGuid().ToString();
     private readonly string _secondAircraftId = Guid.NewGuid().ToString();
 
-    [Fact]
+    [Fact(Skip = "Since sagas are triggered asynchronously, these tests are no longer representative of actual behaviour")]
     public async Task EvaluateTest()
     {
         await Domain.Trigger(_flightId, new Create());

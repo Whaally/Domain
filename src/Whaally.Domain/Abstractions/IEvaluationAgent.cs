@@ -1,52 +1,105 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 
 namespace Whaally.Domain.Abstractions;
 
 /// <summary>
 ///     Central component providing behaviour for the high-level interaction between different domain components.
 /// </summary>
-public interface IEvaluationAgent
-{
-    public Task<IResult<ICommandEnvelope[]>> Run<TService>(IServiceEnvelope<TService> service)
+public interface IEvaluationAgent : IDisposable
+{   
+    /// <summary>
+    ///     Invokes a saga, meaning it runs the saga, and consequently invokes all resulting events as well
+    ///
+    ///     Possibly incurs side effects
+    /// </summary>
+    /// <param name="saga"></param>
+    /// <param name="event"></param>
+    /// <returns></returns>
+    public Task<IResultBase> Invoke(ISaga saga, IEventEnvelope @event);
+    
+    /// <summary>
+    ///     Evaluates a service, meaning it will run the service and collect its output as a number of commands, but not
+    ///     continue eavaluating these commands.
+    ///
+    ///     Should be side effect free
+    /// </summary>
+    /// <param name="service"></param>
+    /// <typeparam name="TService"></typeparam>
+    /// <returns></returns>
+    public Task<IResult<ICommandEnvelope[]>> Evaluate<TService>(IServiceEnvelope<TService> service)
         where TService : class, IService;
     
+    /// <summary>
+    ///     Evaluates a command, meaning it runs the command and collects its output as events, but does not apply these
+    ///
+    ///     Should be side effect free 
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns></returns>
     public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands);
     
+    /// <summary>
+    ///     Applies several events, triggering a state change on corresponding aggregates
+    ///
+    ///     Possibly incurs side effects
+    /// </summary>
+    /// <param name="events"></param>
+    /// <returns></returns>
     public Task<IResultBase> Apply(params IEventEnvelope[] events);
     
-    public Task<IResultBase> Continue(IEventEnvelope @event);
+    /// <summary>
+    ///     Continue from an event onwards. Finds relevant sagas and invokes these
+    ///
+    ///     Possibly incurs side effects
+    /// </summary>
+    /// <param name="events"></param>
+    /// <returns></returns>
+    public Task<IResultBase> Continue(params IEventEnvelope[] events);
     
-    
-    public async Task<IResult<IEventEnvelope[]>> Trigger(params ICommandEnvelope[] commands)
+    /// <summary>
+    ///     Invokes a number of commands, meaning they are ran, and the resulting events are applied to the
+    ///     corresponding aggregates
+    ///
+    ///     Possibly incurs side effects
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns></returns>
+    public async Task<IResult<IEventEnvelope[]>> Invoke(params ICommandEnvelope[] commands)
     {
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
         
         var commandResult = await Evaluate(commands);
-
+        
         if (commandResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(commandResult.Errors);
-
+        
         var eventResult = await Apply(commandResult.Value);
-
+        
         if (eventResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
-
-        foreach (var @event in commandResult.Value)
-        {
-            await Continue(@event);
-        }
-
+        
+        await Continue(commandResult.Value);
+        
         return commandResult;
     }
     
-    public async Task<IResult<IEventEnvelope[]>> Trigger<TService>(IServiceEnvelope<TService> service)
+    /// <summary>
+    ///     Invokes a service, meaning the service is ran, and the resulting output is processed further
+    ///
+    ///     Possibly incurs side effects
+    /// </summary>
+    /// <param name="service"></param>
+    /// <typeparam name="TService"></typeparam>
+    /// <returns></returns>
+    public async Task<IResult<IEventEnvelope[]>> Invoke<TService>(IServiceEnvelope<TService> service)
         where TService : class, IService
     {
-        var serviceResult = await Run(service);
+        var serviceResult = await Evaluate(service);
 
         if (serviceResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(serviceResult.Errors);
-
-        return await Trigger(serviceResult.Value);
+        
+        return await Invoke(serviceResult.Value);
     }
 }

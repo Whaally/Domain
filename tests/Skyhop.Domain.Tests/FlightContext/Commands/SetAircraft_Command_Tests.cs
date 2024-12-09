@@ -16,9 +16,9 @@ public class SetAircraft_Command_Tests : DomainTest
     {
         var flight = AggregateFactory.Instantiate<Flight>(_flightId);
 
-        var result = await flight.EvaluateAndApply(
-            new Create(),
-            new SetAircraft(_aircraftId));
+        var result = await flight.Trigger(
+            (CommandEnvelope<Create>)new Create(),
+            (CommandEnvelope<SetAircraft>)new SetAircraft(_aircraftId));
         
         Assert.Empty(result.Errors);
         Assert.Equal(2, result.Value.Length);
@@ -30,9 +30,9 @@ public class SetAircraft_Command_Tests : DomainTest
     {
         var aggregate = AggregateFactory.Instantiate<Flight>(_flightId);
 
-        var result = await aggregate.EvaluateAndApply(
-            new Create(),
-            new SetAircraft(""));
+        var result = await aggregate.Trigger(
+            (CommandEnvelope<Create>)new Create(),
+            (CommandEnvelope<SetAircraft>)new SetAircraft(""));
 
         Assert.Single(result.Errors);
     }

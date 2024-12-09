@@ -59,7 +59,8 @@ public class RecursiveServiceInvocationTest
         };
 
         var serviceHandler = _services.GetRequiredService<IServiceHandler<RecursiveService>>();
-        var serviceHandlerContext = _services.GetRequiredService<IServiceHandlerContext>();
+        var serviceHandlerContext =
+            new ServiceHandlerContext(_services, _services.GetRequiredService<IEvaluationAgent>());
 
         var result = await serviceHandler.Handle(serviceHandlerContext, service);
 

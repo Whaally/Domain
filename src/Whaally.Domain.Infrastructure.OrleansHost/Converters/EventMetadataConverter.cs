@@ -6,17 +6,18 @@ namespace Whaally.Domain.Infrastructure.OrleansHost.Converters;
 public sealed class IEventMetadataConverter : IConverter<EventMetadata, EventMetadataSurrogate>
 {
     public EventMetadata ConvertFromSurrogate(in EventMetadataSurrogate surrogate) =>
-        new(surrogate.AggregateId)
+        new()
         {
-            Timestamp = surrogate.Timestamp,
-            SourceActivity = surrogate.SourceActivity
+            AggregateId = surrogate.AggregateId,
+            CreatedAt = surrogate.CreatedAt,
+            ParentContext = surrogate.SourceActivity
         };
 
     public EventMetadataSurrogate ConvertToSurrogate(in EventMetadata value) =>
         new()
         {
             AggregateId = value.AggregateId,
-            Timestamp = value.Timestamp,
-            SourceActivity = value.SourceActivity
+            CreatedAt = value.CreatedAt,
+            SourceActivity = value.ParentContext
         };
 }

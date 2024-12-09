@@ -1,6 +1,9 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
+
+// ReSharper disable InvertIf
 
 namespace Whaally.Domain;
 
@@ -14,6 +17,8 @@ namespace Whaally.Domain;
 // This allows us to go from large scale to small scale structures. E.g. cluster -> service -> command -> event
 public class DomainContext(IServiceProvider services)
 {
+    internal static ActivitySource ActivitySource = new("Whaally.Domain");
+    
     #region handler metadata
     /// <summary>
     ///     Metadata about the command handlers registered with this domain instance.
@@ -113,6 +118,7 @@ public class DomainContext(IServiceProvider services)
 
     private IEvaluationAgent _evaluationAgent => services.GetRequiredService<IEvaluationAgent>();
     
+    
     internal IAggregateHandler GetAggregate(Type type, string id)
     {
         var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
@@ -133,7 +139,6 @@ public class DomainContext(IServiceProvider services)
                 .SingleOrDefault(q => q.EventType == type)
                 ?.AggregateType;
         
-        
         if (aggregateType == null) 
             throw new Exception($"Aggregate type could not be resolved for {type.FullName}");
             
@@ -146,40 +151,76 @@ public class DomainContext(IServiceProvider services)
 
         return handler;
     }
-
-    public IAggregateHandler<TAggregate> GetAggregate<TAggregate>(string id)
+    
+    public virtual IAggregateHandler<TAggregate> GetAggregate<TAggregate>(string id)
         where TAggregate : class, IAggregate 
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
 
+    public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(string aggregateId, TCommand command)
+        where TCommand : class, ICommand =>
+        Trigger(
+            command,
+            new CommandMetadata
+            {
+                AggregateId = aggregateId,
+                CreatedAt = DateTimeOffset.UtcNow
+            });
     
-    public Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(string aggregateId, TCommand command)
+    public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(
+        TCommand command,
+        ICommandMetadata metadata)
+        where TCommand : class, ICommand =>
+        _evaluationAgent.Evaluate(new CommandEnvelope(command, metadata));
+
+    public virtual Task<IResult<IEventEnvelope[]>> Trigger<TCommand>(
+        string aggregateId,
+        TCommand command)
         where TCommand : class, ICommand
-        => _evaluationAgent.Evaluate(new CommandEnvelope(
-            command,
-            new CommandMetadata
-            {
-                AggregateId = aggregateId,
-                Timestamp = DateTime.UtcNow
-            }));
-
+        => Trigger(command, new CommandMetadata
+        {
+            AggregateId = aggregateId,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
     
-    public Task<IResult<IEventEnvelope[]>> Trigger<TCommand>(string aggregateId, TCommand command)
-        where TCommand : class, ICommand => 
-        _evaluationAgent.Trigger(new CommandEnvelope(
-            command,
-            new CommandMetadata
-            {
-                AggregateId = aggregateId,
-                Timestamp = DateTime.UtcNow
-            }));
+    public virtual Task<IResult<IEventEnvelope[]>> Trigger<TCommand>(
+        TCommand command,
+        ICommandMetadata metadata)
+        where TCommand : class, ICommand
+    {
+        using var evaluationAgent = _evaluationAgent;
+        
+        return evaluationAgent.Invoke(new CommandEnvelope(command, metadata));
+    }
 
+    public virtual Task<IResult<IEventEnvelope[]>> Trigger(
+        string aggregateId,
+        params ICommand[] commands)
+    {
+        using var evaluationAgent = _evaluationAgent;
+
+        return evaluationAgent.Invoke(commands
+            .Select(command => new CommandEnvelope(
+                command,
+                new CommandMetadata
+                {
+                    AggregateId = aggregateId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                }))
+            .ToArray());
+    }
     
-    public async Task<IResult<IEventEnvelope[]>> Trigger<TService>(TService service)
-        where TService : class, IService =>
-        await _evaluationAgent.Trigger(new ServiceEnvelope<TService>(
-            service, 
+    public virtual async Task<IResult<IEventEnvelope[]>> Trigger<TService>(
+        TService service,
+        IServiceMetadata? metadata = null)
+        where TService : class, IService
+    {
+        using var evaluationAgent = _evaluationAgent;
+        
+        return await evaluationAgent.Invoke(new ServiceEnvelope<TService>(
+            service,
             new ServiceMetadata
             {
-                Timestamp = DateTime.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow
             }));
+    }
 }

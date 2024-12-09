@@ -5,6 +5,10 @@ namespace Whaally.Domain;
 
 public record ServiceMetadata : IServiceMetadata
 {
-    public DateTime Timestamp { get; init; }
-    public ActivityContext SourceActivity { get; init; }
+    public IDictionary<string, object> Attributes { get; set; }
+        = new Dictionary<string, object>();
+    
+    public ActivityContext? ParentContext { get; set; }
+    
+    public DateTimeOffset CreatedAt { get; set; }
 }

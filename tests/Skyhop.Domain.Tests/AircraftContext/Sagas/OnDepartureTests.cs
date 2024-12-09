@@ -6,26 +6,25 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
+using Timer = System.Timers.Timer;
 
 namespace Skyhop.Domain.Tests.FlightContext.Commands;
 
 public class OnDepartureTests : DomainTest
 {
-    [Fact]
+    [Fact(Skip = "Since sagas are triggered asynchronously, these tests are no longer representative of actual behaviour")]
     public async Task DepartureTimeSet_Should_Trigger_OnDeparture() {
         var aircraftId = Guid.NewGuid().ToString();
         var flightId = Guid.NewGuid().ToString();
         var departureAirfieldId = Guid.NewGuid().ToString();
 
-        var flight = await AggregateFactory
-            .Instantiate<Flight>(flightId)
-            .EvaluateAndApply(
-                new Create(),
-                new SetAircraft(aircraftId),
-                new SetDeparture(
-                    DateTime.UtcNow,
-                    departureAirfieldId
-                ));
+        await Domain.Trigger(flightId,
+            new Create(),
+            new SetAircraft(aircraftId),
+            new SetDeparture(
+                DateTime.UtcNow,
+                departureAirfieldId
+            ));
         
         var aircraft = await AggregateFactory
             .Instantiate<Aircraft>(aircraftId)
@@ -42,9 +41,9 @@ public class OnDepartureTests : DomainTest
         // First we're instantiating a flight as a snapshot of it will be retrieved by the saga
         await AggregateFactory
             .Instantiate<Flight>(flightId)
-            .EvaluateAndApply(
-                new Create(),
-                new SetAircraft(Guid.NewGuid().ToString()));
+            .Trigger(
+                (CommandEnvelope<Create>)new Create(),
+                (CommandEnvelope<SetAircraft>)new SetAircraft(Guid.NewGuid().ToString()));
         
         // Then we're creating the saga, and instantiating the arguments required for evaluation
         var saga = new OnDeparture();

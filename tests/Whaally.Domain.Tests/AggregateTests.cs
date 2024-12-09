@@ -1,3 +1,4 @@
+using FluentAssertions;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
@@ -21,7 +22,7 @@ public class AggregateTests
         var service = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid().ToString());
 
         var result = await service.Evaluate(
-            new TestCommand
+            (CommandEnvelope<TestCommand>)new TestCommand
             {
                 Result = Result.Ok()
             });
@@ -36,7 +37,7 @@ public class AggregateTests
         var service = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid().ToString());
 
         var operationResult = await service.Evaluate(
-            new TestCommand
+            (CommandEnvelope<TestCommand>)new TestCommand
             {
                 Result = Result.Fail("Failure")
             });
@@ -51,7 +52,7 @@ public class AggregateTests
         var aggregateHandler = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid().ToString());
 
         var result = await aggregateHandler.Evaluate(
-            new TestCommand
+            (CommandEnvelope<TestCommand>)new TestCommand
             {
                 Events = new[] { new TestEvent() },
                 Result = Result.Ok()
@@ -68,14 +69,18 @@ public class AggregateTests
         var aggregateHandler = _aggregateHandlerFactory.Instantiate<TestAggregate>(guid);
 
         var result = await aggregateHandler.Evaluate(
-            new TestCommand
+            new CommandEnvelope(new TestCommand
             {
-                Events = new[] { new TestEvent() },
+                Events = [ new TestEvent() ],
                 Result = Result.Ok()
-            });
+            }, new CommandMetadata
+            {
+                AggregateId = guid
+            }));
 
         Assert.True(result.IsSuccess);
         Assert.Single(result.Value);
-        Assert.Equal(guid, result.Value.First().Metadata.AggregateId);
+
+        result.Value.First().Metadata.AggregateId.Should().Be(guid);
     }
 }

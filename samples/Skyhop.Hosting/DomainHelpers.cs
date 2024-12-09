@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Hosting;
@@ -12,7 +13,9 @@ public static class DomainHelpers
     {
         if (aggregate == null) return TypedResults.NotFound();
 
-        var result = await aggregate.Evaluate(commands);
+        var result = await aggregate.Evaluate(
+            commands
+                .Select(q => new CommandEnvelope(q, new CommandMetadata())).ToArray());
 
         if (result.IsFailed)
             return TypedResults.ValidationProblem(

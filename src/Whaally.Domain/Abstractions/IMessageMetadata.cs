@@ -4,27 +4,21 @@ namespace Whaally.Domain.Abstractions;
 
 public interface IMessageMetadata
 {
-    public DateTime Timestamp { get; init; }
+    public IDictionary<string, object> Attributes { get; set; }
+    
+    public DateTimeOffset CreatedAt { get; set; }
+    
+    public ActivityContext? ParentContext { get; set; }
+}
 
-    /// <summary>
-    /// Stores information about the activity from which this operation originated, including TraceId and SpanId.
-    /// </summary>
-    public ActivityContext SourceActivity { get; init; }
+public interface IServiceMetadata : IMessageMetadata;
 
-    // ToDo: consider adding authorization information as well
+public interface ICommandMetadata : IMessageMetadata
+{
+    public string AggregateId { get; set; }
 }
 
 public interface IEventMetadata : IMessageMetadata
 {
-    public string AggregateId { get; init; }
-}
-
-public interface ICommandMetadata : IMessageMetadata
-{
-    public string AggregateId { get; init; }
-}
-
-public interface IServiceMetadata : IMessageMetadata
-{
-
+    public string AggregateId { get; set; }
 }

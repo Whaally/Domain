@@ -21,33 +21,29 @@ public class SagaContext : ISagaContext
     private List<ICommandEnvelope> _commands = new();
     public IAggregateHandlerFactory Factory => _services.GetRequiredService<IAggregateHandlerFactory>();
 
-    public ActivityContext Activity { get; init; }
-
-    // ToDo: I do not know about situations in which no aggregateId would be provided,
-    // though I do not have a decent way to supply the aggregate id.
+    public IDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
+    public ActivityContext? ParentContext { get; init; }
     public string? AggregateId { get; init; }
 
-    public void StageCommand(string aggregateId, ICommand command)
+    public virtual void StageCommand(string aggregateId, ICommand command)
     {
         _commands.Add(new CommandEnvelope(
             command,
             new CommandMetadata
             {
-                SourceActivity = Activity,
-                Timestamp = DateTime.UtcNow,
+                CreatedAt = DateTimeOffset.UtcNow,
                 AggregateId = aggregateId
             }));
     }
 
-    public async Task<IResultBase> EvaluateService(IService service)
+    public virtual async Task<IResultBase> EvaluateService(IService service)
     {
-        var result = await _evaluationAgent.Run(
+        var result = await _evaluationAgent.Evaluate(
             new ServiceEnvelope<IService>(
                 service,
                 new ServiceMetadata
                 {
-                    SourceActivity = Activity,
-                    Timestamp = DateTime.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow
                 }));
 
         if (result.IsSuccess)

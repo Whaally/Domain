@@ -35,9 +35,10 @@ public class AggregateHandlerGrain<TAggregate>
         {
             await AggregateHandler.Apply(new EventEnvelope(
                 (IEvent)@event.Data,
-                new EventMetadata(@event.StreamId.ToString())
+                new EventMetadata
                 {
-                    Timestamp = @event.Timestamp.DateTime
+                    AggregateId = @event.StreamId.ToString(),
+                    CreatedAt = @event.Timestamp.DateTime
                 }));
         }
 

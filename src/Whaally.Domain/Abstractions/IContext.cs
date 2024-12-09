@@ -4,5 +4,5 @@ namespace Whaally.Domain.Abstractions;
 
 public interface IContext
 {
-    public ActivityContext Activity { get; init; }
+    public ActivityContext? ParentContext { get; init; }
 }

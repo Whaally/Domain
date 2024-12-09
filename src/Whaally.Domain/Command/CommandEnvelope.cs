@@ -16,6 +16,6 @@ public record CommandEnvelope<TCommand>(
             command,
             new CommandMetadata
             {
-                Timestamp = DateTime.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow
             });
 }

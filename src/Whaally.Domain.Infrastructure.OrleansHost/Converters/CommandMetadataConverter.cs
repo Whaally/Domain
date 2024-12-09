@@ -9,15 +9,15 @@ public sealed class ICommandMetadataConverter : IConverter<CommandMetadata, Comm
         new()
         {
             AggregateId = surrogate.AggregateId,
-            Timestamp = surrogate.Timestamp,
-            SourceActivity = surrogate.SourceActivity
+            CreatedAt = surrogate.CreatedAt,
+            ParentContext = surrogate.SourceActivity
         };
 
     public CommandMetadataSurrogate ConvertToSurrogate(in CommandMetadata value) =>
         new()
         {
             AggregateId = value.AggregateId,
-            Timestamp = value.Timestamp,
-            SourceActivity = value.SourceActivity
+            CreatedAt = value.CreatedAt,
+            SourceActivity = value.ParentContext
         };
 }

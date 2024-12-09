@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
@@ -12,7 +13,9 @@ public class Create_Command_Tests : DomainTest
     {
         var flight = AggregateFactory.Instantiate<Flight>("");
 
-        var result = await flight.Evaluate(new Create());
+        CommandEnvelope<Create> envelope = new Create();
+        
+        var result = await flight.Evaluate(envelope);
 
         Assert.Empty(result.Errors);
         Assert.IsType<EventEnvelope<Created>>(result.Value.Single());
@@ -23,12 +26,10 @@ public class Create_Command_Tests : DomainTest
     {
         var flight = AggregateFactory.Instantiate<Flight>("");
 
-        // ToDo: We'll need an `EvaluateAndApply` method to do stuff like this?
-        await flight.Apply(
-            (await flight.Evaluate(new Create())).Value);
+        await flight.Trigger((CommandEnvelope<Create>)new Create());
 
-        var result = await flight.Evaluate(new Create());
+        var result = await flight.Trigger((CommandEnvelope<Create>)new Create());
 
-        Assert.Single(result.Errors);
+        result.Errors.Should().ContainSingle();
     }
 }

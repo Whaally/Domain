@@ -32,5 +32,4 @@ public class MessageEnvelope<TMessage> : IMessageEnvelope<TMessage>
 
     public TMessage Message { get; }
     public IMessageMetadata Metadata { get; }
-    public ActivityContext OriginActivity { get; }
 }

@@ -4,13 +4,18 @@ namespace Whaally.Domain.Abstractions;
 
 public interface IAggregateHandler
 {
+    /// <summary>
+    ///     Trigger a command to evaluate the command and applying all related side effects when applicable.
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns></returns>
     public Task<IResult<IEventEnvelope[]>> Trigger(params ICommand[] commands)
         => Trigger(commands
             .Select(q => new CommandEnvelope(
                 q,
                 new CommandMetadata
                 {
-                    Timestamp = DateTime.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow
                 }))
             .ToArray());
 
@@ -44,7 +49,7 @@ public interface IAggregateHandler
                 q,
                 new CommandMetadata
                 {
-                    Timestamp = DateTime.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow
                 }))
             .ToArray());
     
@@ -61,7 +66,7 @@ public interface IAggregateHandler
     /// <param name="events">The events to apply</param>
     /// <returns>async Task</returns>
     public Task<IResultBase> Apply(params IEventEnvelope[] events);
-    
+
     public Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot;
 }
