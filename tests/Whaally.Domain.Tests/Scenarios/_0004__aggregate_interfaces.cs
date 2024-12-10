@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FluentAssertions;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,12 +9,12 @@ namespace Whaally.Domain.Tests.Scenarios;
 public class _0004__aggregate_interfaces
 {
     public interface ITestAggregate : IAggregate;
-
+    
     public class TestImplementation : ITestAggregate;
     
     // Commands
     public class TestCommand : ICommand;
-
+    
     public class TestCommandHandler : ICommandHandler<ITestAggregate, TestCommand>
     {
         public IResultBase Evaluate(ICommandHandlerContext<ITestAggregate> context, TestCommand command)
@@ -39,6 +40,8 @@ public class _0004__aggregate_interfaces
         public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
             => throw new NotImplementedException();
         public Task<IResultBase> Apply(params IEventEnvelope[] events)
+            => throw new NotImplementedException();
+        public Task Abort(ActivityContext context) 
             => throw new NotImplementedException();
         public Task<TSnapshot> Snapshot<TSnapshot>() where TSnapshot : ISnapshot
             => throw new NotImplementedException();

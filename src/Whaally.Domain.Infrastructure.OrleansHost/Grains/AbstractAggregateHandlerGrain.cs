@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 using Microsoft.Extensions.Logging;
 using Orleans.Concurrency;
 using Orleans.EventSourcing;
@@ -95,6 +96,11 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
         _logger.LogTrace("Events applied: {@events}", eventEnvelope.Messages);
         
         return Result.Ok();
+    }
+
+    public Task Abort(ActivityContext context)
+    {
+        throw new NotImplementedException();
     }
 
     [ReadOnly]

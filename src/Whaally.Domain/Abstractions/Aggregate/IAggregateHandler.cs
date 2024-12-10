@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 
 namespace Whaally.Domain.Abstractions;
 
@@ -51,6 +52,13 @@ public interface IAggregateHandler
         => Apply(new EventEnvelope(
             new EventMetadata(),
             events));
+
+    /// <summary>
+    ///     Allows abortion of a running transaction based on the context it is part of
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public Task Abort(ActivityContext context);
     
     public Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot;

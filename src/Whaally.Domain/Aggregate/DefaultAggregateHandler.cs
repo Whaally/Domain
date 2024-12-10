@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -148,6 +149,11 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         await _evaluationAgent.Continue(eventEnvelope);
         
         return Result.Ok();
+    }
+
+    public Task Abort(ActivityContext context)
+    {
+        throw new NotImplementedException();
     }
 
     public Task<TSnapshot> Snapshot<TSnapshot>()
