@@ -2,16 +2,24 @@
 
 namespace Whaally.Domain;
 
-public record ServiceEnvelope<TService>(
-    TService Message,
-    IServiceMetadata Metadata) : IServiceEnvelope<TService>
-    where TService : class, IService
+public record ServiceEnvelope : IServiceEnvelope
 {
-    public static implicit operator ServiceEnvelope<TService>(TService service) =>
-        new(
-            service,
-            new ServiceMetadata
-            {
-                CreatedAt = DateTimeOffset.UtcNow
-            });
+    public ServiceEnvelope(
+        IServiceMetadata metadata,
+        IEnumerable<IService> messages)
+    {
+        Metadata = metadata;
+        Messages = messages;
+    }
+
+    public ServiceEnvelope(
+        IServiceMetadata metadata,
+        params IService[] messages)
+    {
+        Metadata = metadata;
+        Messages = messages;
+    }
+    
+    public IServiceMetadata Metadata { get; init; }
+    public IEnumerable<IService> Messages { get; init; }
 }

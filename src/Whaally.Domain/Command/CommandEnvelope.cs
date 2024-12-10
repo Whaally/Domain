@@ -2,20 +2,24 @@
 
 namespace Whaally.Domain;
 
-public record CommandEnvelope(
-    ICommand Message,
-    ICommandMetadata Metadata) : ICommandEnvelope;
-
-public record CommandEnvelope<TCommand>(
-    TCommand Message,
-    ICommandMetadata Metadata) : ICommandEnvelope<TCommand>
-    where TCommand : class, ICommand
+public record CommandEnvelope : ICommandEnvelope
 {
-    public static implicit operator CommandEnvelope<TCommand>(TCommand command) =>
-        new(
-            command,
-            new CommandMetadata
-            {
-                CreatedAt = DateTimeOffset.UtcNow
-            });
+    public CommandEnvelope(
+        ICommandMetadata metadata,
+        IEnumerable<ICommand> messages)
+    {
+        this.Metadata = metadata;
+        this.Messages = messages;
+    }
+
+    public CommandEnvelope(
+        ICommandMetadata metadata,
+        params ICommand[] messages)
+    {
+        Metadata = metadata;
+        Messages = messages;
+    }
+
+    public ICommandMetadata Metadata { get; init; }
+    public IEnumerable<ICommand> Messages { get; init; }
 }

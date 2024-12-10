@@ -32,11 +32,13 @@ public class _0004__aggregate_interfaces
     // Aggregates
     public class TestAggregateHandler : IAggregateHandler<ITestAggregate>
     {
+        public Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope) 
+            => throw new NotImplementedException();
+        public Task<IResultBase> Apply(IEventEnvelope eventEnvelope) 
+            => throw new NotImplementedException();
         public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
             => throw new NotImplementedException();
         public Task<IResultBase> Apply(params IEventEnvelope[] events)
-            => throw new NotImplementedException();
-        public Task<IResultBase> Continue(params IEventEnvelope[] events)
             => throw new NotImplementedException();
         public Task<TSnapshot> Snapshot<TSnapshot>() where TSnapshot : ISnapshot
             => throw new NotImplementedException();

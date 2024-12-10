@@ -54,21 +54,11 @@ public class TypeInferenceTests
     }
 
     [Fact]
-    public void Generic_EventEnvelope_Is_Generic_IEventEnvelope()
+    public void Generic_EventEnvelope_Is_OfType()
     {
-        EventEnvelope<TestEvent> eventEnvelope = new(new(), new EventMetadata());
+        IEventEnvelope eventEnvelope = new EventEnvelope(new EventMetadata());
 
+        Assert.True(eventEnvelope is EventEnvelope);
         Assert.True(eventEnvelope is IEventEnvelope);
-        Assert.True(eventEnvelope is IEventEnvelope<TestEvent>);
-    }
-
-    [Fact]
-    public void Generic_EventEnvelope_Is_Interface()
-    {
-        IEventEnvelope<IEvent> eventEnvelope = new EventEnvelope<TestEvent>(new(), new EventMetadata());
-
-        Assert.True(eventEnvelope is EventEnvelope<TestEvent>);
-        Assert.True(eventEnvelope is IEventEnvelope);
-        Assert.True(eventEnvelope is IEventEnvelope<IEvent>);
     }
 }

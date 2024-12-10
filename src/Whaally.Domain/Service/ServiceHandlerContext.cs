@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
@@ -7,46 +8,28 @@ namespace Whaally.Domain;
 
 public class ServiceHandlerContext : IServiceHandlerContext
 {
-    private List<ICommandEnvelope> _commands = new(0);
+    private Dictionary<string, CommandEnvelope> _envelopes = new();
     private readonly IServiceProvider _services;
     private readonly IEvaluationAgent _evaluationAgent;
-    
+
     public ServiceHandlerContext(
         IServiceProvider services,
         IEvaluationAgent evaluationAgent)
     {
         _services = services;
         _evaluationAgent = evaluationAgent;
-        
-        using var activity = DomainContext.ActivitySource.StartActivity(
-            ActivityKind.Internal,
-            name: $"run service",
-            parentContext: ParentContext ?? default,
-            tags: new Dictionary<string, object?>
-            {
-                // { "messaging.message.type", typeof(TService).FullName },
-                { "messaging.operation.name", "run" },
-                { "messaging.operation.type", "process" }
-            });
     }
 
-    /// <summary>
-    /// Access to the commands which have previously been issued. Includes the commands
-    /// issued by spawned sub-services as well.
-    /// </summary>
-    public IReadOnlyCollection<ICommandEnvelope> Commands => _commands.AsReadOnly();
-
-    /// <summary>
-    /// Allow retrieving <seealso cref="IAggregateHandler">IAggregateHandler</c> instances directly through the <c cref="IAggregateHandlerFactory">IAggregateHandlerFactory</c>.
-    /// </summary>
-    /// <remarks>
-    /// Note that commands directly issued to the <c>IAggregateHandler</c> are evaluated directly and as such do
-    /// not benefit from the compositional system services use.
-    /// </remarks>
-    public IAggregateHandlerFactory Factory => _services.GetRequiredService<IAggregateHandlerFactory>();
-
-    public IDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
     public ActivityContext? ParentContext { get; init; }
+    
+    public IReadOnlyDictionary<string, object> Attributes { get; init; } 
+        = new Dictionary<string, object>();
+    
+    public IReadOnlyCollection<ICommandEnvelope> Commands 
+        => _envelopes.Values.ToList().AsReadOnly();
+
+    public IAggregateHandlerFactory Factory 
+        => _services.GetRequiredService<IAggregateHandlerFactory>();
 
     /// <summary>
     /// Evaluates a service and when successfull, adds the resulting operations to the current commands basket.
@@ -55,18 +38,25 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// <returns>An <c>IResultBase</c> signalling evaluation state</returns>
     public virtual async Task<IResultBase> EvaluateService<TService>(TService service)
         where TService : class, IService
-    {       
+    {
         var result = await _evaluationAgent.Evaluate(
-            new ServiceEnvelope<TService>(
-                service,
+            new ServiceEnvelope(
                 new ServiceMetadata
                 {
-                    CreatedAt = DateTimeOffset.UtcNow
-                }));
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Attributes = new Dictionary<string, object>(Attributes),
+                    ParentContext = ParentContext
+                }, service));
 
-        if (result.IsSuccess)
-            _commands.AddRange(result.Value);
+        if (!result.IsSuccess) return result.ToResult();
         
+        foreach (var envelope in result.Value)
+        {
+            StageCommands(
+                envelope.Metadata.AggregateId, 
+                envelope.Messages.ToArray());
+        }
+
         return result.ToResult();
     }
 
@@ -74,13 +64,23 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// Adds a command to the commands basket for future evaluation.
     /// </summary>
     /// <param name="command">The command to add to the current commands basket</param>
-    public virtual void StageCommand<TCommand>(string aggregateId, TCommand command)
-        where TCommand : class, ICommand =>
-        _commands.Add(new CommandEnvelope(
-            command,
-            new CommandMetadata
-            {
-                AggregateId = aggregateId,
-                CreatedAt = DateTimeOffset.UtcNow
-            }));
+    public virtual void StageCommands(string aggregateId, params ICommand[] commands)
+    {
+        if (!_envelopes.TryGetValue(aggregateId, out var envelope))
+        {
+            envelope = new CommandEnvelope(
+                new CommandMetadata
+                {
+                    AggregateId = aggregateId
+                });
+        }
+
+        envelope = envelope with
+        {
+            Messages = [..envelope.Messages, ..commands]
+        };
+
+        _envelopes.Remove(aggregateId);
+        _envelopes.Add(aggregateId, envelope);
+    }
 }

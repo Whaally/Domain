@@ -21,7 +21,6 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public string Id { get; init; }
 
-    // ToDo: Use an options pattern to supply mandatory/optional parameters
     public DefaultAggregateHandler(IServiceProvider services, string id)
     {
         _services = services;
@@ -36,16 +35,16 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             .Instantiate<TAggregate>();
     }
     
-    public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
+    public Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
     {
         // ToDo: Check whether the commands have in fact been intended for the present aggregate
         
-        var events = new List<IEventEnvelope>(commands.Length);
+        var events = new List<IEvent>();
         var results = new List<IResultBase>();
 
         TAggregate intermediateState = _aggregate;
 
-        foreach (var cmd in commands)
+        foreach (var cmd in commandEnvelope.Messages)
         {
             // ToDo: Extract the command handler instantiation to some other component
            /*
@@ -57,46 +56,47 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             * 
             */
             
-            ICommandEnvelope command = cmd;
+            ICommand command = cmd;
 
-            if (string.IsNullOrWhiteSpace(command.Metadata.AggregateId)) command.Metadata.AggregateId = Id;
+            if (string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)) commandEnvelope.Metadata.AggregateId = Id;
             // ToDo: Assert we are not executing commands not meant for this instance.
 
             // ToDo: provide more helpful exception methods
             var commandHandler = (ICommandHandler)_services.GetRequiredService(
                 _domainContext.CommandHandlers
                     .Single(q => q.AggregateType == typeof(TAggregate) 
-                                 && q.CommandType == command.Message.GetType())
+                                 && q.CommandType == command.GetType())
                     .HandlerType);
 
             var commandContext = _contextFactory.CreateCommandHandlerContext(
                 intermediateState,
-                command.Metadata);
+                commandEnvelope.Metadata);
             
-            results.Add(commandHandler.Evaluate(commandContext, command.Message));
+            results.Add(commandHandler.Evaluate(commandContext, command));
 
             var intermediateEvents = commandContext.Events.ToList();
 
             foreach (var intermediateEvent in intermediateEvents)
             {
-                IEventEnvelope @event = intermediateEvent;
+                IEvent @event = intermediateEvent;
 
                 var eventHandler = (IEventHandler)_services.GetRequiredService(
                     _domainContext.EventHandlers
                         .Single(q => q.AggregateType == typeof(TAggregate)
-                                     && q.EventType == @event.Message.GetType())
+                                     && q.EventType == @event.GetType())
                         .HandlerType);
                 
                 var eventContext = new EventHandlerContext<TAggregate>(
-                    !string.IsNullOrWhiteSpace(command.Metadata.AggregateId)
-                        ? command.Metadata.AggregateId
+                    !string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)
+                        ? commandEnvelope.Metadata.AggregateId
                         : Id)
                 {
-                    Aggregate = intermediateState
+                    Aggregate = intermediateState,
+                    AggregateId = Id
                 };
 
                 intermediateState = eventHandler
-                    .Apply(eventContext, @event.Message);
+                    .Apply(eventContext, @event);
 
                 events.Add(@event);
             }
@@ -104,41 +104,48 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         
         var result = Result.Ok().WithReasons(results.SelectMany(result => result.Reasons));
         
-        return Task.FromResult<IResult<IEventEnvelope[]>>(result.IsSuccess
-                ? result.ToResult(events.ToArray())
+        return Task.FromResult<IResult<IEventEnvelope>>(
+            result.IsSuccess
+                ? result.ToResult(new EventEnvelope(
+                    new EventMetadata
+                    {
+                        Attributes = commandEnvelope.Metadata.Attributes,
+                        AggregateId = commandEnvelope.Metadata.AggregateId,
+                        CreatedAt = DateTimeOffset.UtcNow
+                    },
+                    events))
                 : result);
     }
     
-    public async Task<IResultBase> Apply(params IEventEnvelope[] events)
+    public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {
-        if (events == null) return Result.Ok();
+        if (eventEnvelope.Messages.Count() == 0) return Result.Ok();
 
         TAggregate intermediateState = _aggregate;
 
-        foreach (var @event in events)
+        foreach (var @event in eventEnvelope.Messages)
         {
             // ToDo: Assert whether the events are intended to be applied to this aggregate instance.
             
             var eventHandler = (IEventHandler)_services.GetRequiredService(
                 _domainContext.EventHandlers
                     .Single(q => q.AggregateType == typeof(TAggregate)
-                                 && q.EventType == @event.Message.GetType())
+                                 && q.EventType == @event.GetType())
                     .HandlerType);
 
             var eventContext = _contextFactory.CreateEventHandlerContext(
                 intermediateState,
-                @event.Metadata);
+                eventEnvelope.Metadata);
             
             intermediateState = eventHandler.Apply(
                 eventContext,
-                @event.Message);
+                @event);
         }
 
         _aggregate = intermediateState;
 
         // Implicitly continue the operations
-        foreach (var @event in events)
-            await _evaluationAgent.Continue(@event);
+        await _evaluationAgent.Continue(eventEnvelope);
         
         return Result.Ok();
     }

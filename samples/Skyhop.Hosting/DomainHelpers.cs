@@ -13,21 +13,19 @@ public static class DomainHelpers
     {
         if (aggregate == null) return TypedResults.NotFound();
 
-        var result = await aggregate.Evaluate(
-            commands
-                .Select(q => new CommandEnvelope(q, new CommandMetadata())).ToArray());
+        var result = await aggregate.Evaluate(commands);
 
         if (result.IsFailed)
             return TypedResults.ValidationProblem(
                 result.Reasons.ToDictionary(q => q.Message, q => new string[] { }));
 
-        if (result.Value.Length == 0)
+        if (!result.Value.Messages.Any())
             return TypedResults.Ok();
-
+        
         await aggregate.Apply(result.Value);
 
         var response = JsonSerializer.Serialize<object[]>(
-            result.Value.ToArray());
+            result.Value.Messages.ToArray());
 
         // Using this primitive approach at the moment as the `TypedResults.Json` method
         // does not properly serialize the returned events.

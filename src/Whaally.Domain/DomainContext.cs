@@ -156,40 +156,43 @@ public class DomainContext(IServiceProvider services)
         where TAggregate : class, IAggregate 
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
 
-    public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(string aggregateId, TCommand command)
-        where TCommand : class, ICommand =>
-        Trigger(
-            command,
+    public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(
+        string aggregateId, 
+        TCommand command)
+        where TCommand : class, ICommand
+    {
+        return Trigger(
             new CommandMetadata
             {
                 AggregateId = aggregateId,
                 CreatedAt = DateTimeOffset.UtcNow
-            });
-    
-    public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(
-        TCommand command,
-        ICommandMetadata metadata)
-        where TCommand : class, ICommand =>
-        _evaluationAgent.Evaluate(new CommandEnvelope(command, metadata));
+            },
+            command);
+    }
 
-    public virtual Task<IResult<IEventEnvelope[]>> Trigger<TCommand>(
+    public virtual Task<IResult<IEventEnvelope[]>> Evaluate(
         string aggregateId,
-        TCommand command)
-        where TCommand : class, ICommand
-        => Trigger(command, new CommandMetadata
-        {
-            AggregateId = aggregateId,
-            CreatedAt = DateTimeOffset.UtcNow
-        });
-    
-    public virtual Task<IResult<IEventEnvelope[]>> Trigger<TCommand>(
-        TCommand command,
-        ICommandMetadata metadata)
-        where TCommand : class, ICommand
+        params ICommand[] commands)
+    {
+        return _evaluationAgent.Evaluate(
+            new CommandEnvelope(
+                new CommandMetadata
+                {
+                    AggregateId = aggregateId
+                },
+                commands));
+    }
+
+    public virtual Task<IResult<IEventEnvelope[]>> Trigger(
+        ICommandMetadata metadata,
+        params ICommand[] commands)
     {
         using var evaluationAgent = _evaluationAgent;
         
-        return evaluationAgent.Invoke(new CommandEnvelope(command, metadata));
+        return evaluationAgent.Invoke(
+            new CommandEnvelope(
+                metadata,
+                commands));
     }
 
     public virtual Task<IResult<IEventEnvelope[]>> Trigger(
@@ -198,29 +201,27 @@ public class DomainContext(IServiceProvider services)
     {
         using var evaluationAgent = _evaluationAgent;
 
-        return evaluationAgent.Invoke(commands
-            .Select(command => new CommandEnvelope(
-                command,
+        return evaluationAgent.Invoke(
+            new CommandEnvelope(
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
                     CreatedAt = DateTimeOffset.UtcNow
-                }))
-            .ToArray());
+                },
+                commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Trigger<TService>(
-        TService service,
+    public virtual Task<IResult<IEventEnvelope[]>> Trigger(
+        IService service,
         IServiceMetadata? metadata = null)
-        where TService : class, IService
     {
         using var evaluationAgent = _evaluationAgent;
-        
-        return await evaluationAgent.Invoke(new ServiceEnvelope<TService>(
-            service,
-            new ServiceMetadata
-            {
-                CreatedAt = DateTimeOffset.UtcNow
-            }));
+
+        return evaluationAgent.Invoke(
+            new ServiceEnvelope(
+                metadata ?? new ServiceMetadata
+                {
+                    CreatedAt = DateTimeOffset.UtcNow
+                }, service));
     }
 }

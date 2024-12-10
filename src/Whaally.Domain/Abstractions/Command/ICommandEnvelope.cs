@@ -2,27 +2,16 @@
 
 public interface ICommandEnvelope : IMessageEnvelope
 {
-    public new ICommand Message { get; }
+    public new IEnumerable<ICommand> Messages { get; }
     public new ICommandMetadata Metadata { get; }
 
-    IMessage IMessageEnvelope.Message
+    IEnumerable<IMessage> IMessageEnvelope.Messages
     {
-        get => Message;
+        get => Messages;
     }
 
     IMessageMetadata IMessageEnvelope.Metadata
     {
         get => Metadata;
-    }
-}
-
-public interface ICommandEnvelope<out TCommand> : ICommandEnvelope
-    where TCommand : ICommand
-{
-    public new TCommand Message { get; }
-
-    ICommand ICommandEnvelope.Message
-    {
-        get => Message;
     }
 }

@@ -13,7 +13,10 @@ public class RemoveAircraft_Command_Tests : DomainTest
         var flight = AggregateFactory.Instantiate<Flight>("");
 
         Assert.Single(
-            (await flight.Evaluate((CommandEnvelope<RemoveAircraft>)new RemoveAircraft()))
+            (await flight.Evaluate(
+                new CommandEnvelope(
+                    new CommandMetadata(), 
+                    new RemoveAircraft())))
             .Errors);
     }
 
@@ -23,9 +26,9 @@ public class RemoveAircraft_Command_Tests : DomainTest
         var flight = AggregateFactory.Instantiate<Flight>("");
 
         await flight.Apply(
-            (await flight.Evaluate((CommandEnvelope<Create>)new Create())).Value);
+            (await flight.Evaluate(new Create())).Value);
 
-        var result = await flight.Evaluate((CommandEnvelope<RemoveAircraft>)new RemoveAircraft());
+        var result = await flight.Evaluate(new RemoveAircraft());
 
         Assert.Single(result.Errors);
     }
@@ -36,12 +39,12 @@ public class RemoveAircraft_Command_Tests : DomainTest
         var flight = AggregateFactory.Instantiate<Flight>("");
         
         await flight.Trigger(
-            (CommandEnvelope<Create>)new Create(),
-            (CommandEnvelope<SetAircraft>)new SetAircraft(Guid.NewGuid().ToString()));
+            new Create(),
+            new SetAircraft(Guid.NewGuid().ToString()));
 
-        var result = await flight.Evaluate((CommandEnvelope<RemoveAircraft>)new RemoveAircraft());
+        var result = await flight.Evaluate(new RemoveAircraft());
 
         Assert.Empty(result.Errors);
-        Assert.IsType<EventEnvelope<AircraftRemoved>>(result.Value.Single());
+        Assert.IsType<EventEnvelope>(result.Value);
     }
 }

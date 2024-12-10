@@ -42,16 +42,17 @@ public class OnDepartureTests : DomainTest
         await AggregateFactory
             .Instantiate<Flight>(flightId)
             .Trigger(
-                (CommandEnvelope<Create>)new Create(),
-                (CommandEnvelope<SetAircraft>)new SetAircraft(Guid.NewGuid().ToString()));
+                new Create(),
+                new SetAircraft(Guid.NewGuid().ToString()));
         
         // Then we're creating the saga, and instantiating the arguments required for evaluation
         var saga = new OnDeparture();
         
-        var context = new SagaContext(Services)
+        var context = new SagaContext(Services, new EventMetadata())
         {
             AggregateId = flightId
         };
+        
         var @event = new DepartureTimeSet(DateTime.Now);
 
         // Evaluate
@@ -60,6 +61,6 @@ public class OnDepartureTests : DomainTest
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Single(context.Commands);
-        Assert.IsType<SetFlightInfo>(context.Commands.Single().Message);
+        Assert.IsType<SetFlightInfo>(context.Commands.Single().Messages.Single());
     }
 }

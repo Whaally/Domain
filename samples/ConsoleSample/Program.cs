@@ -20,7 +20,10 @@ using var traceProvider = Sdk.CreateTracerProviderBuilder()
     .Build();
 
 var services = new ServiceCollection()
-    .AddDomain()
+    .AddDomain(options =>
+    {
+        
+    })
     .BuildServiceProvider();
 
 var domain = services.GetRequiredService<DomainContext>();

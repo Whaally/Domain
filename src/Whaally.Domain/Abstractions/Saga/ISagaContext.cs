@@ -7,14 +7,16 @@ public interface ISagaContext : IContext
     /// <summary>
     ///     The optimistic result of the evaluation of this saga.
     /// </summary>
-    public IReadOnlyCollection<ICommandEnvelope> Commands { get; }
+    public IReadOnlyList<ICommandEnvelope> Commands { get; }
 
     /// <summary>
     ///     Stages a command as the optimistic result of this saga.
     /// </summary>
     /// <param name="command">The command staged as a result of saga evaluation</param>
-    public void StageCommand(string aggregateId, ICommand command);
-
+    public void StageCommands(
+        string aggregateId, 
+        params ICommand[] command);
+    
     /// <summary>
     ///     Evaluates a service and stages the resulting commands as the optimistic result of this saga.
     /// </summary>

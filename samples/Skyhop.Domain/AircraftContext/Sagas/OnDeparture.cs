@@ -17,7 +17,7 @@ public class OnDeparture : ISaga<DepartureTimeSet>
 
         if (!string.IsNullOrWhiteSpace(snapshot.AircraftId)
             && snapshot.AircraftId != null)
-            context.StageCommand(
+            context.StageCommands(
                 snapshot.AircraftId!,
                 new SetFlightInfo(
                     context.AggregateId!,

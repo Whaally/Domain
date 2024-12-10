@@ -8,30 +8,13 @@ public sealed class EventEnvelopeConverter : IConverter<EventEnvelope, EventEnve
 {
     public EventEnvelope ConvertFromSurrogate(in EventEnvelopeSurrogate surrogate) =>
         new(
-            surrogate.Message,
-            surrogate.Metadata);
+            surrogate.Metadata,
+            surrogate.Messages);
 
     public EventEnvelopeSurrogate ConvertToSurrogate(in EventEnvelope value) =>
         new()
         {
-            Message = value.Message,
-            Metadata = value.Metadata
-        };
-}
-
-[RegisterConverter]
-public sealed class GenericEventEnvelopeConverter<TEvent> : IConverter<EventEnvelope<TEvent>, GenericEventEnvelopeSurrogate<TEvent>>
-    where TEvent : class, IEvent
-{
-    public EventEnvelope<TEvent> ConvertFromSurrogate(in GenericEventEnvelopeSurrogate<TEvent> surrogate) =>
-        new(
-            surrogate.Message,
-            surrogate.Metadata);
-
-    public GenericEventEnvelopeSurrogate<TEvent> ConvertToSurrogate(in EventEnvelope<TEvent> value) =>
-        new()
-        {
-            Message = value.Message,
+            Messages = value.Messages,
             Metadata = value.Metadata
         };
 }

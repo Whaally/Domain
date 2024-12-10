@@ -39,12 +39,43 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
 
         await base.OnActivateAsync(token);
     }
-
-    public async Task<IResultBase> Apply(params IEventEnvelope[] events)
+    
+    protected override void TransitionState(
+        TAggregate state,
+        IEventEnvelope eventEnvelope)
     {
-        if (events == null) return Result.Ok();
+        /* In this case, with the DefaultAggregateHandler, there are no async operations
+         * to wait on. Perhaps we should implement a more solid approach though.
+         *
+         * Given the event handler is synchronous, we can:
+         * 1. Create a new event handler context with the current aggregate, and metadata defined on the event envelope
+         * 2. Retrieve the appropriate event handler for the supplied event
+         * 3. Invoke the event handler with the context and the event
+         *
+         * As is outlined above is analogous to the current behaviour of the DefaultAggregateHandler.
+         */
+        AggregateHandler.Apply(eventEnvelope);
+    }
 
-        RaiseEvents(events);
+    public async Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
+    {
+        var result = await AggregateHandler.Evaluate(
+            commandEnvelope.Messages.ToArray());
+
+        if (result.IsSuccess)
+            _logger.LogTrace("Evaluation succesful\r\n\tCommands: {@commands}", commandEnvelope.Messages);
+        else
+            _logger.LogTrace("Evaluation failed\r\n\tCommands: {@command}\r\n\tReasons: {@reasons}", commandEnvelope.Messages,
+                result.Reasons);
+
+        return result;
+    }
+
+    public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
+    {
+        if (eventEnvelope.Messages?.Count() == 0) return Result.Ok();
+
+        RaiseEvent(eventEnvelope);
 
         /*
          * Whether or not events are confirmed within the apply method had a significant impact on performance.
@@ -61,38 +92,9 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
          */
         await ConfirmEvents();
 
-        _logger.LogInformation("Events applied: {@events}", events);
-
+        _logger.LogTrace("Events applied: {@events}", eventEnvelope.Messages);
+        
         return Result.Ok();
-    }
-
-    public async Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands)
-    {
-        var result = await AggregateHandler.Evaluate(commands);
-
-        if (result.IsSuccess)
-            _logger.LogInformation("Evaluation succesful\r\n\tCommands: {@commands}", commands);
-        else
-            _logger.LogWarning("Evaluation failed\r\n\tCommands: {@command}\r\n\tReasons: {@reasons}", commands, result.Reasons);
-
-        return result;
-    }
-
-    protected override void TransitionState(
-        TAggregate state,
-        IEventEnvelope @event)
-    {
-        /* In this case, with the DefaultAggregateHandler, there are no async operations
-         * to wait on. Perhaps we should implement a more solid approach though.
-         *
-         * Given the event handler is synchronous, we can:
-         * 1. Create a new event handler context with the current aggregate, and metadata defined on the event envelope
-         * 2. Retrieve the appropriate event handler for the supplied event
-         * 3. Invoke the event handler with the context and the event
-         *
-         * As is outlined above is analogous to the current behaviour of the DefaultAggregateHandler.
-         */
-        AggregateHandler.Apply(@event);
     }
 
     [ReadOnly]

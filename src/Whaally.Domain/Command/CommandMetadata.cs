@@ -15,6 +15,5 @@ public record CommandMetadata : ICommandMetadata
     // There are valid reasons for why the AggregateId might not be set.
     // One of them is because the command is supplied to an AggregateHandler instance
     // thus already containing a reference to the aggregate.
-    public string AggregateId { get; set; }
-        = "";
+    public string AggregateId { get; set; } = "";
 }

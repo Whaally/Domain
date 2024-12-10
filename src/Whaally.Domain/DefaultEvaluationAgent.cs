@@ -1,12 +1,12 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
+public class DefaultEvaluationAgent : IEvaluationAgent
 {
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
@@ -31,23 +31,26 @@ public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
     /// <param name="serviceEnvelope"></param>
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
-    public async Task<IResult<ICommandEnvelope[]>> Evaluate<TService>(IServiceEnvelope<TService> serviceEnvelope)
-        where TService : class, IService
+    public async Task<IResult<ICommandEnvelope[]>> Evaluate(IServiceEnvelope serviceEnvelope)
     {
-        var serviceHandler = (IServiceHandler<TService>)_services.GetRequiredService(
+        if (serviceEnvelope.Messages.Count() != 1)
+            throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
+        
+        var serviceHandler = (IServiceHandler)_services.GetRequiredService(
             _domainContext.ServiceHandlers
-                .Single(q => q.ServiceType == typeof(TService))
+                .Single(q => q.ServiceType == serviceEnvelope.Messages.Single().GetType())
                 .HandlerType);
         
         var serviceContext =
             new ServiceHandlerContext(_services, this)
             {
-                ParentContext = _activity?.Context
+                ParentContext = _activity?.Context,
+                Attributes = new ReadOnlyDictionary<string, object>(serviceEnvelope.Metadata.Attributes)
             };
         
-        var result = await serviceHandler.Handle<TService>(
+        var result = await serviceHandler.Handle(
             serviceContext,
-            serviceEnvelope.Message);
+            serviceEnvelope.Messages.Single());
         
         if (result.IsFailed)
         {
@@ -68,48 +71,19 @@ public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
     /// <exception cref="Exception"></exception>
     public async Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commandEnvelopes)
     {
-        // group commands by aggregate type and id to batch operations
-        var commandCollections = commandEnvelopes
-            .GroupBy(q => (
-                aggregateType: _domainContext.CommandHandlers
-                    .Single(w => w.CommandType == q.Message.GetType())
-                    .AggregateType,
-                aggregateId: q.Metadata.AggregateId
-            ))
-            .Select(q => (
-                q.Key.aggregateType,
-                q.Key.aggregateId,
-                commands: q.Select(w => w).ToArray(),
-                result: new Result<IEventEnvelope[]>() as IResult<IEventEnvelope[]>
-            ))
-            .ToList();
+        List<IResult<IEventEnvelope>> results = [];
 
-        List<IResult<IEventEnvelope[]>> results = new(commandCollections.Count);
-
-        foreach (var operation in commandCollections)
+        foreach (var envelope in commandEnvelopes)
         {
-            // using var activity = DomainContext.ActivitySource.StartActivity(
-            //     ActivityKind.Internal,
-            //     name: $"evaluate {operation.aggregateType!.Name}",
-            //     parentContext: _activity?.Context ?? default,
-            //     tags: new Dictionary<string, object?>
-            //     {
-            //         { "messaging.batch.message_count", operation.commands.Length },
-            //         { "messaging.batch.types", $"[{string.Join(';', operation.commands.Select(q => q.Message.GetType().FullName))}]" },
-            //         { "messaging.operation.name", "evaluate" },
-            //         { "messaging.operation.type", "process" },
-            //         { "messaging.destination.id", operation.aggregateId },
-            //         { "messaging.destination.name", operation.aggregateType.FullName }
-            //     });
+            if (!envelope.Messages.Any()) continue;
             
-            if (operation.aggregateType == null)
-                throw new Exception($"Aggregate type could not be resolved for command batch");
-
+            var aggregateType = GetCommonAggregateType(envelope);
+            
             var handler = _handlerFactory.Instantiate(
-                operation.aggregateType,
-                operation.aggregateId);
+                aggregateType,
+                envelope.Metadata.AggregateId);
 
-            results.Add(await handler.Evaluate(operation.commands));
+            results.Add(await handler.Evaluate(envelope));
         }
 
         var result = Result
@@ -118,11 +92,9 @@ public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
         
         if (result.IsSuccess)
             result.WithValue(results
-                .SelectMany(q => q.ValueOrDefault != null
-                    ? q.Value
-                    : [])
+                .Select(q => q.Value)
                 .ToArray());
-
+        
         return result;
     }
     
@@ -134,47 +106,19 @@ public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
     /// <exception cref="Exception"></exception>
     public async Task<IResultBase> Apply(params IEventEnvelope[] eventEnvelopes)
     {
-        // group commands by aggregate type and id to batch operations
-        var eventCollections = eventEnvelopes
-            .GroupBy(q => (
-                aggregateType: _domainContext.EventHandlers
-                    .Single(w => w.EventType == q.Message.GetType())
-                    .AggregateType,
-                aggregateId: q.Metadata.AggregateId
-            ))
-            .Select(q => (
-                q.Key.aggregateType,
-                q.Key.aggregateId,
-                events: q.Select(w => w).ToArray(),
-                result: new Result() as IResultBase
-            ))
-            .ToList();
+        List<IResultBase> results = new(eventEnvelopes.Length);
         
-        List<IResultBase> results = new(eventCollections.Count);
-        
-        foreach (var operation in eventCollections)
+        foreach (var envelope in eventEnvelopes)
         {
-            using var activity = DomainContext.ActivitySource.StartActivity(
-                ActivityKind.Internal,
-                name: $"apply {operation.aggregateType!.Name}",
-                parentContext: _activity?.Context ?? default,
-                tags: new Dictionary<string, object?>
-                {
-                    { "messaging.batch.message_count", operation.events.Length },
-                    { "messaging.batch.types", $"[{string.Join(';', operation.events.Select(q => q.Message.GetType().FullName))}]" },
-                    { "messaging.operation.name", "apply" },
-                    { "messaging.operation.type", "settle" },
-                    { "messaging.destination.id", operation.aggregateId },
-                    { "messaging.destination.name", operation.aggregateType.FullName}
-                });
+            if (!envelope.Messages.Any()) continue;
             
-            if (operation.aggregateType == null) throw new Exception($"Aggregate type could not be resolved for event {operation.aggregateType!.FullName}");
-
+            var aggregateType = GetCommonAggregateType(envelope);
+            
             var handler = _handlerFactory.Instantiate(
-                operation.aggregateType,
-                operation.aggregateId);
+                aggregateType,
+                envelope.Metadata.AggregateId);
 
-            results.Add(await handler.Apply(operation.events));
+            results.Add(await handler.Apply(envelope));
         }
         
         var result = new Result()
@@ -188,12 +132,12 @@ public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
     /// </summary>
     /// <param name="eventEnvelope"></param>
     /// <returns></returns>
-    public Task<IResultBase> Continue(params IEventEnvelope[] eventEnvelopes)
+    public Task<IResultBase> Continue(IEventEnvelope eventEnvelope)
     {
-        foreach (var eventEnvelope in eventEnvelopes)
+        foreach (var @event in eventEnvelope.Messages)
         {
             var sagas = _domainContext.Sagas
-                .Where(q => q.EventType == eventEnvelope.Message.GetType())
+                .Where(q => q.EventType == @event.GetType())
                 .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
             
             foreach (var saga in sagas)
@@ -213,33 +157,61 @@ public class DefaultEvaluationAgent : IEvaluationAgent, IDisposable
     /// <returns></returns>
     public async Task<IResultBase> Invoke(ISaga saga, IEventEnvelope eventEnvelope)
     {
-        using var activity = DomainContext.ActivitySource.StartActivity(
-            ActivityKind.Internal,
-            name: $"process {saga.GetType().Name}",
-            links: [new ActivityLink()],
-            tags: new Dictionary<string, object?>
-            {
-                { "messaging.message.type", eventEnvelope.Message.GetType().FullName },
-                { "messaging.operation.name", "continue" },
-                { "messaging.operation.type", "process" },
-                { "messaging.destination.name", saga.GetType().FullName }
-            });
+        if (eventEnvelope.Messages.Count() != 1)
+            throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
         
-        var context = new SagaContext(_services)
+        var context = new SagaContext(
+            _services, 
+            eventEnvelope.Metadata)
         {
             AggregateId = eventEnvelope.Metadata.AggregateId,
-            ParentContext = activity?.Context
+            ParentContext = eventEnvelope.Metadata.ParentContext
         };
 
-        var result = await saga.Evaluate(context, eventEnvelope.Message);
-
-        if (result.IsFailed) activity?.SetTag("error.type", "domain");
-        
-        return result;
+        return await saga.Evaluate(context, eventEnvelope.Messages.Single());
     }
 
     public void Dispose()
     {
         _activity?.Dispose();
+    }
+
+
+    private Type GetCommonAggregateType(ICommandEnvelope commandEnvelope)
+    {
+        var commandTypes = commandEnvelope.Messages
+            .Select(q => q.GetType())
+            .ToList();
+        
+        var aggregateType = _domainContext.CommandHandlers
+            .Where(q => q.CommandType != null
+                        && commandTypes.Contains(q.CommandType))
+            .Select(q => q.AggregateType)
+            .Distinct()
+            .SingleOrDefault();
+
+        if (aggregateType == null)
+            throw new Exception("Single envelope contains commands registered with different aggregate types");
+
+        return aggregateType;
+    }
+    
+    private Type GetCommonAggregateType(IEventEnvelope eventEnvelope)
+    {
+        var eventTypes = eventEnvelope.Messages
+            .Select(q => q.GetType())
+            .ToList();
+        
+        var aggregateType = _domainContext.EventHandlers
+            .Where(q => q.EventType != null
+                        && eventTypes.Contains(q.EventType))
+            .Select(q => q.AggregateType)
+            .Distinct()
+            .SingleOrDefault();
+
+        if (aggregateType == null)
+            throw new Exception("Single envelope contains events registered with different aggregate types");
+        
+        return aggregateType;
     }
 }

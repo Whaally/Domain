@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using FluentResults;
+﻿using FluentResults;
 
 namespace Whaally.Domain.Abstractions;
 
@@ -27,8 +26,7 @@ public interface IEvaluationAgent : IDisposable
     /// <param name="service"></param>
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
-    public Task<IResult<ICommandEnvelope[]>> Evaluate<TService>(IServiceEnvelope<TService> service)
-        where TService : class, IService;
+    public Task<IResult<ICommandEnvelope[]>> Evaluate(IServiceEnvelope service);
     
     /// <summary>
     ///     Evaluates a command, meaning it runs the command and collects its output as events, but does not apply these
@@ -55,7 +53,7 @@ public interface IEvaluationAgent : IDisposable
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    public Task<IResultBase> Continue(params IEventEnvelope[] events);
+    public Task<IResultBase> Continue(IEventEnvelope events);
     
     /// <summary>
     ///     Invokes a number of commands, meaning they are ran, and the resulting events are applied to the
@@ -65,11 +63,11 @@ public interface IEvaluationAgent : IDisposable
     /// </summary>
     /// <param name="commands"></param>
     /// <returns></returns>
-    public async Task<IResult<IEventEnvelope[]>> Invoke(params ICommandEnvelope[] commands)
+    public async Task<IResult<IEventEnvelope[]>> Invoke(params ICommandEnvelope[] commandEnvelopes)
     {
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
         
-        var commandResult = await Evaluate(commands);
+        var commandResult = await Evaluate(commandEnvelopes);
         
         if (commandResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(commandResult.Errors);
@@ -78,28 +76,26 @@ public interface IEvaluationAgent : IDisposable
         
         if (eventResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
-        
-        await Continue(commandResult.Value);
+
+        foreach (var envelope in commandResult.Value)
+        {
+            await Continue(envelope);
+        }
         
         return commandResult;
     }
-    
-    /// <summary>
-    ///     Invokes a service, meaning the service is ran, and the resulting output is processed further
-    ///
-    ///     Possibly incurs side effects
-    /// </summary>
-    /// <param name="service"></param>
-    /// <typeparam name="TService"></typeparam>
-    /// <returns></returns>
-    public async Task<IResult<IEventEnvelope[]>> Invoke<TService>(IServiceEnvelope<TService> service)
-        where TService : class, IService
+
+    public async Task<IResult<IEventEnvelope[]>> Invoke(
+        IServiceEnvelope serviceEnvelope)
     {
-        var serviceResult = await Evaluate(service);
+        List<IResult<IEventEnvelope[]>> results = new(); 
+    
+        var serviceResult = await Evaluate(serviceEnvelope);
 
         if (serviceResult.IsFailed)
-            return Result.Fail<IEventEnvelope[]>(serviceResult.Errors);
-        
+            return new Result<IEventEnvelope[]>()
+                .WithReasons(serviceResult.Reasons);
+
         return await Invoke(serviceResult.Value);
     }
 }

@@ -26,7 +26,7 @@ internal class OnAircraftChanged : ISaga<AircraftSet>
 
         if (!aircraft.FlightsIds.Contains(context.AggregateId))
         {
-            context.StageCommand(
+            context.StageCommands(
                 @event.AircraftId,
                 new SetFlightInfo(
                     context.AggregateId!,

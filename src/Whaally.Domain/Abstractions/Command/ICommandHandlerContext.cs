@@ -9,7 +9,7 @@ public interface ICommandHandlerContext : IContext, IProvideAggregateInstance
     /// 
     ///     Used for further evaluation in case of successfull command evaluation.
     /// </summary>
-    public IReadOnlyCollection<IEventEnvelope> Events { get; }
+    public IReadOnlyCollection<IEvent> Events { get; }
 
     /// <summary>
     ///     Stages an event as the optimistic result of this command.

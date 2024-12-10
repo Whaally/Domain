@@ -8,30 +8,13 @@ public sealed class CommandEnvelopeConverter : IConverter<CommandEnvelope, Comma
 {
     public CommandEnvelope ConvertFromSurrogate(in CommandEnvelopeSurrogate surrogate) =>
         new(
-            surrogate.Message,
-            surrogate.Metadata);
+            surrogate.Metadata,
+            surrogate.Messages);
 
     public CommandEnvelopeSurrogate ConvertToSurrogate(in CommandEnvelope value) =>
         new()
         {
-            Message = value.Message,
-            Metadata = value.Metadata
-        };
-}
-
-[RegisterConverter]
-public sealed class ICommandEnvelopeConverter<TCommand> : IConverter<CommandEnvelope<TCommand>, CommandEnvelopeSurrogate<TCommand>>
-    where TCommand : class, ICommand
-{
-    public CommandEnvelope<TCommand> ConvertFromSurrogate(in CommandEnvelopeSurrogate<TCommand> surrogate) =>
-        new(
-            surrogate.Message,
-            surrogate.Metadata);
-
-    public CommandEnvelopeSurrogate<TCommand> ConvertToSurrogate(in CommandEnvelope<TCommand> value) =>
-        new()
-        {
-            Message = value.Message,
-            Metadata = value.Metadata
+            Metadata = value.Metadata,
+            Messages = value.Messages
         };
 }

@@ -26,7 +26,7 @@ public class OnAircraftRemoved : ISaga<AircraftRemoved>
         
         if (aircraft.FlightsIds.Contains(context.AggregateId))
         {
-            context.StageCommand(
+            context.StageCommands(
                 @event.AircraftId,
                 new RemoveFlight(
                     context.AggregateId!));

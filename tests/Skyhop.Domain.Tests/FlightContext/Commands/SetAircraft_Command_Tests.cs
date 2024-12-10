@@ -17,12 +17,12 @@ public class SetAircraft_Command_Tests : DomainTest
         var flight = AggregateFactory.Instantiate<Flight>(_flightId);
 
         var result = await flight.Trigger(
-            (CommandEnvelope<Create>)new Create(),
-            (CommandEnvelope<SetAircraft>)new SetAircraft(_aircraftId));
+            new Create(),
+            new SetAircraft(_aircraftId));
         
         Assert.Empty(result.Errors);
-        Assert.Equal(2, result.Value.Length);
-        Assert.IsAssignableFrom<IEventEnvelope<AircraftSet>>(result.Value[1]);
+        Assert.Equal(2, result.Value.Messages.Count());
+        Assert.IsAssignableFrom<IEventEnvelope>(result.Value);
     }
 
     [Fact]
@@ -31,8 +31,8 @@ public class SetAircraft_Command_Tests : DomainTest
         var aggregate = AggregateFactory.Instantiate<Flight>(_flightId);
 
         var result = await aggregate.Trigger(
-            (CommandEnvelope<Create>)new Create(),
-            (CommandEnvelope<SetAircraft>)new SetAircraft(""));
+            new Create(),
+            new SetAircraft(""));
 
         Assert.Single(result.Errors);
     }

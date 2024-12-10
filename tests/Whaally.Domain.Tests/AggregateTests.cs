@@ -22,13 +22,13 @@ public class AggregateTests
         var service = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid().ToString());
 
         var result = await service.Evaluate(
-            (CommandEnvelope<TestCommand>)new TestCommand
+            new TestCommand
             {
                 Result = Result.Ok()
             });
 
-        Assert.True(result.IsSuccess);
-        Assert.Empty(result.Value);
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Messages.Should().BeEmpty();
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class AggregateTests
         var service = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid().ToString());
 
         var operationResult = await service.Evaluate(
-            (CommandEnvelope<TestCommand>)new TestCommand
+            new TestCommand
             {
                 Result = Result.Fail("Failure")
             });
@@ -52,14 +52,14 @@ public class AggregateTests
         var aggregateHandler = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid().ToString());
 
         var result = await aggregateHandler.Evaluate(
-            (CommandEnvelope<TestCommand>)new TestCommand
+            new TestCommand
             {
-                Events = new[] { new TestEvent() },
+                Events = [new TestEvent()],
                 Result = Result.Ok()
             });
 
         Assert.True(result.IsSuccess);
-        Assert.Single(result.Value);
+        Assert.Single(result.Value.Messages);
     }
 
     [Fact]
@@ -69,18 +69,20 @@ public class AggregateTests
         var aggregateHandler = _aggregateHandlerFactory.Instantiate<TestAggregate>(guid);
 
         var result = await aggregateHandler.Evaluate(
-            new CommandEnvelope(new TestCommand
-            {
-                Events = [ new TestEvent() ],
-                Result = Result.Ok()
-            }, new CommandMetadata
-            {
-                AggregateId = guid
-            }));
+            new CommandEnvelope(
+                new CommandMetadata
+                {
+                    AggregateId = guid
+                },
+                new TestCommand
+                {
+                    Events = [ new TestEvent() ],
+                    Result = Result.Ok()
+                }));
 
         Assert.True(result.IsSuccess);
-        Assert.Single(result.Value);
+        Assert.Single(result.Value.Messages);
 
-        result.Value.First().Metadata.AggregateId.Should().Be(guid);
+        result.Value.Metadata.AggregateId.Should().Be(guid);
     }
 }

@@ -7,26 +7,11 @@ public interface IAggregateHandler
     /// <summary>
     ///     Trigger a command to evaluate the command and applying all related side effects when applicable.
     /// </summary>
-    /// <param name="commands"></param>
-    /// <returns></returns>
-    public Task<IResult<IEventEnvelope[]>> Trigger(params ICommand[] commands)
-        => Trigger(commands
-            .Select(q => new CommandEnvelope(
-                q,
-                new CommandMetadata
-                {
-                    CreatedAt = DateTimeOffset.UtcNow
-                }))
-            .ToArray());
-
-    /// <summary>
-    ///     Trigger a command to evaluate the command and applying all related side effects when applicable.
-    /// </summary>
     /// <param name="commands">The commands to trigger evaluation and application of side effects for</param>
     /// <returns>Events which had been applied to the aggregate</returns>
-    public async Task<IResult<IEventEnvelope[]>> Trigger(params ICommandEnvelope[] commands)
+    public async Task<IResult<IEventEnvelope>> Trigger(ICommandEnvelope commandEnvelope)
     {
-        var commandResult = await Evaluate(commands);
+        var commandResult = await Evaluate(commandEnvelope);
 
         if (commandResult.IsFailed)
             return commandResult;
@@ -34,39 +19,39 @@ public interface IAggregateHandler
         var eventResult = await Apply(commandResult.Value);
 
         return eventResult.IsFailed 
-            ? Result.Fail<IEventEnvelope[]>(eventResult.Errors) 
+            ? Result.Fail<IEventEnvelope>(eventResult.Errors) 
             : commandResult;
     }
+
+    public Task<IResult<IEventEnvelope>> Trigger(params ICommand[] commands)
+        => Trigger(new CommandEnvelope(
+            new CommandMetadata(),
+            commands));
     
     /// <summary>
     ///     Evaluate the provided commands against the current state.
     /// </summary>
     /// <param name="commands">The commands to evaluate</param>
     /// <returns>async result containing events if successful</returns>
-    public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommand[] commands)
-        => Evaluate(commands
-            .Select(q => new CommandEnvelope(
-                q,
-                new CommandMetadata
-                {
-                    CreatedAt = DateTimeOffset.UtcNow
-                }))
-            .ToArray());
-    
-    /// <summary>
-    ///     Evaluate the provided commands against the current state.
-    /// </summary>
-    /// <param name="commands">The commands to evaluate</param>
-    /// <returns>async result containing events if successful</returns>
-    public Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commands);
+    public Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope);
+
+    public Task<IResult<IEventEnvelope>> Evaluate(params ICommand[] commands)
+        => Evaluate(new CommandEnvelope(
+            new CommandMetadata(),
+            commands));
     
     /// <summary>
     ///     Apply the provided events to the current state.
     /// </summary>
     /// <param name="events">The events to apply</param>
     /// <returns>async Task</returns>
-    public Task<IResultBase> Apply(params IEventEnvelope[] events);
+    public Task<IResultBase> Apply(IEventEnvelope eventEnvelope);
 
+    public Task<IResultBase> Apply(params IEvent[] events)
+        => Apply(new EventEnvelope(
+            new EventMetadata(),
+            events));
+    
     public Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot;
 }
@@ -77,6 +62,4 @@ public interface IAggregateHandler
 /// </summary>
 /// <typeparam name="TAggregate">The aggregate type for which this aggregate handler exists</typeparam>
 public interface IAggregateHandler<TAggregate> : IAggregateHandler
-    where TAggregate : class, IAggregate
-{
-}
+    where TAggregate : class, IAggregate;

@@ -13,8 +13,7 @@ public interface IServiceHandlerContext : IContext
     /// Stages a command as the optimistic result of this service.
     /// </summary>
     /// <param name="command">The command staged as a result of service evaluation</param>
-    public void StageCommand<TCommand>(string aggregateId, TCommand command)
-        where TCommand : class, ICommand;
+    public void StageCommands(string aggregateId, params ICommand[] command);
 
     /// <summary>
     /// Evaluates a service and stages the resulting commands as the optimistic result of this service.

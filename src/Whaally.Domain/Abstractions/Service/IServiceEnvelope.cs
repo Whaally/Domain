@@ -2,27 +2,16 @@
 
 public interface IServiceEnvelope : IMessageEnvelope
 {
-    public new IService Message { get; }
+    public new IEnumerable<IService> Messages { get; }
     public new IServiceMetadata Metadata { get; }
 
-    IMessage IMessageEnvelope.Message
+    IEnumerable<IMessage> IMessageEnvelope.Messages
     {
-        get => Message;
+        get => Messages;
     }
 
     IMessageMetadata IMessageEnvelope.Metadata
     {
         get => Metadata;
-    }
-}
-
-public interface IServiceEnvelope<out TService> : IServiceEnvelope
-    where TService : IService
-{
-    public new TService Message { get; }
-
-    IService IServiceEnvelope.Message
-    {
-        get => Message;
     }
 }

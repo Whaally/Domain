@@ -2,11 +2,24 @@
 
 namespace Whaally.Domain;
 
-public record EventEnvelope(
-    IEvent Message,
-    IEventMetadata Metadata) : IEventEnvelope;
+public record EventEnvelope : IEventEnvelope
+{
+    public EventEnvelope(
+        IEventMetadata metadata,
+        IEnumerable<IEvent> messages)
+    {
+        Messages = messages;
+        Metadata = metadata;
+    }
 
-public record EventEnvelope<TEvent>(
-    TEvent Message,
-    IEventMetadata Metadata) : IEventEnvelope<TEvent>
-    where TEvent : class, IEvent;
+    public EventEnvelope(
+        IEventMetadata metadata,
+        params IEvent[] messages)
+    {
+        Metadata = metadata;
+        Messages = messages;
+    }
+
+    public IEventMetadata Metadata { get; init; }
+    public IEnumerable<IEvent> Messages { get; init; }
+}

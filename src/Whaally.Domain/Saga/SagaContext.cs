@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
@@ -10,44 +11,64 @@ public class SagaContext : ISagaContext
     private readonly IServiceProvider _services;
     private readonly IEvaluationAgent _evaluationAgent;
     
+    private readonly Dictionary<string, CommandEnvelope> _envelopes = new();
+    
     private SagaContext() { throw new Exception($"The private parameterless constructor for type `{nameof(SagaContext)}` should not be used."); }
-    public SagaContext(IServiceProvider services)
+    public SagaContext(
+        IServiceProvider services,
+        IEventMetadata metadata)
     {
         _services = services;
         _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
+        
+        Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes);
     }
-
-    public IReadOnlyCollection<ICommandEnvelope> Commands => _commands.AsReadOnly();
-    private List<ICommandEnvelope> _commands = new();
-    public IAggregateHandlerFactory Factory => _services.GetRequiredService<IAggregateHandlerFactory>();
-
-    public IDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
-    public ActivityContext? ParentContext { get; init; }
+    
     public string? AggregateId { get; init; }
+    public ActivityContext? ParentContext { get; init; }
+    public IReadOnlyDictionary<string, object> Attributes { get; init; } 
+        = new Dictionary<string, object>();
+    
+    public IReadOnlyList<ICommandEnvelope> Commands 
+        => _envelopes.Values.ToList().AsReadOnly();
+    
+    public IAggregateHandlerFactory Factory 
+        => _services.GetRequiredService<IAggregateHandlerFactory>();
 
-    public virtual void StageCommand(string aggregateId, ICommand command)
+    
+    public virtual void StageCommands(string aggregateId, params ICommand[] command)
     {
-        _commands.Add(new CommandEnvelope(
-            command,
-            new CommandMetadata
-            {
-                CreatedAt = DateTimeOffset.UtcNow,
-                AggregateId = aggregateId
-            }));
-    }
+        if (!_envelopes.TryGetValue(aggregateId, out var envelope))
+            envelope = new CommandEnvelope(
+                new CommandMetadata
+                {
+                    AggregateId = aggregateId
+                });
 
+        envelope = envelope with
+        {
+            Messages = [..envelope.Messages, ..command]
+        };
+
+        _envelopes.Remove(aggregateId);
+        _envelopes.Add(aggregateId, envelope);
+    }
+    
     public virtual async Task<IResultBase> EvaluateService(IService service)
     {
         var result = await _evaluationAgent.Evaluate(
-            new ServiceEnvelope<IService>(
-                service,
+            new ServiceEnvelope(
                 new ServiceMetadata
                 {
                     CreatedAt = DateTimeOffset.UtcNow
-                }));
+                }, service));
 
-        if (result.IsSuccess)
-            _commands.AddRange(result.Value);
+        if (!result.IsSuccess) return result.ToResult();
+        
+        foreach (var envelope in result.Value)
+            StageCommands(
+                envelope.Metadata.AggregateId, 
+                envelope.Messages.ToArray());
 
         return result.ToResult();
     }

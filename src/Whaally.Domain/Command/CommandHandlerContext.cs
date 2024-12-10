@@ -8,14 +8,11 @@ namespace Whaally.Domain;
 public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggregate>
     where TAggregate : class, IAggregate
 {
-    public IReadOnlyCollection<IEventEnvelope> Events => _events.AsReadOnly();
-    
-    private List<IEventEnvelope> _events = [];
+    private TAggregate _aggregate = null!;
+    private List<IEvent> _events = [];
     
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
-
-    private readonly Activity? _activity;
     
     public CommandHandlerContext(
         IServiceProvider services, 
@@ -30,45 +27,25 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         _aggregate ??= services
             .GetService<IAggregateFactory>()
             ?.Instantiate<TAggregate>() ?? null!;
-        
-        _activity = DomainContext.ActivitySource.StartActivity(
-            ActivityKind.Internal,
-            name: $"evaluate {typeof(TAggregate).Name}",
-            parentContext: ParentContext ?? default,
-            tags: new Dictionary<string, object?>
-            {
-                // { "messaging.batch.message_count", operation.commands.Length },
-                // { "messaging.batch.types", $"[{string.Join(';', operation.commands.Select(q => q.Message.GetType().FullName))}]" },
-                { "messaging.operation.name", "evaluate" },
-                { "messaging.operation.type", "process" },
-                // { "messaging.destination.id", operation.aggregateId },
-                // { "messaging.destination.name", operation.aggregateType.FullName }
-            });
     }
 
-    private TAggregate _aggregate = null!;
+    public string AggregateId { get; init; }
+    public ActivityContext? ParentContext { get; init; }
+    
+    public IReadOnlyDictionary<string, object> Attributes { get; init; } 
+        = new Dictionary<string, object>();
+    
+    public IReadOnlyCollection<IEvent> Events 
+        => _events.AsReadOnly();
+    
     public TAggregate Aggregate
     {
         get => _aggregate; 
         init => _aggregate = value;
     }
-
-    public IDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
-    public ActivityContext? ParentContext { get; init; }
-    public string AggregateId { get; init; }
     
     public virtual void StageEvent<TEvent>(TEvent @event)
-        where TEvent : class, IEvent
-    {
-        var envelope = new EventEnvelope<TEvent>(
-            @event,
-            new EventMetadata
-            {
-                AggregateId = AggregateId
-            });
-        
-        _events.Add(envelope);
-    }
+        where TEvent : class, IEvent => _events.Add(@event);
     
     public virtual IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
@@ -82,37 +59,40 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
 
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
         // staged events, or there is otherwise a trace of this command being called by another command.
-        var context = _services.GetRequiredService<IContextFactory>()
-            .CreateCommandHandlerContext(_aggregate, new CommandMetadata
-            {
-                AggregateId = AggregateId,
-                CreatedAt = DateTimeOffset.UtcNow
-            });
+        var context = _services
+            .GetRequiredService<IContextFactory>()
+            .CreateCommandHandlerContext(
+                _aggregate, 
+                new CommandMetadata
+                {
+                    AggregateId = AggregateId,
+                    CreatedAt = DateTimeOffset.UtcNow
+                });
         
         var result = commandHandler.Evaluate(context, command);
-
-        if (result.IsSuccess)
+        if (!result.IsSuccess) return result;
+        
+        foreach (var @event in context.Events)
         {
-            foreach (var eventEnvelope in context.Events)
-            {
-                var @event = eventEnvelope.Message;
-                _aggregate =
-                    ((IEventHandler)_services.GetRequiredService(
-                        _domainContext.EventHandlers
-                            .Single(q => q.EventType == @event.GetType())
-                            .HandlerType))
-                    .Apply(new EventHandlerContext<TAggregate>(AggregateId)
+            _aggregate =
+                ((IEventHandler)_services.GetRequiredService(
+                    _domainContext.EventHandlers
+                        .Single(q => q.EventType == @event.GetType())
+                        .HandlerType))
+                .Apply(
+                    new EventHandlerContext<TAggregate>(AggregateId)
                     {
                         Aggregate = Aggregate,
-                        ParentContext = ParentContext
-                    }, @event);
-                
-                _events.Add(eventEnvelope);
-            }
+                        ParentContext = ParentContext,
+                        Attributes = Attributes
+                    }, 
+                    @event);
             
-            _events.AddRange(context.Events);
+            _events.Add(@event);
         }
-
+        
+        _events.AddRange(context.Events);
+        
         return result;
     }
 }

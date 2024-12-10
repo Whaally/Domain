@@ -16,11 +16,11 @@ public class AddItemServiceHandler : IServiceHandler<AddItemService>
     {
         var todoItem = Guid.NewGuid();
         
-        context.StageCommand(
+        context.StageCommands(
             todoItem.ToString(), 
             new CreateTodoItem("do a thing"));
         
-        context.StageCommand(
+        context.StageCommands(
             Guid.NewGuid().ToString(),
             new AddItem(todoItem));
 

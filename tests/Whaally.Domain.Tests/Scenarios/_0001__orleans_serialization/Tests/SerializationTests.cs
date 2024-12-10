@@ -26,13 +26,13 @@ public class SerializationTests(ClusterFixture fixture)
 
     [Fact(Skip = _skipReason)]
     public async Task CanInspectEvent()
-        => (await _evaluation).Value[0].Should().BeAssignableTo<IEventEnvelope<TestEvent>>();
+        => (await _evaluation).Value[0].Should().BeAssignableTo<IEventEnvelope>();
 
     [Fact(Skip = _skipReason)]
     public async Task CanAccessEventData()
-        => (await _evaluation).Value[0].Message.Should().BeAssignableTo<TestEvent>();
+        => (await _evaluation).Value[0].Messages.Single().Should().BeAssignableTo<TestEvent>();
 
     [Fact(Skip = _skipReason)]
     public async Task FlagIsTrue()
-        => ((TestEvent)(await _evaluation).Value[0].Message).Flag.Should().BeTrue();
+        => ((TestEvent)(await _evaluation).Value[0].Messages.Single()).Flag.Should().BeTrue();
 }

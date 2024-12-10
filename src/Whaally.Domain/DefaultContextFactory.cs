@@ -6,7 +6,7 @@ namespace Whaally.Domain;
 public class DefaultContextFactory(IServiceProvider services) : IContextFactory
 {
     public ISagaContext CreateSagaContext(IEventMetadata metadata)
-        => new SagaContext(services);
+        => new SagaContext(services, metadata);
 
     public IServiceHandlerContext CreateServiceHandlerContext(IServiceMetadata metadata)
         => new ServiceHandlerContext(

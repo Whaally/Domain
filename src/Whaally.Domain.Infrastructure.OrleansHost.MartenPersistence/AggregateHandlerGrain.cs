@@ -34,12 +34,12 @@ public class AggregateHandlerGrain<TAggregate>
         foreach (var @event in events)
         {
             await AggregateHandler.Apply(new EventEnvelope(
-                (IEvent)@event.Data,
                 new EventMetadata
                 {
                     AggregateId = @event.StreamId.ToString(),
                     CreatedAt = @event.Timestamp.DateTime
-                }));
+                },
+                (IEvent)@event.Data));
         }
 
         return new KeyValuePair<int, TAggregate>(
@@ -56,7 +56,7 @@ public class AggregateHandlerGrain<TAggregate>
 
         var action = session.Events.Append(
             this.GetPrimaryKey(),
-            updates.Select(q => q.Message));
+            updates.SelectMany(q => q.Messages));
 
         await session.SaveChangesAsync();
         return true;

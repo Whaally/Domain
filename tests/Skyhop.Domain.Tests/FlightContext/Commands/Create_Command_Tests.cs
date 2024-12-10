@@ -13,12 +13,10 @@ public class Create_Command_Tests : DomainTest
     {
         var flight = AggregateFactory.Instantiate<Flight>("");
 
-        CommandEnvelope<Create> envelope = new Create();
-        
-        var result = await flight.Evaluate(envelope);
+        var result = await flight.Evaluate(new Create());
 
         Assert.Empty(result.Errors);
-        Assert.IsType<EventEnvelope<Created>>(result.Value.Single());
+        Assert.IsType<EventEnvelope>(result.Value);
     }
 
     [Fact]
@@ -26,9 +24,9 @@ public class Create_Command_Tests : DomainTest
     {
         var flight = AggregateFactory.Instantiate<Flight>("");
 
-        await flight.Trigger((CommandEnvelope<Create>)new Create());
+        await flight.Trigger(new Create());
 
-        var result = await flight.Trigger((CommandEnvelope<Create>)new Create());
+        var result = await flight.Trigger(new Create());
 
         result.Errors.Should().ContainSingle();
     }
