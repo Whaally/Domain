@@ -34,19 +34,19 @@ public interface ICommandHandlerContext<TAggregate>
         GetType()
             .GetMethod(nameof(StageEvent))!
             .MakeGenericMethod(eventType)
-            .Invoke(this, new object[] { @event });
+            .Invoke(this, [@event]);
 
     void ICommandHandlerContext.StageEvent(IEvent @event) =>
         GetType()
             .GetMethod(nameof(StageEvent))!
             .MakeGenericMethod(@event.GetType())
-            .Invoke(this, new[] { @event });
+            .Invoke(this, [@event]);
 
     void ICommandHandlerContext.EvaluateCommand(ICommand command) =>
         GetType()
             .GetMethod(nameof(EvaluateCommand))!
             .MakeGenericMethod(command.GetType())
-            .Invoke(this, new[] { command });
+            .Invoke(this, [command]);
     
     public void StageEvent<TEvent>(TEvent @event)
         where TEvent : class, IEvent;

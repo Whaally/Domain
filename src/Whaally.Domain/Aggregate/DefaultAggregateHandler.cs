@@ -10,8 +10,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 {
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
-    private readonly IEvaluationAgent _evaluationAgent;
     private readonly IContextFactory _contextFactory;
+    private readonly IEvaluationAgent _evaluationAgent;
     
     private TAggregate _aggregate;
     public TAggregate Aggregate
@@ -26,8 +26,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
-        _evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
         _contextFactory = _services.GetRequiredService<IContextFactory>();
+        _evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
         
         Id = id;
         
@@ -38,8 +38,12 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
     {
-        // ToDo: Check whether the commands have in fact been intended for the present aggregate
-        
+        if (!string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)
+            && commandEnvelope.Metadata.AggregateId != Id)
+        {
+            throw new Exception("The provided commands seem intended for a different aggregate instance");
+        }
+
         var events = new List<IEvent>();
         var results = new List<IResultBase>();
 
@@ -47,7 +51,6 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         foreach (var cmd in commandEnvelope.Messages)
         {
-            // ToDo: Extract the command handler instantiation to some other component
            /*
             * The following things happen:
             * 1. The aggregate ID is set on the command (must be refactored to remove dependency)
@@ -57,29 +60,23 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             * 
             */
             
-            ICommand command = cmd;
+            var command = cmd;
 
             if (string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)) commandEnvelope.Metadata.AggregateId = Id;
-            // ToDo: Assert we are not executing commands not meant for this instance.
-
-            // ToDo: provide more helpful exception methods
-            var commandHandler = (ICommandHandler)_services.GetRequiredService(
-                _domainContext.CommandHandlers
-                    .Single(q => q.AggregateType == typeof(TAggregate) 
-                                 && q.CommandType == command.GetType())
-                    .HandlerType);
 
             var commandContext = _contextFactory.CreateCommandHandlerContext(
                 intermediateState,
                 commandEnvelope.Metadata);
             
-            results.Add(commandHandler.Evaluate(commandContext, command));
+            results.Add(_domainContext
+                .GetCommandHandler(command.GetType())
+                .Evaluate(commandContext, command));
 
             var intermediateEvents = commandContext.Events.ToList();
 
             foreach (var intermediateEvent in intermediateEvents)
             {
-                IEvent @event = intermediateEvent;
+                var @event = intermediateEvent;
 
                 var eventContext = _contextFactory.CreateEventHandlerContext(
                     intermediateState,
@@ -119,8 +116,6 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         foreach (var @event in eventEnvelope.Messages)
         {
-            // ToDo: Assert whether the events are intended to be applied to this aggregate instance.
-
             var eventHandler = _domainContext.GetEventHandler(@event.GetType());
             
             intermediateState = eventHandler.Apply(

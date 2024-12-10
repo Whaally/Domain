@@ -52,9 +52,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     
     public virtual IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
-    {   
-        // ToDo: Assert the aggregate types of the command and this context do match.
-
+    {
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
         // staged events, or there is otherwise a trace of this command being called by another command.
         var context = _contextFactory

@@ -1,3 +1,3 @@
 ﻿namespace Whaally.Domain.Abstractions;
 
-public interface IEvent : IMessage { }
+public interface IEvent : IMessage;

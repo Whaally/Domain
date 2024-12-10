@@ -14,20 +14,20 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
             services.GetRequiredService<IEvaluationAgent>());
 
     public ICommandHandlerContext<TAggregate> CreateCommandHandlerContext<TAggregate>(
-        TAggregate aggregate, 
+        TAggregate aggregate,
         ICommandMetadata metadata)
-        where TAggregate : class, IAggregate
-        => new CommandHandlerContext<TAggregate>(services, metadata.AggregateId)
-            {
-                Aggregate = aggregate
-            };
+        where TAggregate : class, IAggregate =>
+        new CommandHandlerContext<TAggregate>(services, metadata.AggregateId)
+        {
+            Aggregate = aggregate
+        };
 
     public IEventHandlerContext<TAggregate> CreateEventHandlerContext<TAggregate>(
-        TAggregate aggregate, 
+        TAggregate aggregate,
         IEventMetadata metadata)
-        where TAggregate : class, IAggregate
-        => new EventHandlerContext<TAggregate>(metadata.AggregateId)
-            {
-                Aggregate = aggregate
-            };
+        where TAggregate : class, IAggregate => 
+        new EventHandlerContext<TAggregate>(metadata.AggregateId)
+        {
+            Aggregate = aggregate
+        };
 }

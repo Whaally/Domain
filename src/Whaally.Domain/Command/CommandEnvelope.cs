@@ -8,8 +8,8 @@ public record CommandEnvelope : ICommandEnvelope
         ICommandMetadata metadata,
         IEnumerable<ICommand> messages)
     {
-        this.Metadata = metadata;
-        this.Messages = messages;
+        Metadata = metadata;
+        Messages = messages;
     }
 
     public CommandEnvelope(

@@ -1,5 +1,3 @@
 ﻿namespace Whaally.Domain.Abstractions;
 
-public interface IMessageHandler
-{
-}
+public interface IMessageHandler;

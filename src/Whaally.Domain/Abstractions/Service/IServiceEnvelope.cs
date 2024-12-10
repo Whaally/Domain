@@ -5,13 +5,6 @@ public interface IServiceEnvelope : IMessageEnvelope
     public new IEnumerable<IService> Messages { get; }
     public new IServiceMetadata Metadata { get; }
 
-    IEnumerable<IMessage> IMessageEnvelope.Messages
-    {
-        get => Messages;
-    }
-
-    IMessageMetadata IMessageEnvelope.Metadata
-    {
-        get => Metadata;
-    }
+    IEnumerable<IMessage> IMessageEnvelope.Messages => Messages;
+    IMessageMetadata IMessageEnvelope.Metadata => Metadata;
 }

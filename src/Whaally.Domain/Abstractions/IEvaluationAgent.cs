@@ -66,7 +66,6 @@ public interface IEvaluationAgent : IDisposable
     public async Task<IResult<IEventEnvelope[]>> Invoke(params ICommandEnvelope[] commandEnvelopes)
     {
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
-        
         var commandResult = await Evaluate(commandEnvelopes);
         
         if (commandResult.IsFailed)
@@ -77,10 +76,8 @@ public interface IEvaluationAgent : IDisposable
         if (eventResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
 
-        foreach (var envelope in commandResult.Value)
-        {
+        foreach (var envelope in commandResult.Value) 
             await Continue(envelope);
-        }
         
         return commandResult;
     }
@@ -88,8 +85,6 @@ public interface IEvaluationAgent : IDisposable
     public async Task<IResult<IEventEnvelope[]>> Invoke(
         IServiceEnvelope serviceEnvelope)
     {
-        List<IResult<IEventEnvelope[]>> results = new(); 
-    
         var serviceResult = await Evaluate(serviceEnvelope);
 
         if (serviceResult.IsFailed)

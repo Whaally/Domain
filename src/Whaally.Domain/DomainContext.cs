@@ -12,9 +12,6 @@ namespace Whaally.Domain;
  * - Do not inject dependencies to this class (IAggregateHandlerFactory & IEvaluationAgent) as concrete instances.
  *   Doing so causes an infinite loop as this class is often injected as dependency to those.
  */
-
-// ToDo: in this class, create a mapping from operations to the evaluation agent. This way we can already involve it at early stage.
-// This allows us to go from large scale to small scale structures. E.g. cluster -> service -> command -> event
 public class DomainContext(IServiceProvider services)
 {
     internal static ActivitySource ActivitySource = new("Whaally.Domain");
@@ -106,19 +103,9 @@ public class DomainContext(IServiceProvider services)
     } 
     #endregion
 
-    /*
-     * Operations:
-     *
-     * - GetAggregate => AggregateHandler
-     * - Evaluate(Command)
-     * - Evaluate(Service)
-     * - Preview(Command)
-     * - Preview(Service)
-     */
-
     private IEvaluationAgent _evaluationAgent => services.GetRequiredService<IEvaluationAgent>();
-    
-    internal IAggregateHandler GetAggregate(Type type, string id)
+
+    private IAggregateHandler GetAggregate(Type type, string id)
     {
         var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
         
@@ -240,6 +227,8 @@ public class DomainContext(IServiceProvider services)
                 .Single(q => q.EventType == eventType)
                 .HandlerType);
 
+    // TODO: See if we can also require the aggregate type as argument to validate that we're executing the correct handlers
+    //       Same goes for the event handlers though.
     public ICommandHandler GetCommandHandler(Type commandType) =>
         (ICommandHandler)services.GetRequiredService(
             CommandHandlers
