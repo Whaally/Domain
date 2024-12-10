@@ -7,6 +7,4 @@ public interface IAggregateFactory
 {
     T Instantiate<T>()
         where T : class;
-    
-    // object Instantiate(Type t);
 }

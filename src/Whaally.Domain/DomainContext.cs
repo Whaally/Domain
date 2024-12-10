@@ -118,7 +118,6 @@ public class DomainContext(IServiceProvider services)
 
     private IEvaluationAgent _evaluationAgent => services.GetRequiredService<IEvaluationAgent>();
     
-    
     internal IAggregateHandler GetAggregate(Type type, string id)
     {
         var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
@@ -155,7 +154,7 @@ public class DomainContext(IServiceProvider services)
     public virtual IAggregateHandler<TAggregate> GetAggregate<TAggregate>(string id)
         where TAggregate : class, IAggregate 
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
-
+    
     public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(
         string aggregateId, 
         TCommand command)
@@ -169,7 +168,7 @@ public class DomainContext(IServiceProvider services)
             },
             command);
     }
-
+    
     public virtual Task<IResult<IEventEnvelope[]>> Evaluate(
         string aggregateId,
         params ICommand[] commands)
@@ -182,7 +181,7 @@ public class DomainContext(IServiceProvider services)
                 },
                 commands));
     }
-
+    
     public virtual Task<IResult<IEventEnvelope[]>> Trigger(
         ICommandMetadata metadata,
         params ICommand[] commands)
@@ -194,7 +193,7 @@ public class DomainContext(IServiceProvider services)
                 metadata,
                 commands));
     }
-
+    
     public virtual Task<IResult<IEventEnvelope[]>> Trigger(
         string aggregateId,
         params ICommand[] commands)
@@ -224,4 +223,26 @@ public class DomainContext(IServiceProvider services)
                     CreatedAt = DateTimeOffset.UtcNow
                 }, service));
     }
+    
+    public IServiceHandler GetServiceHandler(Type serviceType) => 
+        (IServiceHandler)services.GetRequiredService(
+            ServiceHandlers
+                .Single(q => q.ServiceType == serviceType)
+                .HandlerType);
+    
+    public IEnumerable<ISaga> GetSaga(Type eventType) =>
+        Sagas.Where(q => q.EventType == eventType)
+            .Select(q => (ISaga)services.GetRequiredService(q.HandlerType));
+
+    public IEventHandler GetEventHandler(Type eventType) =>
+        (IEventHandler)services.GetRequiredService(
+            EventHandlers
+                .Single(q => q.EventType == eventType)
+                .HandlerType);
+
+    public ICommandHandler GetCommandHandler(Type commandType) =>
+        (ICommandHandler)services.GetRequiredService(
+            CommandHandlers
+                .Single(q => q.CommandType == commandType)
+                .HandlerType);
 }

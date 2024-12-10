@@ -13,13 +13,16 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
+    private readonly IContextFactory _contextFactory;
     
     public CommandHandlerContext(
-        IServiceProvider services, 
+        IServiceProvider services,
         string aggregateId)
     {
         _services = services;
         _domainContext = services.GetRequiredService<DomainContext>();
+        _contextFactory = services.GetRequiredService<IContextFactory>();
+        
         AggregateId = aggregateId;
         
         // Stuff like this would require me to rethink what I am doing.
@@ -49,18 +52,12 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     
     public virtual IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
-    {
-        var commandHandler = (ICommandHandler) _services.GetRequiredService(
-            _domainContext.CommandHandlers
-                .Single(q => q.CommandType == typeof(TCommand))
-                .HandlerType);
-        
+    {   
         // ToDo: Assert the aggregate types of the command and this context do match.
 
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
         // staged events, or there is otherwise a trace of this command being called by another command.
-        var context = _services
-            .GetRequiredService<IContextFactory>()
+        var context = _contextFactory
             .CreateCommandHandlerContext(
                 _aggregate, 
                 new CommandMetadata
@@ -69,23 +66,25 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                     CreatedAt = DateTimeOffset.UtcNow
                 });
         
-        var result = commandHandler.Evaluate(context, command);
+        var result = _domainContext
+            .GetCommandHandler(command.GetType())
+            .Evaluate(context, command);
+        
         if (!result.IsSuccess) return result;
         
         foreach (var @event in context.Events)
         {
-            _aggregate =
-                ((IEventHandler)_services.GetRequiredService(
-                    _domainContext.EventHandlers
-                        .Single(q => q.EventType == @event.GetType())
-                        .HandlerType))
+            _aggregate = _domainContext
+                .GetEventHandler(@event.GetType())
                 .Apply(
-                    new EventHandlerContext<TAggregate>(AggregateId)
-                    {
-                        Aggregate = Aggregate,
-                        ParentContext = ParentContext,
-                        Attributes = Attributes
-                    }, 
+                    _contextFactory.CreateEventHandlerContext(
+                        Aggregate,
+                        new EventMetadata
+                        {
+                            AggregateId = AggregateId,
+                            Attributes = new Dictionary<string, object>(Attributes),
+                            ParentContext = ParentContext
+                        }),
                     @event);
             
             _events.Add(@event);

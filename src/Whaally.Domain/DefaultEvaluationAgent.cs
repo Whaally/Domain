@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
@@ -11,6 +10,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IAggregateHandlerFactory _handlerFactory;
+    private readonly IContextFactory _contextFactory;
     private readonly Activity? _activity;
     
     public DefaultEvaluationAgent(IServiceProvider services)
@@ -18,7 +18,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
         _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
-
+        _contextFactory = _services.GetRequiredService<IContextFactory>();
+        
         _activity = DomainContext.ActivitySource.StartActivity(
             ActivityKind.Internal,
             name: "DomainContext",
@@ -35,27 +36,17 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     {
         if (serviceEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
+
+        var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
-        var serviceHandler = (IServiceHandler)_services.GetRequiredService(
-            _domainContext.ServiceHandlers
-                .Single(q => q.ServiceType == serviceEnvelope.Messages.Single().GetType())
-                .HandlerType);
-        
-        var serviceContext =
-            new ServiceHandlerContext(_services, this)
-            {
-                ParentContext = _activity?.Context,
-                Attributes = new ReadOnlyDictionary<string, object>(serviceEnvelope.Metadata.Attributes)
-            };
-        
-        var result = await serviceHandler.Handle(
-            serviceContext,
-            serviceEnvelope.Messages.Single());
+        var result = await _domainContext
+            .GetServiceHandler(serviceEnvelope.Messages.Single().GetType())
+            .Handle(
+                serviceContext,
+                serviceEnvelope.Messages.Single());
         
         if (result.IsFailed)
-        {
             return Result.Fail<ICommandEnvelope[]>(result.Errors);
-        }
         
         return Result
             .Ok(Array.Empty<ICommandEnvelope>())
@@ -72,20 +63,18 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commandEnvelopes)
     {
         List<IResult<IEventEnvelope>> results = [];
-
+        
         foreach (var envelope in commandEnvelopes)
         {
             if (!envelope.Messages.Any()) continue;
             
-            var aggregateType = GetCommonAggregateType(envelope);
-            
             var handler = _handlerFactory.Instantiate(
-                aggregateType,
+                GetCommonAggregateType(envelope),
                 envelope.Metadata.AggregateId);
-
+            
             results.Add(await handler.Evaluate(envelope));
         }
-
+        
         var result = Result
             .Ok(Array.Empty<IEventEnvelope>())
             .WithReasons(results.SelectMany(q => q.Reasons));
@@ -112,12 +101,10 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         {
             if (!envelope.Messages.Any()) continue;
             
-            var aggregateType = GetCommonAggregateType(envelope);
-            
             var handler = _handlerFactory.Instantiate(
-                aggregateType,
+                GetCommonAggregateType(envelope),
                 envelope.Metadata.AggregateId);
-
+            
             results.Add(await handler.Apply(envelope));
         }
         
@@ -136,11 +123,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     {
         foreach (var @event in eventEnvelope.Messages)
         {
-            var sagas = _domainContext.Sagas
-                .Where(q => q.EventType == @event.GetType())
-                .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
-            
-            foreach (var saga in sagas)
+            foreach (var saga in _domainContext.GetSaga(@event.GetType()))
             {
                 _ = Task.Run(() => Invoke(saga, eventEnvelope));
             }
@@ -160,23 +143,16 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
         
-        var context = new SagaContext(
-            _services, 
-            eventEnvelope.Metadata)
-        {
-            AggregateId = eventEnvelope.Metadata.AggregateId,
-            ParentContext = eventEnvelope.Metadata.ParentContext
-        };
-
-        return await saga.Evaluate(context, eventEnvelope.Messages.Single());
+        return await saga.Evaluate(
+            _contextFactory.CreateSagaContext(eventEnvelope.Metadata), 
+            eventEnvelope.Messages.Single());
     }
-
+    
     public void Dispose()
     {
         _activity?.Dispose();
     }
-
-
+    
     private Type GetCommonAggregateType(ICommandEnvelope commandEnvelope)
     {
         var commandTypes = commandEnvelope.Messages
@@ -189,10 +165,10 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             .Select(q => q.AggregateType)
             .Distinct()
             .SingleOrDefault();
-
+        
         if (aggregateType == null)
             throw new Exception("Single envelope contains commands registered with different aggregate types");
-
+        
         return aggregateType;
     }
     
@@ -208,7 +184,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             .Select(q => q.AggregateType)
             .Distinct()
             .SingleOrDefault();
-
+        
         if (aggregateType == null)
             throw new Exception("Single envelope contains events registered with different aggregate types");
         

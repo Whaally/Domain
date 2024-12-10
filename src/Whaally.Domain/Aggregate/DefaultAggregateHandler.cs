@@ -81,22 +81,15 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             {
                 IEvent @event = intermediateEvent;
 
-                var eventHandler = (IEventHandler)_services.GetRequiredService(
-                    _domainContext.EventHandlers
-                        .Single(q => q.AggregateType == typeof(TAggregate)
-                                     && q.EventType == @event.GetType())
-                        .HandlerType);
-                
-                var eventContext = new EventHandlerContext<TAggregate>(
-                    !string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)
-                        ? commandEnvelope.Metadata.AggregateId
-                        : Id)
-                {
-                    Aggregate = intermediateState,
-                    AggregateId = Id
-                };
+                var eventContext = _contextFactory.CreateEventHandlerContext(
+                    intermediateState,
+                    new EventMetadata
+                    {
+                        AggregateId = Id
+                    });
 
-                intermediateState = eventHandler
+                intermediateState = _domainContext
+                    .GetEventHandler(@event.GetType())
                     .Apply(eventContext, @event);
 
                 events.Add(@event);
@@ -120,26 +113,20 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {
-        if (eventEnvelope.Messages.Count() == 0) return Result.Ok();
+        if (!eventEnvelope.Messages.Any()) return Result.Ok();
 
         TAggregate intermediateState = _aggregate;
 
         foreach (var @event in eventEnvelope.Messages)
         {
             // ToDo: Assert whether the events are intended to be applied to this aggregate instance.
-            
-            var eventHandler = (IEventHandler)_services.GetRequiredService(
-                _domainContext.EventHandlers
-                    .Single(q => q.AggregateType == typeof(TAggregate)
-                                 && q.EventType == @event.GetType())
-                    .HandlerType);
 
-            var eventContext = _contextFactory.CreateEventHandlerContext(
-                intermediateState,
-                eventEnvelope.Metadata);
+            var eventHandler = _domainContext.GetEventHandler(@event.GetType());
             
             intermediateState = eventHandler.Apply(
-                eventContext,
+                _contextFactory.CreateEventHandlerContext(
+                    intermediateState,
+                    eventEnvelope.Metadata),
                 @event);
         }
 
