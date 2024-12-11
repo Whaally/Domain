@@ -13,7 +13,6 @@ public class ServiceHandlerContext : IServiceHandlerContext
     private readonly DomainContext _domainContext;
 
     private readonly Activity? _activity;
-    // ToDo: Add an activity here to track service evaluation
     
     public ServiceHandlerContext(IServiceProvider services, IServiceMetadata metadata)
     {
@@ -57,6 +56,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
                 new ServiceMetadata
                 {
                     CreatedAt = DateTimeOffset.UtcNow,
+                    ServiceType = service.GetType(),
                     Attributes = new Dictionary<string, object>(Attributes),
                     ParentContext = ParentContext
                 }, service));
@@ -79,6 +79,8 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// <param name="command">The command to add to the current commands basket</param>
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
+        foreach (var command in commands) _activity?.AddEvent(new ActivityEvent($"Stage {command.GetType().Name}"));
+        
         var aggregateType = _domainContext.GetCommonAggregateType(commands);
         
         if (!_envelopes.TryGetValue(aggregateId, out var envelope))
@@ -101,5 +103,11 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
         _envelopes.Remove(aggregateId);
         _envelopes.Add(aggregateId, envelope);
+    }
+
+    public void Dispose()
+    {
+        _evaluationAgent.Dispose();
+        _activity?.Dispose();
     }
 }

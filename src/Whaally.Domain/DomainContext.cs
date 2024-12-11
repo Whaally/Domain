@@ -209,6 +209,7 @@ public class DomainContext
                 metadata ?? new ServiceMetadata
                 {
                     CreatedAt = DateTimeOffset.UtcNow,
+                    ServiceType = service.GetType(),
                     ParentContext = activity?.Context
                 }, service));
     }

@@ -34,7 +34,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         if (serviceEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
         
-        var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
+        using var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
         var result = await _domainContext
             .GetServiceHandler(serviceEnvelope.Messages.Single().GetType())

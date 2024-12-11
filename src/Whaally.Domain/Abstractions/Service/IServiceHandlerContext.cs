@@ -2,7 +2,7 @@
 
 namespace Whaally.Domain.Abstractions;
 
-public interface IServiceHandlerContext : IContext
+public interface IServiceHandlerContext : IContext, IDisposable
 {
     /// <summary>
     /// The optimistic result of the evaluation of this service.

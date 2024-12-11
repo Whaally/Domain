@@ -68,7 +68,8 @@ public class SagaContext : ISagaContext
             new ServiceEnvelope(
                 new ServiceMetadata
                 {
-                    CreatedAt = DateTimeOffset.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    ServiceType = service.GetType()
                 }, service));
 
         if (!result.IsSuccess) return result.ToResult();
