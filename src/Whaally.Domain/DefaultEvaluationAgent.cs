@@ -34,24 +34,13 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         if (serviceEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
         
-        using var activity = DomainContext.ActivitySource.StartActivity(
-            ActivityKind.Internal,
-            name: $"Evaluate {serviceEnvelope.Messages.Single().GetType().Name}",
-            parentContext: serviceEnvelope.Metadata.ParentContext ?? default,
-            tags: new Dictionary<string, object?>
-            {
-                
-            });
-        
-        serviceEnvelope.Metadata.ParentContext = activity?.Context;
-        
         var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
         var result = await _domainContext
             .GetServiceHandler(serviceEnvelope.Messages.Single().GetType())
             .Handle(
                 serviceContext,
-                serviceEnvelope.Messages.Single());
+                serviceEnvelope.Message);
         
         return new Result<ICommandEnvelope[]>()
             .WithValue(serviceContext.Commands.ToArray())

@@ -15,10 +15,9 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
         };
 
     public IServiceHandlerContext CreateServiceHandlerContext(IServiceMetadata metadata)
-        => new ServiceHandlerContext(services)
+        => new ServiceHandlerContext(services, metadata)
         {
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
-            ParentContext = metadata.ParentContext
         };
 
     public ICommandHandlerContext<TAggregate> CreateCommandHandlerContext<TAggregate>(

@@ -12,13 +12,25 @@ public class ServiceHandlerContext : IServiceHandlerContext
     private readonly IEvaluationAgent _evaluationAgent;
     private readonly DomainContext _domainContext;
 
+    private readonly Activity? _activity;
     // ToDo: Add an activity here to track service evaluation
     
-    public ServiceHandlerContext(IServiceProvider services)
+    public ServiceHandlerContext(IServiceProvider services, IServiceMetadata metadata)
     {
         _services = services;
         _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
         _domainContext = services.GetRequiredService<DomainContext>();
+        
+        _activity = DomainContext.ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: $"Evaluate {metadata.ServiceType?.Name}",
+            parentContext: metadata.ParentContext ?? default,
+            tags: new Dictionary<string, object?>
+            {
+                
+            });
+        
+        ParentContext = _activity?.Context;
     }
 
     public ActivityContext? ParentContext { get; init; }

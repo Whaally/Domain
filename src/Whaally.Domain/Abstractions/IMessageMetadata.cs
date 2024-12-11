@@ -9,7 +9,10 @@ public interface IMessageMetadata
     public DateTimeOffset CreatedAt { get; set; }
 }
 
-public interface IServiceMetadata : IMessageMetadata;
+public interface IServiceMetadata : IMessageMetadata
+{
+    public Type? ServiceType { get; set; }
+}
 
 public interface ICommandMetadata : IMessageMetadata
 {

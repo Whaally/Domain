@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Whaally.Domain.Abstractions;
-using Whaally.Domain.Tests.Domain;
+﻿using Whaally.Domain.Tests.Domain;
 
 namespace Whaally.Domain.Tests;
 
@@ -11,7 +9,7 @@ public class ServiceTests
     [Fact]
     public async Task ServiceCanBeEvaluated()
     {
-        var context = new ServiceHandlerContext(_services);
+        var context = new ServiceHandlerContext(_services, new ServiceMetadata());
         var service = new TestService
         {
             Id = Guid.NewGuid().ToString()
@@ -27,7 +25,7 @@ public class ServiceTests
     [Fact]
     public async Task ServiceCanInvokeOtherServices()
     {
-        var context = new ServiceHandlerContext(_services);
+        var context = new ServiceHandlerContext(_services, new ServiceMetadata());
         var service = new TestParentService
         {
             Id1 = Guid.NewGuid().ToString(),

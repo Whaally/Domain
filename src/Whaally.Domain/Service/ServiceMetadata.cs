@@ -11,4 +11,6 @@ public record ServiceMetadata : IServiceMetadata
     public ActivityContext? ParentContext { get; set; }
     
     public DateTimeOffset CreatedAt { get; set; }
+
+    public Type? ServiceType { get; set; }
 }
