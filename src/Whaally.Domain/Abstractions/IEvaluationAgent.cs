@@ -54,6 +54,8 @@ public interface IEvaluationAgent : IDisposable
     /// <param name="events"></param>
     /// <returns></returns>
     public Task<IResultBase> Continue(IEventEnvelope events);
+
+    public Task Abort(params ICommandMetadata[] metadata);
     
     /// <summary>
     ///     Invokes a number of commands, meaning they are ran, and the resulting events are applied to the
@@ -67,21 +69,33 @@ public interface IEvaluationAgent : IDisposable
     {
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
         var commandResult = await Evaluate(commandEnvelopes);
-        
+
         if (commandResult.IsFailed)
+        {
+            await Abort(commandEnvelopes
+                .Select(q => q.Metadata)
+                .ToArray());
+            
             return Result.Fail<IEventEnvelope[]>(commandResult.Errors);
+        }
         
         var eventResult = await Apply(commandResult.Value);
-        
+
         if (eventResult.IsFailed)
+        {
+            await Abort(commandEnvelopes
+                .Select(q => q.Metadata)
+                .ToArray());
+            
             return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
+        }
         
         foreach (var envelope in commandResult.Value) 
             await Continue(envelope);
         
         return commandResult;
     }
-
+    
     public async Task<IResult<IEventEnvelope[]>> Invoke(
         IServiceEnvelope serviceEnvelope)
     {

@@ -13,6 +13,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     private readonly IContextFactory _contextFactory;
     private readonly IEvaluationAgent _evaluationAgent;
     
+    private Activity? _activity = null;
+    
     private TAggregate _aggregate;
     public TAggregate Aggregate
     {
@@ -21,7 +23,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     }
     
     public string Id { get; init; }
-
+    
     public DefaultAggregateHandler(IServiceProvider services, string id)
     {
         _services = services;
@@ -43,6 +45,20 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         {
             throw new Exception("The provided commands seem intended for a different aggregate instance");
         }
+        
+        // TODO: Allow concurrent uses, though queue subsequent operations
+        if (_activity != null
+            && _activity.ParentSpanId != commandEnvelope.Metadata.ParentContext?.SpanId)
+            throw new Exception("Aggregate is locked");
+
+        _activity = DomainContext.ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: $"Aggregate {Aggregate.GetType().Name}",
+            parentContext: commandEnvelope.Metadata.ParentContext ?? default,
+            tags: new Dictionary<string, object?>
+            {
+
+            });
 
         var events = new List<IEvent>();
         var results = new List<IResultBase>();
@@ -62,6 +78,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             
             var command = cmd;
 
+            _activity?.AddEvent(new ActivityEvent($"Evaluate {command.GetType().Name}"));
+            
             if (string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)) commandEnvelope.Metadata.AggregateId = Id;
 
             var commandContext = _contextFactory.CreateCommandHandlerContext(
@@ -110,12 +128,20 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {
-        if (!eventEnvelope.Messages.Any()) return Result.Ok();
+        if (!eventEnvelope.Messages.Any())
+        {
+            _activity?.Dispose();
+            _activity = null;
+            
+            return Result.Ok();
+        }
 
         TAggregate intermediateState = _aggregate;
 
         foreach (var @event in eventEnvelope.Messages)
         {
+            _activity?.AddEvent(new ActivityEvent($"Apply {@event.GetType().Name}"));
+            
             var eventHandler = _domainContext.GetEventHandler(@event.GetType());
             
             intermediateState = eventHandler.Apply(
@@ -129,13 +155,20 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         // Implicitly continue the operations
         await _evaluationAgent.Continue(eventEnvelope);
+
+        _activity?.Dispose();
+        _activity = null;
         
         return Result.Ok();
     }
 
     public Task Abort(ActivityContext context)
     {
-        throw new NotImplementedException();
+        _activity?.AddEvent(new ActivityEvent("Abort"));
+        _activity?.Dispose();
+        _activity = null;
+
+        return Task.CompletedTask;
     }
 
     public Task<TSnapshot> Snapshot<TSnapshot>()

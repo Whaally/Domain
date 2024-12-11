@@ -12,7 +12,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     private readonly IContextFactory _contextFactory;
     private readonly IAggregateHandlerFactory _handlerFactory;
     
-    private readonly Activity? _activity;
+    // private readonly Activity? _activity;
     
     public DefaultEvaluationAgent(IServiceProvider services)
     {
@@ -20,11 +20,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         _domainContext = _services.GetRequiredService<DomainContext>();
         _contextFactory = _services.GetRequiredService<IContextFactory>();
         _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
-        
-        _activity = DomainContext.ActivitySource.StartActivity(
-            ActivityKind.Internal,
-            name: "DomainContext",
-            tags: new Dictionary<string, object?> { });
     }
     
     /// <summary>
@@ -35,10 +30,18 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <returns></returns>
     public async Task<IResult<ICommandEnvelope[]>> Evaluate(IServiceEnvelope serviceEnvelope)
     {
+        // TODO: Can we support evaluation of multiple services? What does this mean for the transactional boundaries?
         if (serviceEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
         
-        serviceEnvelope.Metadata.ParentContext = _activity?.Context;
+        using var activity = DomainContext.ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: $"Evaluate {serviceEnvelope.Messages.Single().GetType().Name}",
+            parentContext: serviceEnvelope.Metadata.ParentContext ?? default,
+            tags: new Dictionary<string, object?>
+            {
+                
+            });
         
         var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
@@ -62,20 +65,20 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commandEnvelopes)
     {
         List<IResult<IEventEnvelope>> results = [];
-        
-        foreach (var envelope in commandEnvelopes)
+
+        await Parallel.ForEachAsync(commandEnvelopes, async (envelope, ct) =>
         {
-            if (!envelope.Messages.Any()) continue;
+            if (!envelope.Messages.Any()) return;
             
-            envelope.Metadata.ParentContext = _activity?.Context;
+            var aggregateType = GetCommonAggregateType(envelope);
             
             var handler = _handlerFactory.Instantiate(
-                GetCommonAggregateType(envelope),
+                aggregateType,
                 envelope.Metadata.AggregateId);
             
             results.Add(await handler.Evaluate(envelope));
-        }
-
+        });
+        
         return new Result<IEventEnvelope[]>()
             .WithValue(results
                 .Select(q => q.Value)
@@ -92,19 +95,19 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResultBase> Apply(params IEventEnvelope[] eventEnvelopes)
     {
         List<IResultBase> results = new(eventEnvelopes.Length);
-        
-        foreach (var envelope in eventEnvelopes)
-        {
-            if (!envelope.Messages.Any()) continue;
 
-            envelope.Metadata.ParentContext = _activity?.Context;
+        await Parallel.ForEachAsync(eventEnvelopes, async (envelope, ct) =>
+        {
+            if (!envelope.Messages.Any()) return;
             
+            var aggregateType = GetCommonAggregateType(envelope);
+
             var handler = _handlerFactory.Instantiate(
-                GetCommonAggregateType(envelope),
+                aggregateType,
                 envelope.Metadata.AggregateId);
             
             results.Add(await handler.Apply(envelope));
-        }
+        });
         
         return new Result()
             .WithReasons(results.SelectMany(q => q.Reasons));
@@ -117,8 +120,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <returns></returns>
     public Task<IResultBase> Continue(IEventEnvelope eventEnvelope)
     {
-        eventEnvelope.Metadata.ParentContext = _activity?.Context;
-        
         foreach (var @event in eventEnvelope.Messages)
         {
             foreach (var saga in _domainContext.GetSaga(@event.GetType()))
@@ -128,6 +129,13 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         }
         
         return Task.FromResult<IResultBase>(Result.Ok());
+    }
+    
+    public Task Abort(params ICommandMetadata[] metadata)
+    {
+        // TODO: Get an aggregate handler instance. Note that the aggregate type is required to do so.
+        // TODO: Create an `IAggregateMetadata` object, the `ICommandMetadata` and `IEventMetadata` derive from
+        return Task.CompletedTask;
     }
     
     /// <summary>
@@ -141,8 +149,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
 
-        eventEnvelope.Metadata.ParentContext = _activity?.Context;
-        
         return await saga.Evaluate(
             _contextFactory.CreateSagaContext(eventEnvelope.Metadata), 
             eventEnvelope.Messages.Single());
@@ -150,7 +156,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     
     public void Dispose()
     {
-        _activity?.Dispose();
     }
     
     private Type GetCommonAggregateType(ICommandEnvelope commandEnvelope)

@@ -13,6 +13,7 @@ using var traceProvider = Sdk.CreateTracerProviderBuilder()
         .AddService("console-sample")
         .AddAttributes(new Dictionary<string, object>
         {
+            // Explicitly adding this field here such that Jaeger does not apply clock skew adjustments
             { "ip", "." }
         }))
     .AddSource("Whaally.Domain")
@@ -28,4 +29,6 @@ var services = new ServiceCollection()
 
 var domain = services.GetRequiredService<DomainContext>();
 
-await domain.Trigger(new AddItemService());
+for (var i = 0; i < 10; i++) {
+    await domain.Trigger(new AddItemService());
+}

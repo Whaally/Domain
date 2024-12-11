@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
 // ReSharper disable InvertIf
-
 namespace Whaally.Domain;
 
 /*
@@ -17,7 +16,13 @@ public class DomainContext
     internal static ActivitySource ActivitySource = new("Whaally.Domain");
     
     private readonly IServiceProvider _services;
-    private readonly Activity? _activity;
+    private IEvaluationAgent _evaluationAgent => _services.GetRequiredService<IEvaluationAgent>();
+    
+    private Activity? _activity => ActivitySource.StartActivity(
+        ActivityKind.Internal,
+        name: nameof(DomainContext),
+        tags: new Dictionary<string, object?>
+        {
 
         });
     
@@ -84,8 +89,7 @@ public class DomainContext
     public IReadOnlyList<SnapshotFactoryMeta> SnapshotFactories { get; private init; } = [];
     #endregion
     
-    private IEvaluationAgent _evaluationAgent => _services.GetRequiredService<IEvaluationAgent>();
-    
+    #region Aggregate handlers
     private IAggregateHandler GetAggregate(Type type, string id)
     {
         var aggregateHandlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
@@ -94,7 +98,7 @@ public class DomainContext
         {
             return aggregateHandlerFactory.Instantiate(type, id);
         }
-
+        
         Type? aggregateType = null;
         
         if (type.IsAssignableTo(typeof(ICommand)))
@@ -122,9 +126,10 @@ public class DomainContext
     public virtual IAggregateHandler<TAggregate> GetAggregate<TAggregate>(string id)
         where TAggregate : class, IAggregate 
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
+    #endregion
     
     public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(
-        string aggregateId, 
+        string aggregateId,
         TCommand command)
         where TCommand : class, ICommand
     {
@@ -133,7 +138,7 @@ public class DomainContext
             {
                 AggregateId = aggregateId,
                 CreatedAt = DateTimeOffset.UtcNow,
-                ParentContext = _activity?.Context
+                
             },
             command);
     }
@@ -146,53 +151,54 @@ public class DomainContext
             new CommandEnvelope(
                 new CommandMetadata
                 {
-                    AggregateId = aggregateId,
-                    ParentContext = _activity?.Context
+                    AggregateId = aggregateId
                 },
                 commands));
     }
     
-    public virtual Task<IResult<IEventEnvelope[]>> Trigger(
+    public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
         ICommandMetadata metadata,
         params ICommand[] commands)
     {
         using var evaluationAgent = _evaluationAgent;
         
-        return evaluationAgent.Invoke(
+        return await evaluationAgent.Invoke(
             new CommandEnvelope(
                 metadata,
                 commands));
     }
     
-    public virtual Task<IResult<IEventEnvelope[]>> Trigger(
+    public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
         string aggregateId,
         params ICommand[] commands)
     {
+        using var activity = _activity;
         using var evaluationAgent = _evaluationAgent;
 
-        return evaluationAgent.Invoke(
+        return await evaluationAgent.Invoke(
             new CommandEnvelope(
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
                     CreatedAt = DateTimeOffset.UtcNow,
-                    ParentContext = _activity?.Context
+                    ParentContext = activity?.Context
                 },
                 commands));
     }
     
-    public virtual Task<IResult<IEventEnvelope[]>> Trigger(
+    public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
         IService service,
         IServiceMetadata? metadata = null)
     {
+        using var activity = _activity;
         using var evaluationAgent = _evaluationAgent;
-
-        return evaluationAgent.Invoke(
+        
+        return await evaluationAgent.Invoke(
             new ServiceEnvelope(
                 metadata ?? new ServiceMetadata
                 {
                     CreatedAt = DateTimeOffset.UtcNow,
-                    ParentContext = _activity?.Context
+                    ParentContext = activity?.Context
                 }, service));
     }
     
@@ -205,13 +211,13 @@ public class DomainContext
     public IEnumerable<ISaga> GetSaga(Type eventType) =>
         Sagas.Where(q => q.EventType == eventType)
             .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
-
+    
     public IEventHandler GetEventHandler(Type eventType) =>
         (IEventHandler)_services.GetRequiredService(
             EventHandlers
                 .Single(q => q.EventType == eventType)
                 .HandlerType);
-
+    
     // TODO: See if we can also require the aggregate type as argument to validate that we're executing the correct handlers
     //       Same goes for the event handlers though.
     public ICommandHandler GetCommandHandler(Type commandType) =>
