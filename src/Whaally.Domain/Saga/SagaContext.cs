@@ -10,6 +10,7 @@ public class SagaContext : ISagaContext
 {
     private readonly IServiceProvider _services;
     private readonly IEvaluationAgent _evaluationAgent;
+    private readonly DomainContext _domainContext;
     
     private readonly Dictionary<string, CommandEnvelope> _envelopes = new();
     
@@ -20,6 +21,7 @@ public class SagaContext : ISagaContext
     {
         _services = services;
         _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
+        _domainContext = services.GetRequiredService<DomainContext>();
         
         Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes);
     }
@@ -36,18 +38,24 @@ public class SagaContext : ISagaContext
         => _services.GetRequiredService<IAggregateHandlerFactory>();
 
     
-    public virtual void StageCommands(string aggregateId, params ICommand[] command)
+    public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
+        var aggregateType = _domainContext.GetCommonAggregateType(commands);
+        
         if (!_envelopes.TryGetValue(aggregateId, out var envelope))
             envelope = new CommandEnvelope(
                 new CommandMetadata
                 {
-                    AggregateId = aggregateId
+                    AggregateId = aggregateId,
+                    AggregateType = aggregateType
                 });
 
+        if (envelope.Metadata.AggregateType != aggregateType)
+            throw new Exception("Aggregate types do not match");
+        
         envelope = envelope with
         {
-            Messages = [..envelope.Messages, ..command]
+            Messages = [..envelope.Messages, ..commands]
         };
 
         _envelopes.Remove(aggregateId);

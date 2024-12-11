@@ -12,18 +12,20 @@ public class AddItemService : IService
 
 public class AddItemServiceHandler : IServiceHandler<AddItemService>
 {
-    public Task<IResultBase> Handle(IServiceHandlerContext context, AddItemService service)
+    public async Task<IResultBase> Handle(IServiceHandlerContext context, AddItemService service)
     {
         var todoItem = Guid.NewGuid();
         
         context.StageCommands(
             todoItem.ToString(), 
             new CreateTodoItem("do a thing"));
+
+        await context.EvaluateService(new NestedService());
         
         context.StageCommands(
             Guid.NewGuid().ToString(),
             new AddItem(todoItem));
 
-        return Task.FromResult<IResultBase>(Result.Ok());
+        return await Task.FromResult<IResultBase>(Result.Ok());
     }
 }

@@ -17,13 +17,12 @@ public class DomainContext
     
     private readonly IServiceProvider _services;
     private IEvaluationAgent _evaluationAgent => _services.GetRequiredService<IEvaluationAgent>();
-    
     private Activity? _activity => ActivitySource.StartActivity(
         ActivityKind.Internal,
         name: nameof(DomainContext),
         tags: new Dictionary<string, object?>
         {
-
+            
         });
     
     public DomainContext(
@@ -66,27 +65,27 @@ public class DomainContext
     /// <summary>
     ///     Metadata about the command handlers registered with this domain instance.
     /// </summary>
-    public IReadOnlyList<CommandHandlerMeta> CommandHandlers { get; private init; } = [];
+    public IReadOnlyList<CommandHandlerMeta> CommandHandlers { get; }
     
     /// <summary>
     ///     Metadata about the event handlers registered with this domain.
     /// </summary>
-    public IReadOnlyList<EventHandlerMeta> EventHandlers { get; private init; } = [];
+    public IReadOnlyList<EventHandlerMeta> EventHandlers { get; }
     
     /// <summary>
     ///     Metadata about the service handlers registered with this domain.
     /// </summary>
-    public IReadOnlyList<ServiceHandlerMeta> ServiceHandlers { get; private init; } = [];
+    public IReadOnlyList<ServiceHandlerMeta> ServiceHandlers { get; }
     
     /// <summary>
     ///     Metadata about the sagas registered with this domain.
     /// </summary>
-    public IReadOnlyList<SagaMeta> Sagas { get; private init; } = [];
+    public IReadOnlyList<SagaMeta> Sagas { get; }
     
     /// <summary>
     ///     Metadata about the snapshot factories registered with this domain.
     /// </summary>
-    public IReadOnlyList<SnapshotFactoryMeta> SnapshotFactories { get; private init; } = [];
+    public IReadOnlyList<SnapshotFactoryMeta> SnapshotFactories { get; }
     #endregion
     
     #region Aggregate handlers
@@ -137,8 +136,8 @@ public class DomainContext
             new CommandMetadata
             {
                 AggregateId = aggregateId,
-                CreatedAt = DateTimeOffset.UtcNow,
-                
+                AggregateType = this.GetCommonAggregateType([ command ]),
+                CreatedAt = DateTimeOffset.UtcNow
             },
             command);
     }
@@ -151,9 +150,20 @@ public class DomainContext
             new CommandEnvelope(
                 new CommandMetadata
                 {
-                    AggregateId = aggregateId
+                    AggregateId = aggregateId,
+                    AggregateType = this.GetCommonAggregateType(commands),
+                    CreatedAt = DateTimeOffset.UtcNow
                 },
                 commands));
+    }
+
+    public virtual async Task<IResult<IEventEnvelope[]>> Evaluate(
+        ICommandMetadata metadata,
+        params ICommand[] commands)
+    {
+        using var evaluationAgent = _evaluationAgent;
+
+        return await _evaluationAgent.Evaluate(new CommandEnvelope(metadata, commands));
     }
     
     public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
@@ -180,6 +190,7 @@ public class DomainContext
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
+                    AggregateType = this.GetCommonAggregateType(commands),
                     CreatedAt = DateTimeOffset.UtcNow,
                     ParentContext = activity?.Context
                 },

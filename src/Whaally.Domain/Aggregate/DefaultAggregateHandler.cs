@@ -100,7 +100,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                     intermediateState,
                     new EventMetadata
                     {
-                        AggregateId = Id
+                        AggregateId = Id,
+                        AggregateType = Aggregate.GetType()
                     });
 
                 intermediateState = _domainContext
@@ -120,6 +121,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                     {
                         Attributes = commandEnvelope.Metadata.Attributes,
                         AggregateId = commandEnvelope.Metadata.AggregateId,
+                        AggregateType = Aggregate.GetType(),
                         CreatedAt = DateTimeOffset.UtcNow
                     },
                     events))

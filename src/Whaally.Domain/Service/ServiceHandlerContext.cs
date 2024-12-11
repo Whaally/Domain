@@ -10,15 +10,15 @@ public class ServiceHandlerContext : IServiceHandlerContext
     private Dictionary<string, CommandEnvelope> _envelopes = new();
     private readonly IServiceProvider _services;
     private readonly IEvaluationAgent _evaluationAgent;
+    private readonly DomainContext _domainContext;
 
     // ToDo: Add an activity here to track service evaluation
     
-    public ServiceHandlerContext(
-        IServiceProvider services,
-        IEvaluationAgent evaluationAgent)
+    public ServiceHandlerContext(IServiceProvider services)
     {
         _services = services;
-        _evaluationAgent = evaluationAgent;
+        _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();
+        _domainContext = services.GetRequiredService<DomainContext>();
     }
 
     public ActivityContext? ParentContext { get; init; }
@@ -67,15 +67,21 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// <param name="command">The command to add to the current commands basket</param>
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
+        var aggregateType = _domainContext.GetCommonAggregateType(commands);
+        
         if (!_envelopes.TryGetValue(aggregateId, out var envelope))
         {
             envelope = new CommandEnvelope(
                 new CommandMetadata
                 {
-                    AggregateId = aggregateId
+                    AggregateId = aggregateId,
+                    AggregateType = aggregateType
                 });
         }
 
+        if (envelope.Metadata.AggregateType != aggregateType)
+            throw new Exception("Aggregate types do not match");
+        
         envelope = envelope with
         {
             Messages = [..envelope.Messages, ..commands]

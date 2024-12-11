@@ -43,6 +43,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
                 
             });
         
+        serviceEnvelope.Metadata.ParentContext = activity?.Context;
+        
         var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
         var result = await _domainContext
@@ -69,11 +71,12 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         await Parallel.ForEachAsync(commandEnvelopes, async (envelope, ct) =>
         {
             if (!envelope.Messages.Any()) return;
-            
-            var aggregateType = GetCommonAggregateType(envelope);
+
+            if (envelope.Metadata.AggregateType == null)
+                envelope.Metadata.AggregateType = _domainContext.GetCommonAggregateType(envelope.Messages);
             
             var handler = _handlerFactory.Instantiate(
-                aggregateType,
+                envelope.Metadata.AggregateType,
                 envelope.Metadata.AggregateId);
             
             results.Add(await handler.Evaluate(envelope));
@@ -100,7 +103,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         {
             if (!envelope.Messages.Any()) return;
             
-            var aggregateType = GetCommonAggregateType(envelope);
+            var aggregateType = _domainContext.GetCommonAggregateType(envelope.Messages);
 
             var handler = _handlerFactory.Instantiate(
                 aggregateType,
@@ -156,43 +159,5 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     
     public void Dispose()
     {
-    }
-    
-    private Type GetCommonAggregateType(ICommandEnvelope commandEnvelope)
-    {
-        var commandTypes = commandEnvelope.Messages
-            .Select(q => q.GetType())
-            .ToList();
-        
-        var aggregateType = _domainContext.CommandHandlers
-            .Where(q => q.CommandType != null
-                        && commandTypes.Contains(q.CommandType))
-            .Select(q => q.AggregateType)
-            .Distinct()
-            .SingleOrDefault();
-        
-        if (aggregateType == null)
-            throw new Exception("Single envelope contains commands registered with different aggregate types");
-        
-        return aggregateType;
-    }
-    
-    private Type GetCommonAggregateType(IEventEnvelope eventEnvelope)
-    {
-        var eventTypes = eventEnvelope.Messages
-            .Select(q => q.GetType())
-            .ToList();
-        
-        var aggregateType = _domainContext.EventHandlers
-            .Where(q => q.EventType != null
-                        && eventTypes.Contains(q.EventType))
-            .Select(q => q.AggregateType)
-            .Distinct()
-            .SingleOrDefault();
-        
-        if (aggregateType == null)
-            throw new Exception("Single envelope contains events registered with different aggregate types");
-        
-        return aggregateType;
     }
 }

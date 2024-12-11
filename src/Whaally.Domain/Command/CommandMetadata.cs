@@ -16,4 +16,6 @@ public record CommandMetadata : ICommandMetadata
     // One of them is because the command is supplied to an AggregateHandler instance
     // thus already containing a reference to the aggregate.
     public string AggregateId { get; set; } = "";
+    
+    public Type? AggregateType { get; set; }
 }

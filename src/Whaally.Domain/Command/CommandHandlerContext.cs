@@ -61,6 +61,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                 new CommandMetadata
                 {
                     AggregateId = AggregateId,
+                    AggregateType = _aggregate.GetType(),
                     CreatedAt = DateTimeOffset.UtcNow
                 });
         
@@ -80,6 +81,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                         new EventMetadata
                         {
                             AggregateId = AggregateId,
+                            AggregateType = Aggregate.GetType(),
                             Attributes = new Dictionary<string, object>(Attributes),
                             ParentContext = ParentContext
                         }),

@@ -15,9 +15,7 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
         };
 
     public IServiceHandlerContext CreateServiceHandlerContext(IServiceMetadata metadata)
-        => new ServiceHandlerContext(
-            services,
-            services.GetRequiredService<IEvaluationAgent>())
+        => new ServiceHandlerContext(services)
         {
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
             ParentContext = metadata.ParentContext

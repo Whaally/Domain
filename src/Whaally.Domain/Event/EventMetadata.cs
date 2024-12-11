@@ -7,6 +7,8 @@ public record EventMetadata : IEventMetadata
 {
     public string AggregateId { get; set; } = "";
 
+    public Type? AggregateType { get; set; }
+
     public IDictionary<string, object> Attributes { get; set; }
         = new Dictionary<string, object>();
     
