@@ -9,16 +9,17 @@ public class DefaultEvaluationAgent : IEvaluationAgent
 {
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
-    private readonly IAggregateHandlerFactory _handlerFactory;
     private readonly IContextFactory _contextFactory;
+    private readonly IAggregateHandlerFactory _handlerFactory;
+    
     private readonly Activity? _activity;
     
     public DefaultEvaluationAgent(IServiceProvider services)
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
-        _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
         _contextFactory = _services.GetRequiredService<IContextFactory>();
+        _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
         
         _activity = DomainContext.ActivitySource.StartActivity(
             ActivityKind.Internal,
@@ -36,7 +37,9 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     {
         if (serviceEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
-
+        
+        serviceEnvelope.Metadata.ParentContext = _activity?.Context;
+        
         var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
         var result = await _domainContext
@@ -45,13 +48,9 @@ public class DefaultEvaluationAgent : IEvaluationAgent
                 serviceContext,
                 serviceEnvelope.Messages.Single());
         
-        if (result.IsFailed)
-            return Result.Fail<ICommandEnvelope[]>(result.Errors);
-        
-        return Result
-            .Ok(Array.Empty<ICommandEnvelope>())
-            .WithReasons(result.Reasons)
-            .WithValue(serviceContext.Commands.ToArray());
+        return new Result<ICommandEnvelope[]>()
+            .WithValue(serviceContext.Commands.ToArray())
+            .WithReasons(result.Reasons);
     }
     
     /// <summary>
@@ -68,23 +67,20 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         {
             if (!envelope.Messages.Any()) continue;
             
+            envelope.Metadata.ParentContext = _activity?.Context;
+            
             var handler = _handlerFactory.Instantiate(
                 GetCommonAggregateType(envelope),
                 envelope.Metadata.AggregateId);
             
             results.Add(await handler.Evaluate(envelope));
         }
-        
-        var result = Result
-            .Ok(Array.Empty<IEventEnvelope>())
-            .WithReasons(results.SelectMany(q => q.Reasons));
-        
-        if (result.IsSuccess)
-            result.WithValue(results
+
+        return new Result<IEventEnvelope[]>()
+            .WithValue(results
                 .Select(q => q.Value)
-                .ToArray());
-        
-        return result;
+                .ToArray())
+            .WithReasons(results.SelectMany(q => q.Reasons));
     }
     
     /// <summary>
@@ -100,6 +96,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         foreach (var envelope in eventEnvelopes)
         {
             if (!envelope.Messages.Any()) continue;
+
+            envelope.Metadata.ParentContext = _activity?.Context;
             
             var handler = _handlerFactory.Instantiate(
                 GetCommonAggregateType(envelope),
@@ -108,10 +106,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             results.Add(await handler.Apply(envelope));
         }
         
-        var result = new Result()
+        return new Result()
             .WithReasons(results.SelectMany(q => q.Reasons));
-        
-        return result;
     }
     
     /// <summary>
@@ -121,6 +117,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <returns></returns>
     public Task<IResultBase> Continue(IEventEnvelope eventEnvelope)
     {
+        eventEnvelope.Metadata.ParentContext = _activity?.Context;
+        
         foreach (var @event in eventEnvelope.Messages)
         {
             foreach (var saga in _domainContext.GetSaga(@event.GetType()))
@@ -142,6 +140,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     {
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
+
+        eventEnvelope.Metadata.ParentContext = _activity?.Context;
         
         return await saga.Evaluate(
             _contextFactory.CreateSagaContext(eventEnvelope.Metadata), 

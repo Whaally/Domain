@@ -11,6 +11,8 @@ public class ServiceHandlerContext : IServiceHandlerContext
     private readonly IServiceProvider _services;
     private readonly IEvaluationAgent _evaluationAgent;
 
+    // ToDo: Add an activity here to track service evaluation
+    
     public ServiceHandlerContext(
         IServiceProvider services,
         IEvaluationAgent evaluationAgent)

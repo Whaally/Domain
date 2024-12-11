@@ -12,9 +12,25 @@ namespace Whaally.Domain;
  * - Do not inject dependencies to this class (IAggregateHandlerFactory & IEvaluationAgent) as concrete instances.
  *   Doing so causes an infinite loop as this class is often injected as dependency to those.
  */
-public class DomainContext(IServiceProvider services)
+public class DomainContext
 {
     internal static ActivitySource ActivitySource = new("Whaally.Domain");
+    
+    private readonly IServiceProvider _services;
+    private readonly Activity? _activity;
+
+    public DomainContext(IServiceProvider services)
+    {
+        _services = services;
+        
+        _activity = ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: nameof(DomainContext),
+            tags: new Dictionary<string, object?>
+            {
+                
+            });
+    }
     
     #region handler metadata
     /// <summary>
@@ -102,12 +118,12 @@ public class DomainContext(IServiceProvider services)
         init => SnapshotFactories = value.Select(SnapshotFactoryMeta.From).ToList().AsReadOnly();
     } 
     #endregion
-
-    private IEvaluationAgent _evaluationAgent => services.GetRequiredService<IEvaluationAgent>();
-
+    
+    private IEvaluationAgent _evaluationAgent => _services.GetRequiredService<IEvaluationAgent>();
+    
     private IAggregateHandler GetAggregate(Type type, string id)
     {
-        var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
+        var aggregateHandlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
         
         if (type.IsAssignableTo(typeof(IAggregate)))
         {
@@ -151,7 +167,8 @@ public class DomainContext(IServiceProvider services)
             new CommandMetadata
             {
                 AggregateId = aggregateId,
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow,
+                ParentContext = _activity?.Context
             },
             command);
     }
@@ -164,7 +181,8 @@ public class DomainContext(IServiceProvider services)
             new CommandEnvelope(
                 new CommandMetadata
                 {
-                    AggregateId = aggregateId
+                    AggregateId = aggregateId,
+                    ParentContext = _activity?.Context
                 },
                 commands));
     }
@@ -192,7 +210,8 @@ public class DomainContext(IServiceProvider services)
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
-                    CreatedAt = DateTimeOffset.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    ParentContext = _activity?.Context
                 },
                 commands));
     }
@@ -207,22 +226,23 @@ public class DomainContext(IServiceProvider services)
             new ServiceEnvelope(
                 metadata ?? new ServiceMetadata
                 {
-                    CreatedAt = DateTimeOffset.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    ParentContext = _activity?.Context
                 }, service));
     }
     
     public IServiceHandler GetServiceHandler(Type serviceType) => 
-        (IServiceHandler)services.GetRequiredService(
+        (IServiceHandler)_services.GetRequiredService(
             ServiceHandlers
                 .Single(q => q.ServiceType == serviceType)
                 .HandlerType);
     
     public IEnumerable<ISaga> GetSaga(Type eventType) =>
         Sagas.Where(q => q.EventType == eventType)
-            .Select(q => (ISaga)services.GetRequiredService(q.HandlerType));
+            .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
 
     public IEventHandler GetEventHandler(Type eventType) =>
-        (IEventHandler)services.GetRequiredService(
+        (IEventHandler)_services.GetRequiredService(
             EventHandlers
                 .Single(q => q.EventType == eventType)
                 .HandlerType);
@@ -230,7 +250,7 @@ public class DomainContext(IServiceProvider services)
     // TODO: See if we can also require the aggregate type as argument to validate that we're executing the correct handlers
     //       Same goes for the event handlers though.
     public ICommandHandler GetCommandHandler(Type commandType) =>
-        (ICommandHandler)services.GetRequiredService(
+        (ICommandHandler)_services.GetRequiredService(
             CommandHandlers
                 .Single(q => q.CommandType == commandType)
                 .HandlerType);

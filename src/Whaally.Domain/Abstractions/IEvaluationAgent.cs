@@ -75,7 +75,7 @@ public interface IEvaluationAgent : IDisposable
         
         if (eventResult.IsFailed)
             return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
-
+        
         foreach (var envelope in commandResult.Value) 
             await Continue(envelope);
         
@@ -86,11 +86,11 @@ public interface IEvaluationAgent : IDisposable
         IServiceEnvelope serviceEnvelope)
     {
         var serviceResult = await Evaluate(serviceEnvelope);
-
+        
         if (serviceResult.IsFailed)
             return new Result<IEventEnvelope[]>()
                 .WithReasons(serviceResult.Reasons);
-
+        
         return await Invoke(serviceResult.Value);
     }
 }
