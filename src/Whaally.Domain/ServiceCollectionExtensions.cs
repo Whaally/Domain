@@ -29,7 +29,6 @@ public static class ServiceCollectionExtensions
         var sagaHandlers = options.SagaTypes();
         var snapshotFactories = options.SnapshotFactoryTypes();
 
-        // I wonder if I ever want to use DI with an event handler, but ahwell, who am I to say what to do?
         Type[] types = [
             ..commandHandlers,
             ..eventHandlers,
@@ -44,14 +43,13 @@ public static class ServiceCollectionExtensions
         
         services
             .AddSingleton<DomainContext>(services => 
-                new DomainContext(services)
-                {
-                    CommandHandlerTypes = commandHandlers,
-                    EventHandlerTypes = eventHandlers,
-                    ServiceHandlerTypes = serviceHandlers,
-                    SagaTypes = sagaHandlers,
-                    SnapshotFactoryTypes = snapshotFactories
-                })
+                new DomainContext(
+                    services,
+                    commandHandlerTypes: commandHandlers,
+                    eventHandlerTypes: eventHandlers,
+                    serviceHandlerTypes: serviceHandlers,
+                    sagaTypes: sagaHandlers,
+                    snapshotFactoryTypes: snapshotFactories))
             .AddSingleton(options.AggregateHandlerFactory)
             .AddSingleton(options.AggregateFactory)
             .AddTransient(options.EvaluationAgent)

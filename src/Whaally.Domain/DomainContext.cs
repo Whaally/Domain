@@ -19,104 +19,69 @@ public class DomainContext
     private readonly IServiceProvider _services;
     private readonly Activity? _activity;
 
-    public DomainContext(IServiceProvider services)
+        });
+    
+    public DomainContext(
+        IServiceProvider services,
+        IEnumerable<Type>? commandHandlerTypes = null,
+        IEnumerable<Type>? eventHandlerTypes = null,
+        IEnumerable<Type>? serviceHandlerTypes = null,
+        IEnumerable<Type>? sagaTypes = null,
+        IEnumerable<Type>? snapshotFactoryTypes = null)
     {
         _services = services;
+
+        CommandHandlers = (commandHandlerTypes ?? [])
+            .Select(CommandHandlerMeta.From)
+            .ToList()
+            .AsReadOnly();
         
-        _activity = ActivitySource.StartActivity(
-            ActivityKind.Internal,
-            name: nameof(DomainContext),
-            tags: new Dictionary<string, object?>
-            {
-                
-            });
+        EventHandlers = (eventHandlerTypes ?? [])
+            .Select(EventHandlerMeta.From)
+            .ToList()
+            .AsReadOnly();
+        
+        ServiceHandlers = (serviceHandlerTypes ?? [])
+            .Select(ServiceHandlerMeta.From)
+            .ToList()
+            .AsReadOnly();
+        
+        Sagas = (sagaTypes ?? [])
+            .Select(SagaMeta.From)
+            .ToList()
+            .AsReadOnly();
+        
+        SnapshotFactories = (snapshotFactoryTypes ?? [])
+            .Select(SnapshotFactoryMeta.From)
+            .ToList()
+            .AsReadOnly();
     }
     
     #region handler metadata
     /// <summary>
     ///     Metadata about the command handlers registered with this domain instance.
-    ///
-    ///     Provide command handler types during instantiation of the domain through the <see cref="CommandHandlerTypes"/> property.
     /// </summary>
     public IReadOnlyList<CommandHandlerMeta> CommandHandlers { get; private init; } = [];
     
     /// <summary>
     ///     Metadata about the event handlers registered with this domain.
-    ///
-    ///     Provide event handler types during instantiation of the domain through the <see cref="EventHandlerTypes"/> property.
     /// </summary>
     public IReadOnlyList<EventHandlerMeta> EventHandlers { get; private init; } = [];
     
     /// <summary>
     ///     Metadata about the service handlers registered with this domain.
-    ///
-    ///     Provide service handler types during instantiation of the domain through the <see cref="ServiceHandlerTypes"/> property.
     /// </summary>
     public IReadOnlyList<ServiceHandlerMeta> ServiceHandlers { get; private init; } = [];
     
     /// <summary>
     ///     Metadata about the sagas registered with this domain.
-    ///
-    ///     Provide saga types during instantiation of the domain through the <see cref="SagaTypes"/> property.
     /// </summary>
     public IReadOnlyList<SagaMeta> Sagas { get; private init; } = [];
     
     /// <summary>
     ///     Metadata about the snapshot factories registered with this domain.
-    ///
-    ///     Provide snapshot factory types during instantiation of the domain through the <see cref="SnapshotFactoryTypes"/> property.
     /// </summary>
     public IReadOnlyList<SnapshotFactoryMeta> SnapshotFactories { get; private init; } = [];
-    
-    /// <summary>
-    ///     Provide the types of command handlers to register with this domain instance.
-    ///
-    ///     Access related metadata through the <see cref="CommandHandlers"/> property.
-    /// </summary>
-    public IEnumerable<Type> CommandHandlerTypes
-    {
-        init => CommandHandlers = value.Select(CommandHandlerMeta.From).ToList().AsReadOnly();
-    }
-    
-    /// <summary>
-    ///     Provide the types of event handlers to register with this domain instance.
-    ///
-    ///     Access related metadata through the <see cref="EventHandlers"/> property.
-    /// </summary>
-    public IEnumerable<Type> EventHandlerTypes
-    {
-        init => EventHandlers = value.Select(EventHandlerMeta.From).ToList().AsReadOnly();
-    } 
-    
-    /// <summary>
-    ///     Provide the types of service handlers to register with this domain instance.
-    ///
-    ///     Access related metadata through the <see cref="ServiceHandlers"/> property.
-    /// </summary>
-    public IEnumerable<Type> ServiceHandlerTypes
-    {
-        init => ServiceHandlers = value.Select(ServiceHandlerMeta.From).ToList().AsReadOnly();
-    } 
-
-    /// <summary>
-    ///     Provide the types of sagas registered with this domain instance.
-    ///
-    ///     Access related metadata through the <see cref="Sagas"/> property.
-    /// </summary>
-    public IEnumerable<Type> SagaTypes
-    {
-        init => Sagas = value.Select(SagaMeta.From).ToList().AsReadOnly();
-    } 
-    
-    /// <summary>
-    ///     Provide the types of snapshot factories registered with this domain instance.
-    ///
-    ///     Access related metadata through the <see cref="SnapshotFactories"/> property.
-    /// </summary>
-    public IEnumerable<Type> SnapshotFactoryTypes
-    {
-        init => SnapshotFactories = value.Select(SnapshotFactoryMeta.From).ToList().AsReadOnly();
-    } 
     #endregion
     
     private IEvaluationAgent _evaluationAgent => _services.GetRequiredService<IEvaluationAgent>();
