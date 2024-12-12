@@ -14,14 +14,17 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;
+    private readonly Activity? _activity;
     
     public CommandHandlerContext(
         IServiceProvider services,
-        string aggregateId)
+        string aggregateId,
+        Activity? activity = null)
     {
         _services = services;
         _domainContext = services.GetRequiredService<DomainContext>();
         _contextFactory = services.GetRequiredService<IContextFactory>();
+        _activity = activity;
         
         AggregateId = aggregateId;
         
@@ -48,11 +51,32 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     }
     
     public virtual void StageEvent<TEvent>(TEvent @event)
-        where TEvent : class, IEvent => _events.Add(@event);
+        where TEvent : class, IEvent
+    {
+        _activity?.AddEvent(new ActivityEvent($"Stage {typeof(TEvent).Name}"));
+        
+        _aggregate = _domainContext
+            .GetEventHandler(@event.GetType())
+            .Apply(
+                _contextFactory.CreateEventHandlerContext(
+                    Aggregate,
+                    new EventMetadata
+                    {
+                        AggregateId = AggregateId,
+                        AggregateType = Aggregate.GetType(),
+                        Attributes = new Dictionary<string, object>(Attributes),
+                        ParentContext = ParentContext
+                    }),
+                @event);
+        
+        _events.Add(@event);
+    }
     
     public virtual IResultBase EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
+        _activity?.AddEvent(new ActivityEvent($"Evaluate {typeof(TCommand).Name}"));
+        
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
         // staged events, or there is otherwise a trace of this command being called by another command.
         var context = _contextFactory
@@ -63,7 +87,8 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                     AggregateId = AggregateId,
                     AggregateType = _aggregate.GetType(),
                     CreatedAt = DateTimeOffset.UtcNow
-                });
+                },
+                _activity);
         
         var result = _domainContext
             .GetCommandHandler(command.GetType())
@@ -89,8 +114,6 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             
             _events.Add(@event);
         }
-        
-        _events.AddRange(context.Events);
         
         return result;
     }

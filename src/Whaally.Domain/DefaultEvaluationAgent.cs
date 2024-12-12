@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using FluentResults;
+﻿using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -11,8 +10,6 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;
     private readonly IAggregateHandlerFactory _handlerFactory;
-    
-    // private readonly Activity? _activity;
     
     public DefaultEvaluationAgent(IServiceProvider services)
     {

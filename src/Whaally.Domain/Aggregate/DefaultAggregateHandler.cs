@@ -84,7 +84,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
             var commandContext = _contextFactory.CreateCommandHandlerContext(
                 intermediateState,
-                commandEnvelope.Metadata);
+                commandEnvelope.Metadata,
+                _activity);
             
             results.Add(_domainContext
                 .GetCommandHandler(command.GetType())

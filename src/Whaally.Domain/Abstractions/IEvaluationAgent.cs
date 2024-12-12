@@ -69,7 +69,7 @@ public interface IEvaluationAgent : IDisposable
     {
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
         var commandResult = await Evaluate(commandEnvelopes);
-
+        
         if (commandResult.IsFailed)
         {
             await Abort(commandEnvelopes
