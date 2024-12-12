@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.Diagnostics;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -113,7 +114,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         {
             foreach (var saga in _domainContext.GetSaga(@event.GetType()))
             {
-                _ = Task.Run(() => Invoke(saga, eventEnvelope));
+                // Does this help prevent mutation of the original?
+                _ = Task.Run(() => Invoke(saga, new EventEnvelope(eventEnvelope.Metadata, @event)));
             }
         }
         
@@ -138,6 +140,19 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
 
+        using var activity = DomainContext.ActivitySource.StartActivity(
+            ActivityKind.Internal,
+            name: $"Invoke {saga.GetType().Name}",
+            parentContext: default,
+            links: [ new ActivityLink(eventEnvelope.Metadata.ParentContext ?? default) ],
+            tags: new Dictionary<string, object?>
+            {
+                
+            });
+
+
+        eventEnvelope.Metadata.ParentContext = activity?.Context;
+        
         return await saga.Evaluate(
             _contextFactory.CreateSagaContext(eventEnvelope.Metadata), 
             eventEnvelope.Messages.Single());

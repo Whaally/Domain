@@ -90,9 +90,6 @@ public interface IEvaluationAgent : IDisposable
             return Result.Fail<IEventEnvelope[]>(eventResult.Errors);
         }
         
-        foreach (var envelope in commandResult.Value) 
-            await Continue(envelope);
-        
         return commandResult;
     }
     
