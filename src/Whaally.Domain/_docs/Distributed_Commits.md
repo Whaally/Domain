@@ -28,3 +28,11 @@ If/when all nodes are responsive, a distributed commit can be achieved in a mini
 - Two phase commits are prone to coordinator failures. Upon failure participants should be able to instantiate a new coordinator (evaluation agent), and achieve consensus about the viability of the requested state change.
 - Upon evaluation of services, there is a certain amount of time between any information the service acts upon, and the time the distributed commit of resulting commands happens. Depending on load and interdependence of operations this may increase odds of commit failure. _If timing is that crucial and error-prone you might as well talk about race conditions instead, and go with a completely different design altogether._
 - At this moment there is no way to implement or enable commit protocols on a case-by-case basis.
+
+## Distributed deadlocks
+By default there is virtually no risk of having distributed deadlocks. This is a side effect from two things:
+
+- Not having to read the state of the aggregate before invoking an operation
+- Not acquiring a lock or starting a transaction when state is read
+
+Practically this means that any operation to be committed against an aggregate can either fail or succeed, without having to wait for other operations to release their locks on an aggregate. The locks which do exist are short lived, and only dependent on the responsiveness of other nodes in the network. A more serious failure mode to consider is the congestion of a single aggregate instance.

@@ -41,7 +41,7 @@ public class _0004__aggregate_interfaces
             => throw new NotImplementedException();
         public Task<IResultBase> Apply(params IEventEnvelope[] events)
             => throw new NotImplementedException();
-        public Task Abort(ActivityContext context) 
+        public Task Abort(IMessageMetadata metadata) 
             => throw new NotImplementedException();
         public Task<TSnapshot> Snapshot<TSnapshot>() where TSnapshot : ISnapshot
             => throw new NotImplementedException();

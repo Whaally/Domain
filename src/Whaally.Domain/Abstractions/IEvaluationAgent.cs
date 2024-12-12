@@ -67,6 +67,16 @@ public interface IEvaluationAgent : IDisposable
     /// <returns></returns>
     public async Task<IResult<IEventEnvelope[]>> Invoke(params ICommandEnvelope[] commandEnvelopes)
     {
+        // Assign a transaction to the commands involved in this operation
+        // If you start assigning transaction ids on your own; you are own your own.
+        if (commandEnvelopes.All(q => string.IsNullOrEmpty(q.Metadata.TransactionId)))
+        {
+            var transactionId = Guid.NewGuid().ToString();
+            
+            foreach (var envelope in commandEnvelopes) 
+                envelope.Metadata.TransactionId = transactionId;
+        }
+        
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
         var commandResult = await Evaluate(commandEnvelopes);
         
@@ -96,6 +106,9 @@ public interface IEvaluationAgent : IDisposable
     public async Task<IResult<IEventEnvelope[]>> Invoke(
         IServiceEnvelope serviceEnvelope)
     {
+        if (string.IsNullOrEmpty(serviceEnvelope.Metadata.TransactionId))
+            serviceEnvelope.Metadata.TransactionId = Guid.NewGuid().ToString();
+        
         var serviceResult = await Evaluate(serviceEnvelope);
         
         if (serviceResult.IsFailed)

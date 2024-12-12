@@ -98,7 +98,7 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
         return Result.Ok();
     }
 
-    public Task Abort(ActivityContext context)
+    public Task Abort(IMessageMetadata metadata)
     {
         throw new NotImplementedException();
     }

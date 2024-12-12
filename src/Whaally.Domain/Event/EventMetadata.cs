@@ -15,4 +15,6 @@ public record EventMetadata : IEventMetadata
     public ActivityContext? ParentContext { get; set; }
     
     public DateTimeOffset CreatedAt { get; set; }
+    
+    public string? TransactionId { get; set; }
 }

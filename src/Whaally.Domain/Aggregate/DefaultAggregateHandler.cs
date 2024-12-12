@@ -12,7 +12,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;
     private readonly IEvaluationAgent _evaluationAgent;
-    
+
     private Activity? _activity = null;
     
     private TAggregate _aggregate;
@@ -38,7 +38,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             .Instantiate<TAggregate>();
     }
     
-    public Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
+    public virtual Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
     {
         if (!string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)
             && commandEnvelope.Metadata.AggregateId != Id)
@@ -133,7 +133,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 : result);
     }
     
-    public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
+    public virtual async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {
         if (!eventEnvelope.Messages.Any())
         {
@@ -169,16 +169,16 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         return Result.Ok();
     }
 
-    public Task Abort(ActivityContext context)
+    public virtual Task Abort(IMessageMetadata metadata)
     {
         _activity?.AddEvent(new ActivityEvent("Abort"));
         _activity?.Dispose();
         _activity = null;
-
+        
         return Task.CompletedTask;
     }
 
-    public Task<TSnapshot> Snapshot<TSnapshot>()
+    public virtual Task<TSnapshot> Snapshot<TSnapshot>()
         where TSnapshot : ISnapshot =>
         Task.FromResult(
             ((ISnapshotFactory<TAggregate, TSnapshot>)_services.GetRequiredService(

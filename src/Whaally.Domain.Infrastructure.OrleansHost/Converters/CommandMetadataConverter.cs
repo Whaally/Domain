@@ -9,6 +9,7 @@ public sealed class ICommandMetadataConverter : IConverter<CommandMetadata, Comm
         new()
         {
             AggregateId = surrogate.AggregateId,
+            AggregateType = surrogate.AggregateType,
             CreatedAt = surrogate.CreatedAt,
             ParentContext = surrogate.SourceActivity
         };
@@ -17,6 +18,7 @@ public sealed class ICommandMetadataConverter : IConverter<CommandMetadata, Comm
         new()
         {
             AggregateId = value.AggregateId,
+            AggregateType = value.AggregateType,
             CreatedAt = value.CreatedAt,
             SourceActivity = value.ParentContext
         };

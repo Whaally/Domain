@@ -42,19 +42,13 @@ public class Program
              * I'm lazy so I'd rather write a single line of code.
              */
 
-            builder.Services.AddDomain("Skyhop.Domain");
-        
-            var defaultHandler = builder
-                .Services
-                .SingleOrDefault(q => q.ServiceType.IsAssignableTo(typeof(IAggregateHandlerFactory)));
-            
-            if (defaultHandler != null)
-                builder.Services.Remove(defaultHandler);
-            
-            /*
-             * This registers a custom AggregateHandlerFactory, retrieving IAggregateHandler instances from Orleans.
-             */
-            builder.Services.AddSingleton<IAggregateHandlerFactory, OrleansAggregateHandlerFactory>();
+            builder.Services.AddDomain(
+                options =>
+                {
+                    options.Assembly = "Skyhop.Domain";
+                    options.AggregateHandlerFactory = services =>
+                        new OrleansAggregateHandlerFactory(services.GetRequiredService<IClusterClient>());
+                });
             
             /*
              * Add Marten for event persistence and projections.
@@ -64,7 +58,7 @@ public class Program
                 options.Connection(builder.Configuration.GetConnectionString("PostgreSQL")!);
                 options.Events.MetadataConfig.EnableAll();
             });
-                
+            
             martenBuilder.OptimizeArtifactWorkflow();
             
             /*
@@ -87,15 +81,6 @@ public class Program
                     .AddActivityPropagation()
                     .AddCustomStorageBasedLogConsistencyProvider()
                     .AddMemoryGrainStorage("PubSubStore");
-                
-                siloBuilder.Services
-                    // See https://github.com/dotnet/orleans/issues/8157 for more context
-                    .AddSingleton<Factory<IGrainContext, ILogConsistencyProtocolServices>>(serviceProvider =>
-                    {
-                        var factory = ActivatorUtilities.CreateFactory(typeof(ProtocolServices),
-                            new[] { typeof(IGrainContext) });
-                        return arg1 => (ILogConsistencyProtocolServices)factory(serviceProvider, new object[] { arg1 });
-                    });
             });
 
             var app = builder

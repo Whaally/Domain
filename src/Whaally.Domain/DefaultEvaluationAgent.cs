@@ -139,7 +139,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     {
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
-
+        
         using var activity = DomainContext.ActivitySource.StartActivity(
             ActivityKind.Internal,
             name: $"Invoke {saga.GetType().Name}",
@@ -149,8 +149,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             {
                 
             });
-
-
+        
         eventEnvelope.Metadata.ParentContext = activity?.Context;
         
         return await saga.Evaluate(
