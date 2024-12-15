@@ -7,67 +7,70 @@ namespace Whaally.Domain;
 public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler<TAggregate>
     where TAggregate : class, IAggregate
 {
-    
-    
     public TransactionalAggregateHandler(IServiceProvider services, string id) : base(services, id)
     {
     }
-
+    
     public override Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
     {
-        if (!AcquireLock(commandEnvelope.Metadata))
+        var @lock = AcquireLock(commandEnvelope.Metadata);
+        if (@lock == null)
             return Task.FromResult<IResult<IEventEnvelope>>(Result.Fail<IEventEnvelope>("Could not acquire lock"));
         
-        return base.Evaluate(commandEnvelope);
+        return base.Evaluate(commandEnvelope, @lock.Value.cancellationToken);
     }
-
+    
     public override Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {
-        if (!AcquireLock(eventEnvelope.Metadata))
+        var @lock = AcquireLock(eventEnvelope.Metadata);
+        if (@lock == null)
             return Task.FromResult<IResultBase>(Result.Fail<IResultBase>("Could not acquire lock"));
         
-        var result = base.Apply(eventEnvelope);
-
-        ReleaseLock(eventEnvelope.Metadata);
+        var result = base.Apply(eventEnvelope, @lock.Value.cancellationToken);
+        
+        ReleaseLock(@lock.Value.transactionId);
         
         return result;
     }
-
+    
     public override Task Abort(IMessageMetadata metadata)
     {
-        ReleaseLock(metadata);
+        if (!string.IsNullOrWhiteSpace(metadata.TransactionId))
+            ReleaseLock(metadata.TransactionId);
+        
         return base.Abort(metadata);
     }
-
+    
     // TODO: Automatically release any lock after a set amount of time: the timeout period
     // When this happens trigger any cancellation tokens to abort ongoing operations (if any), release the lock and let the
     // next transaction continue. Any work in progress fails with a timeout result.
     
-    private ConcurrentQueue<string> _lockingQueue = new();
+    private ConcurrentQueue<(string transactionId, CancellationTokenSource cancellationToken)> _lockingQueue = new();
     private EventWaitHandle _waitHandler = new(false, EventResetMode.ManualReset);
     
-    private bool AcquireLock(IMessageMetadata metadata)
+    private (string transactionId, CancellationToken cancellationToken)? AcquireLock(IMessageMetadata metadata)
     {
-        if (string.IsNullOrEmpty(metadata.TransactionId)) return false;
-        
-        if (!_lockingQueue.Any(q => q == metadata.TransactionId))
-            _lockingQueue.Enqueue(metadata.TransactionId);
-        
-        if (_lockingQueue.TryPeek(out var txId)
-            && txId == metadata.TransactionId) return true;
+        if (string.IsNullOrEmpty(metadata.TransactionId)) return null;
+
+        if (!_lockingQueue.Any(q => q.transactionId == metadata.TransactionId))
+            _lockingQueue.Enqueue((metadata.TransactionId, new CancellationTokenSource()));
+
+        if (_lockingQueue.TryPeek(out var @lock)
+            && @lock.transactionId == metadata.TransactionId) 
+            return (@lock.transactionId, @lock.cancellationToken.Token);
 
         _waitHandler.WaitOne();
         
         return AcquireLock(metadata);
     }
-
-    private void ReleaseLock(IMessageMetadata metadata)
+    
+    private void ReleaseLock(string transactionId)
     {
-        if (_lockingQueue.TryPeek(out var txId)
-            && txId == metadata.TransactionId)
+        if (_lockingQueue.TryPeek(out var @lock)
+            && @lock.transactionId == transactionId)
             _lockingQueue.TryDequeue(out _);
         else
-            _lockingQueue = new ConcurrentQueue<string>(_lockingQueue.Where(q => q != metadata.TransactionId));
+            _lockingQueue.Single(q => q.transactionId == transactionId).cancellationToken.Cancel();
         
         _waitHandler.Set();
         _waitHandler.Reset();
