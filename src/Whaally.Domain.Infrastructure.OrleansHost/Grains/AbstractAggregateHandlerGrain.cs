@@ -1,39 +1,38 @@
-﻿using System.Diagnostics;
-using FluentResults;
+﻿using FluentResults;
 using Microsoft.Extensions.Logging;
 using Orleans.Concurrency;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
+using Orleans.Serialization.Invocation;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Infrastructure.OrleansHost.Grains;
 
+[MayInterleave(nameof(DoInterleave))]
 public abstract class AbstractAggregateHandlerGrain<TAggregate> :
     JournaledGrain<TAggregate, IEventEnvelope>,
     ICustomStorageInterface<TAggregate, IEventEnvelope>,
     IAggregateHandlerGrain<TAggregate>
     where TAggregate : class, IAggregate, new()
 {
+    public static bool DoInterleave(IInvokable req) => true;
+    
     private readonly IServiceProvider _services;
-    private readonly ILogger<AbstractAggregateHandlerGrain<TAggregate>> _logger;
 
     protected IAggregateHandler<TAggregate> AggregateHandler;
     protected TAggregate Aggregate = new();
-
-    public AbstractAggregateHandlerGrain(
-        IServiceProvider services,
-        ILogger<AbstractAggregateHandlerGrain<TAggregate>> logger)
+    
+    public AbstractAggregateHandlerGrain(IServiceProvider services)
     {
         _services = services;
-        _logger = logger;
-
+        
         Aggregate = new();
-        AggregateHandler = new DefaultAggregateHandler<TAggregate>(_services, this.GetPrimaryKey().ToString())
+        AggregateHandler = new TransactionalAggregateHandler<TAggregate>(_services, this.GetPrimaryKey().ToString())
         {
             Aggregate = Aggregate
         };
     }
-
+    
     public override async Task OnActivateAsync(CancellationToken token)
     {
         await RefreshNow();
@@ -57,20 +56,9 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
          */
         AggregateHandler.Apply(eventEnvelope);
     }
-
-    public async Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
-    {
-        var result = await AggregateHandler.Evaluate(
-            commandEnvelope.Messages.ToArray());
-
-        if (result.IsSuccess)
-            _logger.LogTrace("Evaluation succesful\r\n\tCommands: {@commands}", commandEnvelope.Messages);
-        else
-            _logger.LogTrace("Evaluation failed\r\n\tCommands: {@command}\r\n\tReasons: {@reasons}", commandEnvelope.Messages,
-                result.Reasons);
-
-        return result;
-    }
+    
+    public async Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope) =>
+        await AggregateHandler.Evaluate(commandEnvelope.Messages.ToArray());
 
     public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {
@@ -92,22 +80,15 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
          * events are applied against the latest state.
          */
         await ConfirmEvents();
-
-        _logger.LogTrace("Events applied: {@events}", eventEnvelope.Messages);
         
         return Result.Ok();
     }
 
     public Task Abort(IMessageMetadata metadata)
-    {
-        throw new NotImplementedException();
-    }
+        => AggregateHandler.Abort(metadata);
 
     [ReadOnly]
-    public Task<TSnapshot> Snapshot<TSnapshot>() where TSnapshot : ISnapshot
-    {
-        return AggregateHandler.Snapshot<TSnapshot>();
-    }
+    public Task<TSnapshot> Snapshot<TSnapshot>() where TSnapshot : ISnapshot => AggregateHandler.Snapshot<TSnapshot>();
 
     /// <summary>
     ///     Retrieve the current aggregate version from storage

@@ -15,9 +15,8 @@ public class AggregateHandlerGrain<TAggregate>
     
     public AggregateHandlerGrain(
         IServiceProvider services,
-        ILogger<AbstractAggregateHandlerGrain<TAggregate>> logger,
         IDocumentStore store) 
-        : base(services, logger)
+        : base(services)
     {
         _store = store;
     }
