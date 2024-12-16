@@ -58,7 +58,7 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
     }
     
     public async Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope) =>
-        await AggregateHandler.Evaluate(commandEnvelope.Messages.ToArray());
+        await AggregateHandler.Evaluate(commandEnvelope);
 
     public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
     {

@@ -14,8 +14,8 @@ public class OnAircraftChanged_Saga_Tests : DomainTest
     [Fact(Skip = "Since sagas are triggered asynchronously, these tests are no longer representative of actual behaviour")]
     public async Task EvaluateTest()
     {
-        await Domain.Trigger(_flightId, new Create());
-        await Domain.Trigger(_flightId, new SetAircraft(_firstAircraftId));
+        await Domain.Invoke(_flightId, new Create());
+        await Domain.Invoke(_flightId, new SetAircraft(_firstAircraftId));
         
         // ToDo: Assert change on a1H but not on a2H
         (await Domain

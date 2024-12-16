@@ -10,4 +10,5 @@ public struct EventMetadataSurrogate
     [Id(2)] public DateTimeOffset CreatedAt;
     [Id(3)] public IDictionary<string, object> Attributes;
     [Id(4)] public ActivityContext? SourceActivity;
+    [Id(5)] public string? TransactionId;
 }

@@ -10,7 +10,7 @@ public class FlightControllerTests : IntegrationTest
     public async Task Should_Create_New_Flight()
     {
         var client = Factory.CreateClient();
-
+        
         var result = await client.PostAsync("/flight/new", null);
         
         Assert.True(result.IsSuccessStatusCode);

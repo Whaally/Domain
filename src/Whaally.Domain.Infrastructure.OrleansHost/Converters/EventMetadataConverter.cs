@@ -12,7 +12,8 @@ public sealed class IEventMetadataConverter : IConverter<EventMetadata, EventMet
             AggregateType = surrogate.AggregateType,
             CreatedAt = surrogate.CreatedAt,
             Attributes = surrogate.Attributes,
-            ParentContext = surrogate.SourceActivity
+            ParentContext = surrogate.SourceActivity,
+            TransactionId = surrogate.TransactionId
         };
 
     public EventMetadataSurrogate ConvertToSurrogate(in EventMetadata value) =>
@@ -22,6 +23,7 @@ public sealed class IEventMetadataConverter : IConverter<EventMetadata, EventMet
             AggregateType = value.AggregateType,
             CreatedAt = value.CreatedAt,
             Attributes = value.Attributes,
-            SourceActivity = value.ParentContext
+            SourceActivity = value.ParentContext,
+            TransactionId = value.TransactionId
         };
 }

@@ -4,14 +4,17 @@ using Whaally.Domain.Infrastructure.OrleansHost.Surrogates;
 namespace Whaally.Domain.Infrastructure.OrleansHost.Converters;
 
 [RegisterConverter]
-public sealed class CommandEnvelopeConverter : IConverter<CommandEnvelope, CommandEnvelopeSurrogate>
+public sealed class CommandEnvelopeConverter : IConverter<ICommandEnvelope, CommandEnvelopeSurrogate>
 {
-    public CommandEnvelope ConvertFromSurrogate(in CommandEnvelopeSurrogate surrogate) =>
-        new(
+    // TODO: Convert the metadata objects as well.
+    // The commands work because they are decorated with the [GenerateSerializer] attribute as well.
+    
+    public ICommandEnvelope ConvertFromSurrogate(in CommandEnvelopeSurrogate surrogate) =>
+        new CommandEnvelope(
             surrogate.Metadata,
             surrogate.Messages);
 
-    public CommandEnvelopeSurrogate ConvertToSurrogate(in CommandEnvelope value) =>
+    public CommandEnvelopeSurrogate ConvertToSurrogate(in ICommandEnvelope value) =>
         new()
         {
             Metadata = value.Metadata,

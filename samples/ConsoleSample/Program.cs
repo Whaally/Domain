@@ -30,5 +30,5 @@ var services = new ServiceCollection()
 var domain = services.GetRequiredService<DomainContext>();
 
 for (var i = 0; i < 10; i++) {
-    await domain.Trigger(new AddItemService());
+    await domain.Invoke(new AddItemService());
 }

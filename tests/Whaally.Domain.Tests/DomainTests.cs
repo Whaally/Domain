@@ -16,7 +16,7 @@ public class DomainTests
         var domain = _services
             .GetRequiredService<DomainContext>();
 
-        var result = await domain.Trigger(new TestService());
+        var result = await domain.Invoke(new TestService());
         
         Assert.True(result.IsSuccess);
     }
@@ -26,7 +26,7 @@ public class DomainTests
     {
         var domain = _services.GetRequiredService<DomainContext>();
 
-        var result = await domain.Trigger(new TestService());
+        var result = await domain.Invoke(new TestService());
 
         Assert.True(result.IsSuccess);
     }

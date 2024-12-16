@@ -13,13 +13,15 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
         {
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
             AggregateId = metadata.AggregateId,
-            ParentContext = metadata.ParentContext
+            ParentContext = metadata.ParentContext,
+            TransactionId = metadata.TransactionId
         };
 
     public IServiceHandlerContext CreateServiceHandlerContext(IServiceMetadata metadata, Activity? activity = null)
         => new ServiceHandlerContext(services, metadata)
         {
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
+            TransactionId = metadata.TransactionId
         };
 
     public ICommandHandlerContext<TAggregate> CreateCommandHandlerContext<TAggregate>(
@@ -32,7 +34,8 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
             Aggregate = aggregate,
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
             AggregateId = metadata.AggregateId,
-            ParentContext = metadata.ParentContext
+            ParentContext = metadata.ParentContext,
+            TransactionId = metadata.TransactionId
         };
 
     public IEventHandlerContext<TAggregate> CreateEventHandlerContext<TAggregate>(
@@ -45,6 +48,7 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
             Aggregate = aggregate,
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
             AggregateId = metadata.AggregateId,
-            ParentContext = metadata.ParentContext
+            ParentContext = metadata.ParentContext,
+            TransactionId = metadata.TransactionId
         };
 }

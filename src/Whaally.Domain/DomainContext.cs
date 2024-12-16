@@ -132,7 +132,7 @@ public class DomainContext
         TCommand command)
         where TCommand : class, ICommand
     {
-        return Trigger(
+        return Evaluate(
             new CommandMetadata
             {
                 AggregateId = aggregateId,
@@ -166,7 +166,7 @@ public class DomainContext
         return await _evaluationAgent.Evaluate(new CommandEnvelope(metadata, commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
+    public virtual async Task<IResult<IEventEnvelope[]>> Invoke(
         ICommandMetadata metadata,
         params ICommand[] commands)
     {
@@ -178,7 +178,7 @@ public class DomainContext
                 commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
+    public virtual async Task<IResult<IEventEnvelope[]>> Invoke(
         string aggregateId,
         params ICommand[] commands)
     {
@@ -192,12 +192,13 @@ public class DomainContext
                     AggregateId = aggregateId,
                     AggregateType = this.GetCommonAggregateType(commands),
                     CreatedAt = DateTimeOffset.UtcNow,
-                    ParentContext = activity?.Context
+                    ParentContext = activity?.Context,
+                    TransactionId = Guid.NewGuid().ToString()
                 },
                 commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Trigger(
+    public virtual async Task<IResult<IEventEnvelope[]>> Invoke(
         IService service,
         IServiceMetadata? metadata = null)
     {
@@ -210,7 +211,8 @@ public class DomainContext
                 {
                     CreatedAt = DateTimeOffset.UtcNow,
                     ServiceType = service.GetType(),
-                    ParentContext = activity?.Context
+                    ParentContext = activity?.Context,
+                    TransactionId = Guid.NewGuid().ToString()
                 }, service));
     }
     

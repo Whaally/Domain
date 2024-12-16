@@ -18,7 +18,7 @@ public class OnDepartureTests : DomainTest
         var flightId = Guid.NewGuid().ToString();
         var departureAirfieldId = Guid.NewGuid().ToString();
 
-        await Domain.Trigger(flightId,
+        await Domain.Invoke(flightId,
             new Create(),
             new SetAircraft(aircraftId),
             new SetDeparture(

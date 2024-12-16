@@ -32,6 +32,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
         ParentContext = _activity?.Context;
     }
 
+    public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
     
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
@@ -42,7 +43,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     public IAggregateHandlerFactory Factory 
         => _services.GetRequiredService<IAggregateHandlerFactory>();
-
+    
     /// <summary>
     /// Evaluates a service and when successfull, adds the resulting operations to the current commands basket.
     /// </summary>
@@ -58,7 +59,8 @@ public class ServiceHandlerContext : IServiceHandlerContext
                     CreatedAt = DateTimeOffset.UtcNow,
                     ServiceType = service.GetType(),
                     Attributes = new Dictionary<string, object>(Attributes),
-                    ParentContext = ParentContext
+                    ParentContext = ParentContext,
+                    TransactionId = TransactionId
                 }, service));
 
         if (!result.IsSuccess) return result.ToResult();
@@ -89,7 +91,11 @@ public class ServiceHandlerContext : IServiceHandlerContext
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
-                    AggregateType = aggregateType
+                    AggregateType = aggregateType,
+                    Attributes = new Dictionary<string, object>(Attributes),
+                    ParentContext = ParentContext,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    TransactionId = TransactionId
                 });
         }
 

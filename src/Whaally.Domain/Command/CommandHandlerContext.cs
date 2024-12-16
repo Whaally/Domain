@@ -36,6 +36,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     }
 
     public string AggregateId { get; init; }
+    public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
     
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
@@ -66,7 +67,8 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                         AggregateType = Aggregate.GetType(),
                         CreatedAt = DateTimeOffset.UtcNow,
                         Attributes = new Dictionary<string, object>(Attributes),
-                        ParentContext = ParentContext
+                        ParentContext = ParentContext,
+                        TransactionId = TransactionId
                     }),
                 @event);
         
@@ -87,7 +89,10 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                 {
                     AggregateId = AggregateId,
                     AggregateType = _aggregate.GetType(),
-                    CreatedAt = DateTimeOffset.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Attributes = new Dictionary<string, object>(Attributes),
+                    ParentContext = ParentContext,
+                    TransactionId = TransactionId
                 },
                 _activity);
         
@@ -110,7 +115,8 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                             AggregateType = Aggregate.GetType(),
                             CreatedAt = DateTimeOffset.UtcNow,
                             Attributes = new Dictionary<string, object>(Attributes),
-                            ParentContext = ParentContext
+                            ParentContext = ParentContext,
+                            TransactionId = TransactionId
                         }),
                     @event);
             

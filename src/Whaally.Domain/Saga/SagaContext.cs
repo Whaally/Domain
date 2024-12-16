@@ -27,6 +27,7 @@ public class SagaContext : ISagaContext
     }
     
     public string? AggregateId { get; init; }
+    public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
@@ -37,7 +38,6 @@ public class SagaContext : ISagaContext
     public IAggregateHandlerFactory Factory 
         => _services.GetRequiredService<IAggregateHandlerFactory>();
 
-    
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
         var aggregateType = _domainContext.GetCommonAggregateType(commands);
@@ -47,7 +47,11 @@ public class SagaContext : ISagaContext
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
-                    AggregateType = aggregateType
+                    AggregateType = aggregateType,
+                    Attributes = new Dictionary<string, object>(Attributes),
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    ParentContext = ParentContext,
+                    TransactionId = TransactionId
                 });
 
         if (envelope.Metadata.AggregateType != aggregateType)
@@ -69,7 +73,8 @@ public class SagaContext : ISagaContext
                 new ServiceMetadata
                 {
                     CreatedAt = DateTimeOffset.UtcNow,
-                    ServiceType = service.GetType()
+                    ServiceType = service.GetType(),
+                    TransactionId = TransactionId
                 }, service));
 
         if (!result.IsSuccess) return result.ToResult();

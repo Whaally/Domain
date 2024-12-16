@@ -113,7 +113,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                         AggregateType = Aggregate.GetType(),
                         CreatedAt = DateTimeOffset.UtcNow,
                         Attributes = commandEnvelope.Metadata.Attributes,
-                        ParentContext = _activity?.Context
+                        ParentContext = _activity?.Context,
+                        TransactionId = commandEnvelope.Metadata.TransactionId
                     });
 
                 intermediateState = _domainContext
@@ -135,7 +136,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                         AggregateType = Aggregate.GetType(),
                         CreatedAt = DateTimeOffset.UtcNow,
                         Attributes = commandEnvelope.Metadata.Attributes,
-                        ParentContext = _activity?.Context
+                        ParentContext = _activity?.Context,
+                        TransactionId = commandEnvelope.Metadata.TransactionId
                     },
                     events))
                 : result);

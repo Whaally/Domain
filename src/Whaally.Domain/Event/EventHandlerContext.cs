@@ -10,8 +10,9 @@ public class EventHandlerContext<TAggregate> : IEventHandlerContext<TAggregate>
     {
         AggregateId = aggregateId;
     }
-
+    
     public string AggregateId { get; init; }
+    public string? TransactionId { get; init; }
     public TAggregate Aggregate { get; init; } = null!;
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
