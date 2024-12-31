@@ -11,42 +11,50 @@ on:
     - beta
     
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Semantic Release
-      uses: cycjimmy/semantic-release-action@v3
-      id: semantic
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
-
     - name: Restore
       run: dotnet restore /property:Configuration=Release
-
-    - name: Write release notes
-      env:
-        RELEASE_NOTES: "${{ steps.semantic.outputs.new_release_notes}}"
-      run: echo "$RELEASE_NOTES" > "./src/Whaally.Domain/release-notes.txt"
-
     - name: Build for Publish
-      run: |
-        if [ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]; then
-          dotnet build --configuration Release /property:Version="${{ steps.semantic.outputs.new_release_version }}" /property:AssemblyVersion="${{steps.semantic.outputs.new_release_major_version}}" /property:AssemblyFileVersion="${{ steps.semantic.outputs.new_release_version }}" --no-restore
-        else
-          dotnet build --configuration Release --no-restore
-        fi
-
+      run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test /property:Configuration=Release --no-restore --no-build --verbosity normal
-      
-    - name: Publish
-      if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/beta')
-      run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup .NET
+        if: steps.semantic.outputs.new_release_published
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        if: steps.semantic.outputs.new_release_published
+        run: dotnet restore /property:Configuration=Release
+      - name: Write release notes
+        if: steps.semantic.outputs.new_release_published
+        env:
+          RELEASE_NOTES: "${{ steps.semantic.outputs.new_release_notes}}"
+        run: echo "$RELEASE_NOTES" > "./src/Whaally.Domain/release-notes.txt"
+      - name: Build for Publish
+        if: steps.semantic.outputs.new_release_published
+        run: |
+          if [ ! -z "${{ steps.semantic.outputs.new_release_version }}" ]; then
+            dotnet build --configuration Release /property:Version="${{ steps.semantic.outputs.new_release_version }}" /property:AssemblyVersion="${{steps.semantic.outputs.new_release_major_version}}" /property:AssemblyFileVersion="${{ steps.semantic.outputs.new_release_version }}" --no-restore
+          else
+            dotnet build --configuration Release --no-restore
+          fi
+      - name: Publish
+        if: steps.semantic.outputs.new_release_published && (startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/beta'))
+        run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
