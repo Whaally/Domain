@@ -26,6 +26,7 @@ jobs:
     - name: Test
       run: dotnet test /property:Configuration=Release --no-restore --no-build --verbosity normal
   release:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
