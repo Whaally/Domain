@@ -22,11 +22,6 @@ public interface IAggregateHandler
             ? Result.Fail<IEventEnvelope>(eventResult.Errors) 
             : commandResult;
     }
-
-    public Task<IResult<IEventEnvelope>> Trigger(params ICommand[] commands)
-        => Trigger(new CommandEnvelope(
-            new CommandMetadata(),
-            commands));
     
     /// <summary>
     ///     Evaluate the provided commands against the current state.
@@ -35,10 +30,7 @@ public interface IAggregateHandler
     /// <returns>async result containing events if successful</returns>
     public Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope);
 
-    public Task<IResult<IEventEnvelope>> Evaluate(params ICommand[] commands)
-        => Evaluate(new CommandEnvelope(
-            new CommandMetadata(),
-            commands));
+
     
     /// <summary>
     ///     Apply the provided events to the current state.
@@ -46,11 +38,6 @@ public interface IAggregateHandler
     /// <param name="events">The events to apply</param>
     /// <returns>async Task</returns>
     public Task<IResultBase> Apply(IEventEnvelope eventEnvelope);
-
-    public Task<IResultBase> Apply(params IEvent[] events)
-        => Apply(new EventEnvelope(
-            new EventMetadata(),
-            events));
 
     /// <summary>
     ///     Allows abortion of a running transaction

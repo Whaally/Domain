@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentResults" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" />
   </ItemGroup>
@@ -21,6 +20,10 @@
     </AssemblyAttribute>
   </ItemGroup>
   
+  <ItemGroup>
+    <ProjectReference Include="..\Whaally.Domain.Abstractions\Whaally.Domain.Abstractions.csproj" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <PackageId>Whaally.Domain</PackageId>
     <Description>Decouple domain model from infrastructure allowing independent evolution of
@@ -28,7 +31,7 @@
     <PackageProjectUrl>https://github.com/whaally/domain</PackageProjectUrl>
     <RepositoryUrl>https://github.com/whaally/domain</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright (c) Whaally 2024</Copyright>
+    <Copyright>Copyright (c) Whaally 2025</Copyright>
     <RepositoryType>git</RepositoryType>
     <Authors>Corstian Boerman</Authors>
     <Company>Whaally</Company>
