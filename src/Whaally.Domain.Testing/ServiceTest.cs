@@ -21,7 +21,7 @@ public abstract class ServiceTest<TService> : DomainTest
         Service = service;
         
         var id = Guid.NewGuid();
-        Context = new ServiceHandlerContext(Services)
+        Context = new ServiceHandlerContext(Services, new ServiceMetadata())
         {
             ParentContext = default
         };
