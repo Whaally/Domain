@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "samples\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Abstractions", "src\Whaally.Domain.Abstractions\Whaally.Domain.Abstractions.csproj", "{B941C601-66E6-4764-AC79-139A3484FF26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Testing", "src\Whaally.Domain.Testing\Whaally.Domain.Testing.csproj", "{F31853A3-42FA-4A3E-91F2-091D1CE94E04}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{B941C601-66E6-4764-AC79-139A3484FF26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B941C601-66E6-4764-AC79-139A3484FF26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B941C601-66E6-4764-AC79-139A3484FF26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F31853A3-42FA-4A3E-91F2-091D1CE94E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F31853A3-42FA-4A3E-91F2-091D1CE94E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F31853A3-42FA-4A3E-91F2-091D1CE94E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F31853A3-42FA-4A3E-91F2-091D1CE94E04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,6 +99,7 @@ Global
 		{9AF0C648-D5E4-4701-AEC4-5AC5B3166B9F} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
 		{BD192AB0-96AB-4483-97EE-8B71737A77F4} = {E88FF4B1-4D2E-415E-92BF-61E3829CDB9B}
 		{B941C601-66E6-4764-AC79-139A3484FF26} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
+		{F31853A3-42FA-4A3E-91F2-091D1CE94E04} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68BCF0DD-5501-460A-B702-728C2A93C91C}

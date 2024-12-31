@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\assets\whaally-logo.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Whaally.Domain\Whaally.Domain.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <PackageId>Whaally.Domain.Testing</PackageId>
+        <Description>Test helpers to validate the correct functioning of domain implementations.</Description>
+        <PackageProjectUrl>https://github.com/whaally/domain</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/whaally/domain</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) Whaally 2025</Copyright>
+        <RepositoryType>git</RepositoryType>
+        <Authors>Corstian Boerman</Authors>
+        <Company>Whaally</Company>
+        <PackageTags>ddd domain model abstraction distributed
+            actor framework</PackageTags>
+        <PackageIcon>whaally-logo.png</PackageIcon>
+        <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)\..\Whaally.Domain\release-notes.txt"))</PackageReleaseNotes>
+    </PropertyGroup>
+</Project>

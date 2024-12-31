@@ -43,7 +43,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     public IAggregateHandlerFactory Factory 
         => _services.GetRequiredService<IAggregateHandlerFactory>();
-    
+
     /// <summary>
     /// Evaluates a service and when successfull, adds the resulting operations to the current commands basket.
     /// </summary>
