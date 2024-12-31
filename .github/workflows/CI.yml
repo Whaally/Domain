@@ -28,6 +28,7 @@ jobs:
   release:
     needs: test
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/beta')
     steps:
       - uses: actions/checkout@v3
       - name: Semantic Release
@@ -57,5 +58,5 @@ jobs:
             dotnet build --configuration Release --no-restore
           fi
       - name: Publish
-        if: steps.semantic.outputs.new_release_published == 'true' && (startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/beta'))
+        if: steps.semantic.outputs.new_release_published == 'true'
         run: dotnet nuget push **\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
