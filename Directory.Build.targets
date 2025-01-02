@@ -4,6 +4,7 @@
 	<!-- Settings that append the existing setting value -->
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);$(OS)</DefineConstants>
+		<OrleansVersion>9.0.1</OrleansVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,14 +19,14 @@
 		<PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
 		<PackageReference Update="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
-		<PackageReference Update="Microsoft.Orleans.Client" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.Clustering.AzureStorage" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.Core.Abstractions" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.EventSourcing" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.Persistence.AzureStorage" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.Sdk" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.Serialization.Protobuf" Version="8.2.0" />
-		<PackageReference Update="Microsoft.Orleans.Server" Version="8.2.0" />
+		<PackageReference Update="Microsoft.Orleans.Client" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Clustering.AzureStorage" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Core.Abstractions" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.EventSourcing" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Persistence.AzureStorage" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Sdk" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Serialization.Protobuf" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Server" Version="$(OrleansVersion)" />
 		<PackageReference Update="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 		<PackageReference Update="NetTopologySuite" Version="2.5.0" />
 		<PackageReference Update="Npgsql" Version="7.0.4" />
