@@ -10,15 +10,18 @@ namespace Whaally.Domain.Infrastructure.OrleansHost.Grains;
 
 [MayInterleave(nameof(DoInterleave))]
 public abstract class AbstractAggregateHandlerGrain<TAggregate> :
-    JournaledGrain<TAggregate, IEventEnvelope>,
-    ICustomStorageInterface<TAggregate, IEventEnvelope>,
+    JournaledGrain<TAggregate, EventEnvelope>,
+    ICustomStorageInterface<TAggregate, EventEnvelope>,
     IAggregateHandlerGrain<TAggregate>
     where TAggregate : class, IAggregate, new()
 {
-    public static bool DoInterleave(IInvokable req) => true;
+    public static bool DoInterleave(IInvokable req)
+    {
+        return true;
+    }
     
     private readonly IServiceProvider _services;
-
+    
     protected IAggregateHandler<TAggregate> AggregateHandler;
     protected TAggregate Aggregate = new();
     
@@ -42,7 +45,7 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
     
     protected override void TransitionState(
         TAggregate state,
-        IEventEnvelope eventEnvelope)
+        EventEnvelope eventEnvelope)
     {
         /* In this case, with the DefaultAggregateHandler, there are no async operations
          * to wait on. Perhaps we should implement a more solid approach though.
@@ -57,10 +60,10 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
         AggregateHandler.Apply(eventEnvelope);
     }
     
-    public async Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope) =>
+    public async Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope) =>
         await AggregateHandler.Evaluate(commandEnvelope);
 
-    public async Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
+    public async Task<IResultBase> Apply(EventEnvelope eventEnvelope)
     {
         if (eventEnvelope.Messages?.Count() == 0) return Result.Ok();
 
@@ -105,5 +108,5 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
     /// <param name="updates">The events reflecting the changes</param>
     /// <param name="expectedversion">The expected version after the events had been applied</param>
     /// <returns>A boolean value indicating success state</returns>
-    public abstract Task<bool> ApplyUpdatesToStorage(IReadOnlyList<IEventEnvelope> updates, int expectedversion);
+    public abstract Task<bool> ApplyUpdatesToStorage(IReadOnlyList<EventEnvelope> updates, int expectedversion);
 }

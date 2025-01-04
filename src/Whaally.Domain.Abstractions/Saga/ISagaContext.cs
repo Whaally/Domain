@@ -7,7 +7,7 @@ public interface ISagaContext : IContext
     /// <summary>
     ///     The optimistic result of the evaluation of this saga.
     /// </summary>
-    public IReadOnlyList<ICommandEnvelope> Commands { get; }
+    public IReadOnlyList<CommandEnvelope> Commands { get; }
 
     /// <summary>
     ///     Stages a command as the optimistic result of this saga.

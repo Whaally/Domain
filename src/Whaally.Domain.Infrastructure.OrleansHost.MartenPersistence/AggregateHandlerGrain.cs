@@ -46,7 +46,7 @@ public class AggregateHandlerGrain<TAggregate>
             Aggregate);
     }
 
-    public override async Task<bool> ApplyUpdatesToStorage(IReadOnlyList<IEventEnvelope> updates, int expectedversion)
+    public override async Task<bool> ApplyUpdatesToStorage(IReadOnlyList<EventEnvelope> updates, int expectedversion)
     {
         // ToDo: Add version check
         // ToDo: Add tracing information to each event individually

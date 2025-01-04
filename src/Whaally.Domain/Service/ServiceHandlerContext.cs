@@ -38,7 +38,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
     
-    public IReadOnlyCollection<ICommandEnvelope> Commands 
+    public IReadOnlyCollection<CommandEnvelope> Commands 
         => _envelopes.Values.ToList().AsReadOnly();
 
     public IAggregateHandlerFactory Factory 

@@ -7,7 +7,7 @@ public interface IServiceHandlerContext : IContext, IDisposable
     /// <summary>
     /// The optimistic result of the evaluation of this service.
     /// </summary>
-    public IReadOnlyCollection<ICommandEnvelope> Commands { get; }
+    public IReadOnlyCollection<CommandEnvelope> Commands { get; }
 
     /// <summary>
     /// Stages a command as the optimistic result of this service.

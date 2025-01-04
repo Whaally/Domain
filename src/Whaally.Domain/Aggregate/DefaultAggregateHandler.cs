@@ -38,17 +38,17 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             .Instantiate<TAggregate>();
     }
 
-    public virtual Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope) =>
+    public virtual Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope) =>
         Evaluate(commandEnvelope, null);
     
-    public virtual Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope, CancellationToken? cancellationToken)
+    public virtual Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope, CancellationToken? cancellationToken)
     {
         if (!string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)
             && commandEnvelope.Metadata.AggregateId != Id)
             throw new Exception("The provided commands seem intended for a different aggregate instance");
         else if (cancellationToken?.IsCancellationRequested ?? false)
-            return Task.FromResult<IResult<IEventEnvelope>>(
-                Result.Fail<IEventEnvelope>("Operation was cancelled"));
+            return Task.FromResult<IResult<EventEnvelope>>(
+                Result.Fail<EventEnvelope>("Operation was cancelled"));
         
         // TODO: Allow concurrent uses, though queue subsequent operations
         if (_activity != null
@@ -100,8 +100,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             foreach (var intermediateEvent in intermediateEvents)
             {
                 if (cancellationToken?.IsCancellationRequested ?? false)
-                    return Task.FromResult<IResult<IEventEnvelope>>(
-                        Result.Fail<IEventEnvelope>("Operation was cancelled"));
+                    return Task.FromResult<IResult<EventEnvelope>>(
+                        Result.Fail<EventEnvelope>("Operation was cancelled"));
                 
                 var @event = intermediateEvent;
 
@@ -127,7 +127,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         
         var result = Result.Ok().WithReasons(results.SelectMany(result => result.Reasons));
         
-        return Task.FromResult<IResult<IEventEnvelope>>(
+        return Task.FromResult<IResult<EventEnvelope>>(
             result.IsSuccess
                 ? result.ToResult(new EventEnvelope(
                     new EventMetadata
@@ -143,9 +143,9 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 : result);
     }
 
-    public virtual Task<IResultBase> Apply(IEventEnvelope eventEnvelope) => Apply(eventEnvelope, null);
+    public virtual Task<IResultBase> Apply(EventEnvelope eventEnvelope) => Apply(eventEnvelope, null);
     
-    public virtual async Task<IResultBase> Apply(IEventEnvelope eventEnvelope, CancellationToken? cancellationToken)
+    public virtual async Task<IResultBase> Apply(EventEnvelope eventEnvelope, CancellationToken? cancellationToken)
     {
         if (!eventEnvelope.Messages.Any())
         {

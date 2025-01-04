@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using FluentResults;
+using Nito.AsyncEx;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
@@ -11,22 +12,22 @@ public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler
     {
     }
     
-    public override Task<IResult<IEventEnvelope>> Evaluate(ICommandEnvelope commandEnvelope)
+    public override async Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope)
     {
-        var @lock = AcquireLock(commandEnvelope.Metadata);
+        var @lock = await AcquireLock(commandEnvelope.Metadata);
         if (@lock == null)
-            return Task.FromResult<IResult<IEventEnvelope>>(Result.Fail<IEventEnvelope>("Could not acquire lock"));
+            return await Task.FromResult<IResult<EventEnvelope>>(Result.Fail<EventEnvelope>("Could not acquire lock"));
         
-        return base.Evaluate(commandEnvelope, @lock.Value.cancellationToken);
+        return await base.Evaluate(commandEnvelope, @lock.Value.cancellationToken);
     }
     
-    public override Task<IResultBase> Apply(IEventEnvelope eventEnvelope)
+    public override async Task<IResultBase> Apply(EventEnvelope eventEnvelope)
     {
-        var @lock = AcquireLock(eventEnvelope.Metadata);
+        var @lock = await AcquireLock(eventEnvelope.Metadata);
         if (@lock == null)
-            return Task.FromResult<IResultBase>(Result.Fail<IResultBase>("Could not acquire lock"));
+            return await Task.FromResult<IResultBase>(Result.Fail<IResultBase>("Could not acquire lock"));
         
-        var result = base.Apply(eventEnvelope, @lock.Value.cancellationToken);
+        var result = await base.Apply(eventEnvelope, @lock.Value.cancellationToken);
         
         ReleaseLock(@lock.Value.transactionId);
         
@@ -46,22 +47,29 @@ public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler
     // next transaction continue. Any work in progress fails with a timeout result.
     
     private ConcurrentQueue<(string transactionId, CancellationTokenSource cancellationToken)> _lockingQueue = new();
-    private EventWaitHandle _waitHandler = new(false, EventResetMode.ManualReset);
+    private AsyncManualResetEvent _waitHandler = new(false);
     
-    private (string transactionId, CancellationToken cancellationToken)? AcquireLock(IMessageMetadata metadata)
+    private async Task<(string transactionId, CancellationToken cancellationToken)?> AcquireLock(IMessageMetadata metadata)
     {
         if (string.IsNullOrEmpty(metadata.TransactionId)) return null;
-
+        
         if (!_lockingQueue.Any(q => q.transactionId == metadata.TransactionId))
             _lockingQueue.Enqueue((metadata.TransactionId, new CancellationTokenSource()));
-
-        if (_lockingQueue.TryPeek(out var @lock)
-            && @lock.transactionId == metadata.TransactionId) 
-            return (@lock.transactionId, @lock.cancellationToken.Token);
-
-        _waitHandler.WaitOne();
         
-        return AcquireLock(metadata);
+        if (_lockingQueue.TryPeek(out var @lock)
+            && @lock.transactionId == metadata.TransactionId)
+        {
+            return (@lock.transactionId, @lock.cancellationToken.Token);
+        }
+        
+        // ToDo: configure a timeout
+        await _waitHandler.WaitAsync();
+        
+        // // Delay the task for x ms before continuing. This allows interleaving, for example for aborts etc.
+        // // ToDo: Is there a way to asynchronously signal continuation?
+        // await Task.Delay(5);
+        
+        return await AcquireLock(metadata);
     }
     
     private void ReleaseLock(string transactionId)
@@ -70,7 +78,11 @@ public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler
             && @lock.transactionId == transactionId)
             _lockingQueue.TryDequeue(out _);
         else
-            _lockingQueue.Single(q => q.transactionId == transactionId).cancellationToken.Cancel();
+        {
+            var res = _lockingQueue
+                .SingleOrDefault(q => q.transactionId == transactionId);
+            res.cancellationToken?.Cancel();
+        }
         
         _waitHandler.Set();
         _waitHandler.Reset();

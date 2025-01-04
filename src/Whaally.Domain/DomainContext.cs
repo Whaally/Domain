@@ -127,7 +127,7 @@ public class DomainContext
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
     #endregion
     
-    public virtual Task<IResult<IEventEnvelope[]>> Evaluate<TCommand>(
+    public virtual Task<IResult<EventEnvelope[]>> Evaluate<TCommand>(
         string aggregateId,
         TCommand command)
         where TCommand : class, ICommand
@@ -142,7 +142,7 @@ public class DomainContext
             command);
     }
     
-    public virtual Task<IResult<IEventEnvelope[]>> Evaluate(
+    public virtual Task<IResult<EventEnvelope[]>> Evaluate(
         string aggregateId,
         params ICommand[] commands)
     {
@@ -157,8 +157,8 @@ public class DomainContext
                 commands));
     }
 
-    public virtual async Task<IResult<IEventEnvelope[]>> Evaluate(
-        ICommandMetadata metadata,
+    public virtual async Task<IResult<EventEnvelope[]>> Evaluate(
+        CommandMetadata metadata,
         params ICommand[] commands)
     {
         using var evaluationAgent = _evaluationAgent;
@@ -166,8 +166,8 @@ public class DomainContext
         return await _evaluationAgent.Evaluate(new CommandEnvelope(metadata, commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Invoke(
-        ICommandMetadata metadata,
+    public virtual async Task<IResult<EventEnvelope[]>> Invoke(
+        CommandMetadata metadata,
         params ICommand[] commands)
     {
         using var evaluationAgent = _evaluationAgent;
@@ -178,7 +178,7 @@ public class DomainContext
                 commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Invoke(
+    public virtual async Task<IResult<EventEnvelope[]>> Invoke(
         string aggregateId,
         params ICommand[] commands)
     {
@@ -198,7 +198,7 @@ public class DomainContext
                 commands));
     }
     
-    public virtual async Task<IResult<IEventEnvelope[]>> Invoke(
+    public virtual async Task<IResult<EventEnvelope[]>> Invoke(
         IService service,
         IServiceMetadata? metadata = null)
     {

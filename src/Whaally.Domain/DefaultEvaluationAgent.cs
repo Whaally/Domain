@@ -19,14 +19,14 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         _contextFactory = _services.GetRequiredService<IContextFactory>();
         _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="serviceEnvelope"></param>
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
-    public async Task<IResult<ICommandEnvelope[]>> Evaluate(IServiceEnvelope serviceEnvelope)
+    public async Task<IResult<CommandEnvelope[]>> Evaluate(IServiceEnvelope serviceEnvelope)
     {
         // TODO: Can we support evaluation of multiple services? What does this mean for the transactional boundaries?
         if (serviceEnvelope.Messages.Count() != 1)
@@ -40,20 +40,20 @@ public class DefaultEvaluationAgent : IEvaluationAgent
                 serviceContext,
                 serviceEnvelope.Message);
         
-        return new Result<ICommandEnvelope[]>()
+        return new Result<CommandEnvelope[]>()
             .WithValue(serviceContext.Commands.ToArray())
             .WithReasons(result.Reasons);
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="commandEnvelopes"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task<IResult<IEventEnvelope[]>> Evaluate(params ICommandEnvelope[] commandEnvelopes)
+    public async Task<IResult<EventEnvelope[]>> Evaluate(params CommandEnvelope[] commandEnvelopes)
     {
-        List<IResult<IEventEnvelope>> results = [];
+        List<IResult<EventEnvelope>> results = [];
 
         await Parallel.ForEachAsync(commandEnvelopes, async (envelope, ct) =>
         {
@@ -69,7 +69,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             results.Add(await handler.Evaluate(envelope));
         });
         
-        return new Result<IEventEnvelope[]>()
+        return new Result<EventEnvelope[]>()
             .WithValue(results
                 .Select(q => q.Value)
                 .ToArray())
@@ -82,7 +82,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <param name="eventEnvelopes"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task<IResultBase> Apply(params IEventEnvelope[] eventEnvelopes)
+    public async Task<IResultBase> Apply(params EventEnvelope[] eventEnvelopes)
     {
         List<IResultBase> results = new(eventEnvelopes.Length);
 
@@ -108,7 +108,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// </summary>
     /// <param name="eventEnvelope"></param>
     /// <returns></returns>
-    public Task<IResultBase> Continue(IEventEnvelope eventEnvelope)
+    public Task<IResultBase> Continue(EventEnvelope eventEnvelope)
     {
         foreach (var @event in eventEnvelope.Messages)
         {
@@ -135,7 +135,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <param name="saga"></param>
     /// <param name="eventEnvelope"></param>
     /// <returns></returns>
-    public async Task<IResultBase> Invoke(ISaga saga, IEventEnvelope eventEnvelope)
+    public async Task<IResultBase> Invoke(ISaga saga, EventEnvelope eventEnvelope)
     {
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");

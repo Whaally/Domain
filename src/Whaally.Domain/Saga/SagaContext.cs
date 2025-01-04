@@ -32,7 +32,7 @@ public class SagaContext : ISagaContext
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
     
-    public IReadOnlyList<ICommandEnvelope> Commands 
+    public IReadOnlyList<CommandEnvelope> Commands 
         => _envelopes.Values.ToList().AsReadOnly();
     
     public IAggregateHandlerFactory Factory 
