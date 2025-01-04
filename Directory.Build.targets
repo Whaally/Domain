@@ -27,8 +27,12 @@
 		<PackageReference Update="Microsoft.Orleans.Sdk" Version="$(OrleansVersion)" />
 		<PackageReference Update="Microsoft.Orleans.Serialization.Protobuf" Version="$(OrleansVersion)" />
 		<PackageReference Update="Microsoft.Orleans.Server" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.EventSourcing" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.Serialization.Protobuf" Version="$(OrleansVersion)" />
+		<PackageReference Update="Microsoft.Orleans.TestingHost" Version="$(OrleansVersion)" />
 		<PackageReference Update="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 		<PackageReference Update="NetTopologySuite" Version="2.5.0" />
+		<PackageReference Update="Nito.AsyncEx" Version="5.1.2" />
 		<PackageReference Update="Npgsql" Version="7.0.4" />
 		<PackageReference Update="Serilog" Version="2.12.0" />
 		<PackageReference Update="Serilog.AspNetCore" Version="8.0.3" />
@@ -36,6 +40,7 @@
 		<PackageReference Update="Serilog.Sinks.Console" Version="4.1.0" />
 		<PackageReference Update="Swashbuckle.AspNetCore" Version="6.9.0"/>
 		<PackageReference Update="System.Text.Json" Version="8.0.5" />
+		<PackageReference Update="System.Diagnostics.DiagnosticSource" Version="9.0.0" />
 	</ItemGroup>
 
 </Project>
