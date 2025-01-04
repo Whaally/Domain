@@ -65,10 +65,6 @@ public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler
         // ToDo: configure a timeout
         await _waitHandler.WaitAsync();
         
-        // // Delay the task for x ms before continuing. This allows interleaving, for example for aborts etc.
-        // // ToDo: Is there a way to asynchronously signal continuation?
-        // await Task.Delay(5);
-        
         return await AcquireLock(metadata);
     }
     
