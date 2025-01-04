@@ -1,4 +1,5 @@
-﻿using Whaally.Domain.Tests.Domain;
+﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Tests.Domain;
 
 namespace Whaally.Domain.Tests;
 

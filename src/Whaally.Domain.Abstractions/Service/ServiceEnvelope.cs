@@ -1,6 +1,4 @@
-﻿using Whaally.Domain.Abstractions;
-
-namespace Whaally.Domain;
+﻿namespace Whaally.Domain.Abstractions;
 
 public record ServiceEnvelope(
     ServiceMetadata Metadata,

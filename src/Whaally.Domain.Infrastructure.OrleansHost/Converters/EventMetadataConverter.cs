@@ -1,4 +1,5 @@
-﻿using Whaally.Domain.Infrastructure.OrleansHost.Surrogates;
+﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Infrastructure.OrleansHost.Surrogates;
 
 namespace Whaally.Domain.Infrastructure.OrleansHost.Converters;
 
