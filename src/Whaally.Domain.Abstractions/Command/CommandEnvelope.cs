@@ -1,6 +1,6 @@
 ﻿namespace Whaally.Domain.Abstractions;
 
-public record CommandEnvelope : ICommandEnvelope
+public record CommandEnvelope : IMessageEnvelope
 {
     public CommandEnvelope(
         CommandMetadata metadata,
@@ -20,4 +20,7 @@ public record CommandEnvelope : ICommandEnvelope
 
     public CommandMetadata Metadata { get; init; }
     public IEnumerable<ICommand> Messages { get; init; }
+    
+    IEnumerable<IMessage> IMessageEnvelope.Messages => Messages;
+    IMessageMetadata IMessageEnvelope.Metadata => Metadata;
 }

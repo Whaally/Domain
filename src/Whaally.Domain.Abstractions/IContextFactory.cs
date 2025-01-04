@@ -11,7 +11,7 @@ public interface IContextFactory
     /// <param name="activity">Optional activity to share with the context</param>
     /// <returns>A new - single use - saga context</returns>
     public ISagaContext CreateSagaContext(
-        IEventMetadata metadata,
+        EventMetadata metadata,
         Activity? activity = null);
 
     /// <summary>
@@ -21,7 +21,7 @@ public interface IContextFactory
     /// <param name="activity">Optional activity to share with this context instance</param>
     /// <returns>A new - single use - service handler context</returns>
     public IServiceHandlerContext CreateServiceHandlerContext(
-        IServiceMetadata metadata,
+        ServiceMetadata metadata,
         Activity? activity = null);
 
     /// <summary>
@@ -34,7 +34,7 @@ public interface IContextFactory
     /// <returns>A new - single use - command handler context</returns>
     public ICommandHandlerContext<TAggregate> CreateCommandHandlerContext<TAggregate>(
         TAggregate aggregate,
-        ICommandMetadata metadata,
+        CommandMetadata metadata,
         Activity? activity = null)
         where TAggregate : class, IAggregate;
 
@@ -48,7 +48,7 @@ public interface IContextFactory
     /// <returns>A new - single use - event handler context</returns>
     public IEventHandlerContext<TAggregate> CreateEventHandlerContext<TAggregate>(
         TAggregate aggregate, 
-        IEventMetadata metadata,
+        EventMetadata metadata,
         Activity? activity = null)
         where TAggregate : class, IAggregate;
 }

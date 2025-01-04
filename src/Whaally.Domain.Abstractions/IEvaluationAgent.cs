@@ -26,7 +26,7 @@ public interface IEvaluationAgent : IDisposable
     /// <param name="service"></param>
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
-    public Task<IResult<CommandEnvelope[]>> Evaluate(IServiceEnvelope service);
+    public Task<IResult<CommandEnvelope[]>> Evaluate(ServiceEnvelope service);
 
     /// <summary>
     ///     Evaluates a command, meaning it runs the command and collects its output as events, but does not apply these
@@ -55,7 +55,7 @@ public interface IEvaluationAgent : IDisposable
     /// <returns></returns>
     public Task<IResultBase> Continue(EventEnvelope events);
 
-    public Task Abort(params ICommandMetadata[] metadata);
+    public Task Abort(params CommandMetadata[] metadata);
 
     /// <summary>
     ///     Invokes a number of commands, meaning they are ran, and the resulting events are applied to the
@@ -105,7 +105,7 @@ public interface IEvaluationAgent : IDisposable
     }
     
     public async Task<IResult<EventEnvelope[]>> Invoke(
-        IServiceEnvelope serviceEnvelope)
+        ServiceEnvelope serviceEnvelope)
     {
         if (string.IsNullOrEmpty(serviceEnvelope.Metadata.TransactionId))
             serviceEnvelope.Metadata.TransactionId = Guid.NewGuid().ToString();

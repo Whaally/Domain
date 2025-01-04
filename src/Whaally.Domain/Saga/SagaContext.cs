@@ -17,7 +17,7 @@ public class SagaContext : ISagaContext
     private SagaContext() { throw new Exception($"The private parameterless constructor for type `{nameof(SagaContext)}` should not be used."); }
     public SagaContext(
         IServiceProvider services,
-        IEventMetadata metadata)
+        EventMetadata metadata)
     {
         _services = services;
         _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();

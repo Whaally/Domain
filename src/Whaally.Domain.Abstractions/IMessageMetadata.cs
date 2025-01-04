@@ -10,20 +10,3 @@ public interface IMessageMetadata
     
     public string? TransactionId { get; set; }
 }
-
-public interface IServiceMetadata : IMessageMetadata
-{
-    public Type? ServiceType { get; set; }
-}
-
-public interface ICommandMetadata : IMessageMetadata
-{
-    public string AggregateId { get; set; }
-    public Type? AggregateType { get; set; }
-}
-
-public interface IEventMetadata : IMessageMetadata
-{
-    public string AggregateId { get; set; }
-    public Type? AggregateType { get; set; }
-}

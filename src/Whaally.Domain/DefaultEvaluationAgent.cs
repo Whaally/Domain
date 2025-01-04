@@ -26,16 +26,14 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <param name="serviceEnvelope"></param>
     /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
-    public async Task<IResult<CommandEnvelope[]>> Evaluate(IServiceEnvelope serviceEnvelope)
+    public async Task<IResult<CommandEnvelope[]>> Evaluate(ServiceEnvelope serviceEnvelope)
     {
         // TODO: Can we support evaluation of multiple services? What does this mean for the transactional boundaries?
-        if (serviceEnvelope.Messages.Count() != 1)
-            throw new ArgumentException($"Expected {nameof(serviceEnvelope)} to contain one message");
         
         using var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
         
         var result = await _domainContext
-            .GetServiceHandler(serviceEnvelope.Messages.Single().GetType())
+            .GetServiceHandler(serviceEnvelope.Message.GetType())
             .Handle(
                 serviceContext,
                 serviceEnvelope.Message);
@@ -122,7 +120,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         return Task.FromResult<IResultBase>(Result.Ok());
     }
     
-    public Task Abort(params ICommandMetadata[] metadata)
+    public Task Abort(params CommandMetadata[] metadata)
     {
         // TODO: Get an aggregate handler instance. Note that the aggregate type is required to do so.
         // TODO: Create an `IAggregateMetadata` object, the `ICommandMetadata` and `IEventMetadata` derive from

@@ -22,7 +22,7 @@ public class SetAircraft_Command_Tests : DomainTest
         
         Assert.Empty(result.Errors);
         Assert.Equal(2, result.Value.Messages.Count());
-        Assert.IsAssignableFrom<IEventEnvelope>(result.Value);
+        Assert.IsAssignableFrom<EventEnvelope>(result.Value);
     }
 
     [Fact]

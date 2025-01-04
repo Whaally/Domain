@@ -6,7 +6,7 @@ namespace Whaally.Domain;
 
 public class DefaultContextFactory(IServiceProvider services) : IContextFactory
 {
-    public ISagaContext CreateSagaContext(IEventMetadata metadata, Activity? activity = null)
+    public ISagaContext CreateSagaContext(EventMetadata metadata, Activity? activity = null)
         => new SagaContext(
             services, 
             metadata)
@@ -17,7 +17,7 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
             TransactionId = metadata.TransactionId
         };
 
-    public IServiceHandlerContext CreateServiceHandlerContext(IServiceMetadata metadata, Activity? activity = null)
+    public IServiceHandlerContext CreateServiceHandlerContext(ServiceMetadata metadata, Activity? activity = null)
         => new ServiceHandlerContext(services, metadata)
         {
             Attributes = new ReadOnlyDictionary<string, object>(metadata.Attributes),
@@ -26,7 +26,7 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
 
     public ICommandHandlerContext<TAggregate> CreateCommandHandlerContext<TAggregate>(
         TAggregate aggregate,
-        ICommandMetadata metadata,
+        CommandMetadata metadata,
         Activity? activity = null)
         where TAggregate : class, IAggregate =>
         new CommandHandlerContext<TAggregate>(services, metadata.AggregateId, activity)
@@ -40,7 +40,7 @@ public class DefaultContextFactory(IServiceProvider services) : IContextFactory
 
     public IEventHandlerContext<TAggregate> CreateEventHandlerContext<TAggregate>(
         TAggregate aggregate,
-        IEventMetadata metadata,
+        EventMetadata metadata,
         Activity? activity = null)
         where TAggregate : class, IAggregate => 
         new EventHandlerContext<TAggregate>(metadata.AggregateId)

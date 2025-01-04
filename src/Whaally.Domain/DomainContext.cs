@@ -200,7 +200,7 @@ public class DomainContext
     
     public virtual async Task<IResult<EventEnvelope[]>> Invoke(
         IService service,
-        IServiceMetadata? metadata = null)
+        ServiceMetadata? metadata = null)
     {
         using var activity = _activity;
         using var evaluationAgent = _evaluationAgent;

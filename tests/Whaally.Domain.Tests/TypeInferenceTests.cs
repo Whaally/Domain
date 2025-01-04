@@ -56,9 +56,8 @@ public class TypeInferenceTests
     [Fact]
     public void Generic_EventEnvelope_Is_OfType()
     {
-        IEventEnvelope eventEnvelope = new EventEnvelope(new EventMetadata());
+        EventEnvelope eventEnvelope = new EventEnvelope(new EventMetadata());
 
         Assert.True(eventEnvelope is EventEnvelope);
-        Assert.True(eventEnvelope is IEventEnvelope);
     }
 }

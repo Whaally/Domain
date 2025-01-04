@@ -14,7 +14,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     private readonly Activity? _activity;
     
-    public ServiceHandlerContext(IServiceProvider services, IServiceMetadata metadata)
+    public ServiceHandlerContext(IServiceProvider services, ServiceMetadata metadata)
     {
         _services = services;
         _evaluationAgent = services.GetRequiredService<IEvaluationAgent>();

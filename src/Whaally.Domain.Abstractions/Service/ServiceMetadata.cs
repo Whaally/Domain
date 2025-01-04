@@ -3,7 +3,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public record ServiceMetadata : IServiceMetadata
+public record ServiceMetadata : IMessageMetadata
 {
     public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
     public ActivityContext? ParentContext { get; set; }

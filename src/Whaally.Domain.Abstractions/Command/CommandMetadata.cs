@@ -2,7 +2,7 @@
 
 namespace Whaally.Domain.Abstractions;
 
-public record CommandMetadata : ICommandMetadata
+public record CommandMetadata : IMessageMetadata
 {
     public IDictionary<string, object> Attributes { get; set; } 
         = new Dictionary<string, object>();

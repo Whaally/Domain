@@ -3,7 +3,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public record EventMetadata : IEventMetadata
+public record EventMetadata : IMessageMetadata
 {
     public string AggregateId { get; set; } = "";
 
