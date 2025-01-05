@@ -17,7 +17,7 @@ public class _0004__aggregate_interfaces
     
     public class TestCommandHandler : ICommandHandler<ITestAggregate, TestCommand>
     {
-        public IResultBase Evaluate(ICommandHandlerContext<ITestAggregate> context, TestCommand command)
+        public IEnumerable<IReason> Evaluate(ICommandHandlerContext<ITestAggregate> context, TestCommand command)
             => throw new NotImplementedException();
     }
     

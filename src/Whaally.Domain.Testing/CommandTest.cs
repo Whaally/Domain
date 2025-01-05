@@ -35,7 +35,7 @@ public abstract class CommandTest<TAggregate, TCommand> : DomainTest
         var output = Handler.Evaluate(Context, Command);
 
         if (output.GetType().GenericTypeArguments.Any())
-            Result = new Result().WithReasons(output.Reasons);
+            Result = new Result().WithReasons(output);
         else
             Result = (Result)output;
         

@@ -13,13 +13,13 @@ public record SetFlightInfo(
 
 public class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
     {
         context.StageEvent(new FlightInfoSet(
             command.FlightId,
             command.Departure,
             command.Arrival));
 
-        return Result.Ok();
+        return [];
     }
 }

@@ -11,6 +11,6 @@ public record CorrectTotalFlightCount(
 
 public class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
-        => Result.Ok();
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
+        => [];
 }

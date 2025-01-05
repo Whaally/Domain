@@ -8,13 +8,10 @@ public record TestCommand() : ICommand;
 
 public class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
-        var result = new Result();
-        
-        if (result.IsSuccess)
-            context.StageEvent(new TestEvent(true));
+        context.StageEvent(new TestEvent(true));
 
-        return result;
+        return [];
     }
 }

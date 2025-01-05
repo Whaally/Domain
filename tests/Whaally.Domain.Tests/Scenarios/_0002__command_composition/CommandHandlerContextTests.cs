@@ -1,4 +1,5 @@
 using FluentAssertions;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -35,8 +36,9 @@ public class CommandHandlerContextTests
     [Fact]
     public void RunFromHandler()
     {
-        new TestCommandHandler()
-            .Evaluate(Context, new TestCommand())
-            .IsSuccess.Should().BeTrue();
+        new Result()
+            .WithReasons(new TestCommandHandler().Evaluate(Context, new TestCommand()))
+            .IsSuccess
+            .Should().BeTrue();
     }
 }

@@ -96,9 +96,10 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                 },
                 _activity);
         
-        var result = _domainContext
-            .GetCommandHandler(command.GetType())
-            .Evaluate(context, command);
+        var result = new Result().WithReasons(
+            _domainContext
+                .GetCommandHandler(command.GetType())
+                .Evaluate(context, command));
         
         if (!result.IsSuccess) return result;
         

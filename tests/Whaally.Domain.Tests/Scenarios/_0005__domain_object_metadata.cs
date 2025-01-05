@@ -17,12 +17,12 @@ public class _0005__domain_object_metadata
     
     class TestCommandHandler : ICommandHandler
     {
-        public IResultBase Evaluate(ICommandHandlerContext context, ICommand command) => throw new NotImplementedException();
+        public IEnumerable<IReason> Evaluate(ICommandHandlerContext context, ICommand command) => throw new NotImplementedException();
     }
 
     class TestCommandHandlerWithGenerics : ICommandHandler<TestAggregate, TestCommand>
     {
-        public IResultBase Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command) => throw new NotImplementedException();
+        public IEnumerable<IReason> Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command) => throw new NotImplementedException();
     }
 
     class TestEventHandler : IEventHandler

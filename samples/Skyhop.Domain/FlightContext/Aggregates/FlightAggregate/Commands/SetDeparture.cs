@@ -12,29 +12,21 @@ public record SetDeparture(
 
 public class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
     {
-        var result = new Result();
-
         if (!context.Aggregate.IsInitialized) 
-            result.WithError("Flight does not exist");
+            yield return new Error("Flight does not exist");
         
         if (string.IsNullOrWhiteSpace(command.AirfieldId))
-            result.WithError("Airfield was not provided");
+            yield return new Error("Airfield was not provided");
 
         if (command.Time == DateTime.MinValue
             || command.Time == DateTime.MaxValue)
-            result.WithError("Departure time was not provided");
+            yield return new Error("Departure time was not provided");
 
-        if (result.IsSuccess)
-        {
-            context.StageEvent(new DepartureTimeSet(
-                command.Time));
-
-            context.StageEvent(new DepartureAirfieldSet(
-                command.AirfieldId));
-        }
-
-        return result;
+        context.StageEvent(
+            new DepartureTimeSet(command.Time));
+        context.StageEvent(
+            new DepartureAirfieldSet(command.AirfieldId));
     }
 }

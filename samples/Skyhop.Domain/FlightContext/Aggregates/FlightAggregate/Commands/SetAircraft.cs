@@ -10,29 +10,23 @@ public record SetAircraft(string AircraftId) : ICommand;
 
 public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
-        var result = new Result();
-
         if (!context.Aggregate.IsInitialized) 
-            result.WithError("Flight does not exist");
+            yield return new Error("Flight does not exist");
         
         if (string.IsNullOrWhiteSpace(command.AircraftId))
-            result.WithError("Aircraft was not provided");
+            yield return new Error("Aircraft was not provided");
 
-        if (result.IsSuccess)
+        
+        if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
         {
-            if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
-            {
-                context.StageEvent(
-                    new AircraftRemoved(
-                        context.Aggregate.AircraftId));
-            }
-
             context.StageEvent(
-                new AircraftSet(command.AircraftId));
+                new AircraftRemoved(
+                    context.Aggregate.AircraftId));
         }
 
-        return result;
+        context.StageEvent(
+            new AircraftSet(command.AircraftId));
     }
 }

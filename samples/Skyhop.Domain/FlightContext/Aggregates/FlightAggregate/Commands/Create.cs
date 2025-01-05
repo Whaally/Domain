@@ -10,12 +10,11 @@ public record Create() : ICommand;
 
 public class CreateHandler : ICommandHandler<Flight, Create>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Flight> context, Create command)
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {
-        if (context.Aggregate.IsInitialized) return Result.Fail("Flight had already been created");
+        if (context.Aggregate.IsInitialized) 
+            yield return new Error("Flight had already been created");
         
         context.StageEvent(new Created());
-
-        return Result.Ok();
     }
 }

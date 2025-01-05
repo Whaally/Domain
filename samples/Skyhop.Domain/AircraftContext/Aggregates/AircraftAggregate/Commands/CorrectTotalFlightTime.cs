@@ -11,6 +11,6 @@ public record CorrectTotalFlightTime(
 
 public class CorrectTotalFlightTimeHandler : ICommandHandler<Aircraft, CorrectTotalFlightTime>
 {
-    public IResultBase Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
-        => Result.Ok();
+    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
+        => [];
 }
