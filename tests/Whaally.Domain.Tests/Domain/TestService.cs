@@ -11,12 +11,10 @@ internal class TestService : IService
 
 internal class TestServiceHandler : IServiceHandler<TestService>
 {
-    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, TestService service)
+    public async Task Invoke(IServiceHandlerContext context, TestService service)
     {
         context.StageCommands(
             service.Id,
             new TestCommand());
-
-        yield break;
     }
 }

@@ -34,7 +34,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
-    
+    public Result Result { get; init; } = new();
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
     
@@ -49,7 +49,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// </summary>
     /// <param name="service">The service to evaluate</param>
     /// <returns>An <c>IResultBase</c> signalling evaluation state</returns>
-    public virtual async Task<IResultBase> InvokeService<TService>(TService service)
+    public virtual async Task InvokeService<TService>(TService service)
         where TService : class, IService
     {
         var result = await _evaluationAgent.Evaluate(
@@ -63,7 +63,9 @@ public class ServiceHandlerContext : IServiceHandlerContext
                     TransactionId = TransactionId
                 }, service));
 
-        if (!result.IsSuccess) return result.ToResult();
+        Result.WithReasons(result.Reasons);
+        
+        if (!result.IsSuccess) return;
         
         foreach (var envelope in result.Value)
         {
@@ -71,8 +73,6 @@ public class ServiceHandlerContext : IServiceHandlerContext
                 envelope.Metadata.AggregateId, 
                 envelope.Messages.ToArray());
         }
-
-        return result.ToResult();
     }
 
     /// <summary>

@@ -10,7 +10,7 @@ public class ServiceTests
     readonly IServiceProvider _services = DependencyContainer.Create();
 
     [Fact]
-    public void ServiceCanBeEvaluated()
+    public async Task ServiceCanBeEvaluated()
     {
         var context = new ServiceHandlerContext(_services, new ServiceMetadata());
         var service = new TestService
@@ -18,16 +18,15 @@ public class ServiceTests
             Id = Guid.NewGuid().ToString()
         };
 
-        var result = new TestServiceHandler()
-            .Invoke(context, service)
-            .ToBlockingEnumerable();
+        await new TestServiceHandler()
+            .Invoke(context, service);
 
-        result.Should().BeEmpty();
+        context.Result.Reasons.Should().BeEmpty();
         Assert.Equal(service.Id, context.Commands.Single().Metadata.AggregateId);
     }
 
     [Fact]
-    public void ServiceCanInvokeOtherServices()
+    public async Task ServiceCanInvokeOtherServices()
     {
         var context = new ServiceHandlerContext(_services, new ServiceMetadata());
         var service = new TestParentService
@@ -36,11 +35,10 @@ public class ServiceTests
             Id2 = Guid.NewGuid().ToString()
         };
 
-        var result = new TestParentServiceHandler()
-            .Invoke(context, service)
-            .ToBlockingEnumerable();
+        await new TestParentServiceHandler()
+            .Invoke(context, service);
 
-        result.Should().BeEmpty();
+        context.Result.Reasons.Should().BeEmpty();
         Assert.Equal(service.Id1, context.Commands.First().Metadata.AggregateId);
         Assert.Equal(service.Id2, context.Commands.Last().Metadata.AggregateId);
     }

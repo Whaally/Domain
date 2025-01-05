@@ -32,16 +32,14 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         using var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
 
         var result = new Result<CommandEnvelope[]>();
-        
-        await foreach (var reason in _domainContext
-                           .GetServiceHandler(serviceEnvelope.Message.GetType())
-                           .Invoke(
-                               serviceContext,
-                               serviceEnvelope.Message))
-        {
-            result.WithReason(reason);
-        }
 
+        await _domainContext
+            .GetServiceHandler(serviceEnvelope.Message.GetType())
+            .Invoke(
+                serviceContext,
+                serviceEnvelope.Message);
+
+        result.WithReasons(serviceContext.Result.Reasons);
         result.WithValue(serviceContext.Commands.ToArray());
 
         return result;

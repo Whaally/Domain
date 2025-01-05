@@ -5,14 +5,11 @@ using Whaally.Domain.Abstractions;
 
 namespace ConsoleSample.Domain;
 
-public class AddItemService : IService
-{
-    
-}
+public class AddItemService : IService;
 
 public class AddItemServiceHandler : IServiceHandler<AddItemService>
 {
-    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, AddItemService service)
+    public async Task Invoke(IServiceHandlerContext context, AddItemService service)
     {
         var todoItem = Guid.NewGuid();
         
@@ -25,7 +22,5 @@ public class AddItemServiceHandler : IServiceHandler<AddItemService>
         context.StageCommands(
             Guid.NewGuid().ToString(),
             new AddItem(todoItem));
-
-        yield break;
     }
 }

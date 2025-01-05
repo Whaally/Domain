@@ -21,21 +21,19 @@ public class RecursiveServiceInvocationTest
 
     public class RecursiveServiceHandler : IServiceHandler<RecursiveService>
     {
-        public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, RecursiveService service)
+        public async Task Invoke(IServiceHandlerContext context, RecursiveService service)
         {
             if (service.Depth == 0)
             {
-                yield break;
+                return;
             }
-            else
+
+            var newService = new RecursiveService
             {
-                var newService = new RecursiveService
-                {
-                    Depth = service.Depth - 1
-                };
+                Depth = service.Depth - 1
+            };
                 
-                await context.InvokeService(newService);
-            }
+            await context.InvokeService(newService);
         }
     }
 
@@ -63,8 +61,8 @@ public class RecursiveServiceInvocationTest
         var serviceHandlerContext =
             new ServiceHandlerContext(_services, new ServiceMetadata());
 
-        var result = serviceHandler.Invoke(serviceHandlerContext, service).ToBlockingEnumerable();
+        serviceHandler.Invoke(serviceHandlerContext, service);
 
-        result.Should().BeEmpty();
+        serviceHandlerContext.Result.Reasons.Should().BeEmpty();
     }
 }

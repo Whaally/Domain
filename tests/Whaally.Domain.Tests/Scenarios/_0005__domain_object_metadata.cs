@@ -42,7 +42,7 @@ public class _0005__domain_object_metadata
     
     class TestServiceHandler : IServiceHandler<TestService>
     {
-        public IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, TestService service) => throw new NotImplementedException();
+        public Task Invoke(IServiceHandlerContext context, TestService service) => throw new NotImplementedException();
     }
     
     class TestSnapshotFactory : ISnapshotFactory<TestAggregate, TestSnapshot>
