@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using Whaally.Domain.Abstractions;
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Whaally.Domain.Tests.Domain;
 
@@ -11,11 +12,11 @@ public class TestParentService : IService
 
 public class TestParentServiceHandler : IServiceHandler<TestParentService>
 {
-    public Task<IResultBase> Handle(IServiceHandlerContext context, TestParentService service)
+    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, TestParentService service)
     {
-        context.EvaluateService(new TestService { Id = service.Id1 });
-        context.EvaluateService(new TestService { Id = service.Id2 });
+        await context.EvaluateService(new TestService { Id = service.Id1 });
+        await context.EvaluateService(new TestService { Id = service.Id2 });
 
-        return Task.FromResult<IResultBase>(Result.Ok());
+        yield break;
     }
 }

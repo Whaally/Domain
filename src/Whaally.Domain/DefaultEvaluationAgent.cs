@@ -29,20 +29,24 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<CommandEnvelope[]>> Evaluate(ServiceEnvelope serviceEnvelope)
     {
         // TODO: Can we support evaluation of multiple services? What does this mean for the transactional boundaries?
-        
         using var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
-        
-        var result = await _domainContext
-            .GetServiceHandler(serviceEnvelope.Message.GetType())
-            .Handle(
-                serviceContext,
-                serviceEnvelope.Message);
-        
-        return new Result<CommandEnvelope[]>()
-            .WithValue(serviceContext.Commands.ToArray())
-            .WithReasons(result.Reasons);
-    }
 
+        var result = new Result<CommandEnvelope[]>();
+        
+        await foreach (var reason in _domainContext
+                           .GetServiceHandler(serviceEnvelope.Message.GetType())
+                           .Handle(
+                               serviceContext,
+                               serviceEnvelope.Message))
+        {
+            result.WithReason(reason);
+        }
+
+        result.WithValue(serviceContext.Commands.ToArray());
+
+        return result;
+    }
+    
     /// <summary>
     /// 
     /// </summary>
@@ -52,11 +56,11 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     public async Task<IResult<EventEnvelope[]>> Evaluate(params CommandEnvelope[] commandEnvelopes)
     {
         List<IResult<EventEnvelope>> results = [];
-
+        
         await Parallel.ForEachAsync(commandEnvelopes, async (envelope, ct) =>
         {
             if (!envelope.Messages.Any()) return;
-
+            
             if (envelope.Metadata.AggregateType == null)
                 envelope.Metadata.AggregateType = _domainContext.GetCommonAggregateType(envelope.Messages);
             

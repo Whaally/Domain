@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using FluentAssertions;
+using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Tests.Domain;
@@ -20,11 +21,11 @@ public class RecursiveServiceInvocationTest
 
     public class RecursiveServiceHandler : IServiceHandler<RecursiveService>
     {
-        public async Task<IResultBase> Handle(IServiceHandlerContext context, RecursiveService service)
+        public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, RecursiveService service)
         {
             if (service.Depth == 0)
             {
-                return Result.Ok();
+                yield break;
             }
             else
             {
@@ -32,8 +33,8 @@ public class RecursiveServiceInvocationTest
                 {
                     Depth = service.Depth - 1
                 };
-
-                return await context.EvaluateService(newService);
+                
+                await context.EvaluateService(newService);
             }
         }
     }
@@ -51,7 +52,7 @@ public class RecursiveServiceInvocationTest
      */
 
     [Fact]
-    public async Task RecursiveServiceCanBeEvaluated()
+    public void RecursiveServiceCanBeEvaluated()
     {
         var service = new RecursiveService
         {
@@ -62,8 +63,8 @@ public class RecursiveServiceInvocationTest
         var serviceHandlerContext =
             new ServiceHandlerContext(_services, new ServiceMetadata());
 
-        var result = await serviceHandler.Handle(serviceHandlerContext, service);
+        var result = serviceHandler.Handle(serviceHandlerContext, service).ToBlockingEnumerable();
 
-        Assert.True(result.IsSuccess);
+        result.Should().BeEmpty();
     }
 }

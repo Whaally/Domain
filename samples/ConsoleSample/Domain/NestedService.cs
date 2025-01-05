@@ -1,4 +1,6 @@
-﻿using FluentResults;
+﻿#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
+using FluentResults;
 using Whaally.Domain.Abstractions;
 
 namespace ConsoleSample.Domain;
@@ -6,5 +8,10 @@ namespace ConsoleSample.Domain;
 public record NestedService : IService;
 
 public class NestedServiceHandler : IServiceHandler<NestedService> {
-    public Task<IResultBase> Handle(IServiceHandlerContext context, NestedService service) => Task.FromResult<IResultBase>(Result.Ok());
+    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, NestedService service)
+    {
+        yield break;
+    }
 }
+
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

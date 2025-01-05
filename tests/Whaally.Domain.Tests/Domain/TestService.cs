@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using Whaally.Domain.Abstractions;
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
 namespace Whaally.Domain.Tests.Domain;
 
@@ -10,12 +11,12 @@ internal class TestService : IService
 
 internal class TestServiceHandler : IServiceHandler<TestService>
 {
-    public Task<IResultBase> Handle(IServiceHandlerContext context, TestService service)
+    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, TestService service)
     {
         context.StageCommands(
             service.Id,
             new TestCommand());
 
-        return Task.FromResult<IResultBase>(Result.Ok());
+        yield break;
     }
 }

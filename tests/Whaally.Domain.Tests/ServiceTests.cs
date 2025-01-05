@@ -1,4 +1,6 @@
-﻿using Whaally.Domain.Abstractions;
+﻿using FluentAssertions;
+using JasperFx.Core;
+using Whaally.Domain.Abstractions;
 using Whaally.Domain.Tests.Domain;
 
 namespace Whaally.Domain.Tests;
@@ -8,7 +10,7 @@ public class ServiceTests
     readonly IServiceProvider _services = DependencyContainer.Create();
 
     [Fact]
-    public async Task ServiceCanBeEvaluated()
+    public void ServiceCanBeEvaluated()
     {
         var context = new ServiceHandlerContext(_services, new ServiceMetadata());
         var service = new TestService
@@ -16,15 +18,16 @@ public class ServiceTests
             Id = Guid.NewGuid().ToString()
         };
 
-        var result = await new TestServiceHandler()
-            .Handle(context, service);
+        var result = new TestServiceHandler()
+            .Handle(context, service)
+            .ToBlockingEnumerable();
 
-        Assert.True(result.IsSuccess);
+        result.Should().BeEmpty();
         Assert.Equal(service.Id, context.Commands.Single().Metadata.AggregateId);
     }
 
     [Fact]
-    public async Task ServiceCanInvokeOtherServices()
+    public void ServiceCanInvokeOtherServices()
     {
         var context = new ServiceHandlerContext(_services, new ServiceMetadata());
         var service = new TestParentService
@@ -33,10 +36,11 @@ public class ServiceTests
             Id2 = Guid.NewGuid().ToString()
         };
 
-        var result = await new TestParentServiceHandler()
-            .Handle(context, service);
+        var result = new TestParentServiceHandler()
+            .Handle(context, service)
+            .ToBlockingEnumerable();
 
-        Assert.True(result.IsSuccess);
+        result.Should().BeEmpty();
         Assert.Equal(service.Id1, context.Commands.First().Metadata.AggregateId);
         Assert.Equal(service.Id2, context.Commands.Last().Metadata.AggregateId);
     }

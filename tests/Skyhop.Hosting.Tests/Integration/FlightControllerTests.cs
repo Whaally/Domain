@@ -5,7 +5,7 @@ public class FlightControllerTests : IntegrationTest
     public FlightControllerTests(ApplicationFactory<Program> factory) : base(factory)
     {
     }
-
+    
     [Fact]
     public async Task Should_Create_New_Flight()
     {

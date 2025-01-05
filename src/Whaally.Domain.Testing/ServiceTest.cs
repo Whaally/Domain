@@ -26,7 +26,8 @@ public abstract class ServiceTest<TService> : DomainTest
             ParentContext = default
         };
         
-        var output = Handler.Handle(Context, Service).Result;
+        // TODO: Reconsider this approach and refactor into an IAsyncLifetime structure
+        var output = new Result().WithReasons(Handler.Handle(Context, Service).ToBlockingEnumerable());
         
         if (output.GetType().GenericTypeArguments.Any())
             Result = new Result().WithReasons(output.Reasons);

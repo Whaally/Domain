@@ -4,15 +4,15 @@ namespace Whaally.Domain.Abstractions;
 
 public interface IServiceHandler : IMessageHandler
 {
-    public Task<IResultBase> Handle<TService>(IServiceHandlerContext context, TService service)
+    public IAsyncEnumerable<IReason> Handle<TService>(IServiceHandlerContext context, TService service)
         where TService : class, IService;
 }
 
 public interface IServiceHandler<TService> : IServiceHandler
     where TService : class, IService
 {
-    Task<IResultBase> IServiceHandler.Handle<T>(IServiceHandlerContext context, T service)
+    IAsyncEnumerable<IReason> IServiceHandler.Handle<T>(IServiceHandlerContext context, T service)
         => Handle(context, (service as TService)!);
 
-    public Task<IResultBase> Handle(IServiceHandlerContext context, TService service);
+    public IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, TService service);
 }
