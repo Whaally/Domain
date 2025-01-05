@@ -154,12 +154,12 @@ public class DefaultEvaluationAgent : IEvaluationAgent
 
         var result = new Result();
 
-        await foreach (var reason in saga.Evaluate(
-                           _contextFactory.CreateSagaContext(eventEnvelope.Metadata),
-                           eventEnvelope.Messages.Single()))
-        {
-            result.WithReason(reason);
-        }
+        var context = _contextFactory.CreateSagaContext(eventEnvelope.Metadata);
+        await saga.Evaluate(
+            context,
+            eventEnvelope.Messages.Single());
+
+        result.WithReasons(context.Result.Reasons);
         
         return result;
     }

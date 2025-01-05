@@ -7,10 +7,8 @@ namespace ConsoleSample.Domain;
 
 public class TodoItemAddedSaga : ISaga<TodoItemCreated>
 {
-    public async IAsyncEnumerable<IReason> Evaluate(ISagaContext context, TodoItemCreated @event)
+    public async Task Evaluate(ISagaContext context, TodoItemCreated @event)
     {
         await context.InvokeService(new NestedService());
-
-        yield break;
     }
 }

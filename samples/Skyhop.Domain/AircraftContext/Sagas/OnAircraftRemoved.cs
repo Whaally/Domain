@@ -11,14 +11,14 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 public class OnAircraftRemoved : ISaga<AircraftRemoved>
 {
-    public async IAsyncEnumerable<IReason> Evaluate(ISagaContext context, AircraftRemoved @event)
+    public async Task Evaluate(ISagaContext context, AircraftRemoved @event)
     {
         var flight = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)
             .Snapshot<FlightSnapshot>();
 
         // No need to make a change; nothing to remove here.
-        if (flight.AircraftId == @event.AircraftId) yield break;
+        if (flight.AircraftId == @event.AircraftId) return;
         
         var aircraft = await context.Factory
             .Instantiate<Aircraft>(@event.AircraftId)

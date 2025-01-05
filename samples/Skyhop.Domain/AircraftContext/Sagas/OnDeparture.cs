@@ -9,7 +9,7 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 public class OnDeparture : ISaga<DepartureTimeSet>
 {
-    public async IAsyncEnumerable<IReason> Evaluate(ISagaContext context, DepartureTimeSet @event)
+    public async Task Evaluate(ISagaContext context, DepartureTimeSet @event)
     {
         var snapshot = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)
@@ -23,7 +23,5 @@ public class OnDeparture : ISaga<DepartureTimeSet>
                     context.AggregateId!,
                     @event.DepartureTime,
                     snapshot.ArrivalTime));
-
-        yield break;
     }
 }

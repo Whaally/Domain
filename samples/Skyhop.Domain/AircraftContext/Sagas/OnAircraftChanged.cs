@@ -11,14 +11,14 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 internal class OnAircraftChanged : ISaga<AircraftSet>
 {
-    public async IAsyncEnumerable<IReason> Evaluate(ISagaContext context, AircraftSet @event)
+    public async Task Evaluate(ISagaContext context, AircraftSet @event)
     {   
         var flight = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)
             .Snapshot<FlightSnapshot>();
 
         // There is no need to make a change as the flight is up to date with the latest state
-        if (flight.AircraftId != @event.AircraftId) yield break;
+        if (flight.AircraftId != @event.AircraftId) return;
 
         var aircraft = await context.Factory
             .Instantiate<Aircraft>(@event.AircraftId)

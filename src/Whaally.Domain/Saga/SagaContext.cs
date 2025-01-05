@@ -27,6 +27,7 @@ public class SagaContext : ISagaContext
     }
     
     public string? AggregateId { get; init; }
+    public Result Result { get; init; } = new();
     public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
@@ -66,7 +67,7 @@ public class SagaContext : ISagaContext
         _envelopes.Add(aggregateId, envelope);
     }
     
-    public virtual async Task<IResultBase> InvokeService(IService service)
+    public virtual async Task InvokeService(IService service)
     {
         var result = await _evaluationAgent.Evaluate(
             new ServiceEnvelope(
@@ -77,13 +78,13 @@ public class SagaContext : ISagaContext
                     TransactionId = TransactionId
                 }, service));
 
-        if (!result.IsSuccess) return result.ToResult();
+        Result.WithReasons(result.Reasons);
+        
+        if (!result.IsSuccess) return;
         
         foreach (var envelope in result.Value)
             StageCommands(
                 envelope.Metadata.AggregateId, 
                 envelope.Messages.ToArray());
-
-        return result.ToResult();
     }
 }
