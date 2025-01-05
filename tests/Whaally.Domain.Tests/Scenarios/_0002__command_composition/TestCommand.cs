@@ -10,12 +10,11 @@ public record TestCommand : ICommand
 
 public class TestCommandHandler : ICommandHandler<Aggregate, TestCommand>
 {
-    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
+    public void Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
     {
         context.EvaluateCommand(new AnotherCommand());
 
-        return context.Aggregate.EventApplicationCount != 1 
-            ? [ new Error("Event application count is not 1") ] 
-            : [];
+        if (context.Aggregate.EventApplicationCount != 1)
+            context.Result.WithError("Event application count is not 1");
     }
 }

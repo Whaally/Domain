@@ -5,12 +5,19 @@ namespace Whaally.Domain.Abstractions;
 public interface ICommandHandlerContext : IContext, IProvideAggregateInstance
 {
     /// <summary>
-    ///     The optimistic result of this commands evaluation wrapped in message envelopes.
+    ///     The optimistic result of this commands evaluation
     /// 
-    ///     Used for further evaluation in case of successfull command evaluation.
+    ///     Used for further evaluation in case of successful command evaluation
     /// </summary>
     public IReadOnlyCollection<IEvent> Events { get; }
-
+    
+    /// <summary>
+    ///     The aggregate result of this evaluation
+    ///
+    ///     Determines the success or failure of the evaluation of this command
+    /// </summary>
+    public Result Result { get; }
+    
     /// <summary>
     ///     Stages an event as the optimistic result of this command.
     /// </summary>

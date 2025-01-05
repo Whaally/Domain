@@ -90,11 +90,12 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 intermediateState,
                 commandEnvelope.Metadata,
                 _activity);
-            
-            results.Add(new Result()
-                .WithReasons(_domainContext
-                    .GetCommandHandler(command.GetType())
-                    .Evaluate(commandContext, command)));
+
+            _domainContext
+                .GetCommandHandler(command.GetType())
+                .Evaluate(commandContext, command);
+                
+            results.Add(commandContext.Result);
 
             var intermediateEvents = commandContext.Events.ToList();
 

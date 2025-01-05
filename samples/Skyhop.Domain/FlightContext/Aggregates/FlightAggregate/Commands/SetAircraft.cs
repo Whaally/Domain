@@ -10,13 +10,13 @@ public record SetAircraft(string AircraftId) : ICommand;
 
 public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
-    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
+    public void Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
         if (!context.Aggregate.IsInitialized) 
-            yield return new Error("Flight does not exist");
+            context.Result.WithError("Flight does not exist");
         
         if (string.IsNullOrWhiteSpace(command.AircraftId))
-            yield return new Error("Aircraft was not provided");
+            context.Result.WithError("Aircraft was not provided");
 
         
         if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))

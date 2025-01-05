@@ -13,13 +13,13 @@ internal record TestCommand : ICommand
 
 internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
-    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+    public void Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
         foreach (var @event in command.Events)
         {
             context.StageEvent(@event.GetType(), @event);
         }
 
-        return command.Result.Reasons;
+        context.Result.WithReasons(command.Result.Reasons);
     }
 }

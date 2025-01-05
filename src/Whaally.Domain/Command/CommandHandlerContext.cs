@@ -92,11 +92,13 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                     TransactionId = TransactionId
                 },
                 _activity);
+
+        _domainContext
+            .GetCommandHandler(command.GetType())
+            .Evaluate(context, command);
         
-        Result.WithReasons(
-            _domainContext
-                .GetCommandHandler(command.GetType())
-                .Evaluate(context, command));
+        // ToDo: we have the input (command), and the output (context.result). Can we map the results in such way that it is clear what had happened?
+        Result.WithReasons(context.Result.Reasons);
         
         if (!Result.IsSuccess) return;
         

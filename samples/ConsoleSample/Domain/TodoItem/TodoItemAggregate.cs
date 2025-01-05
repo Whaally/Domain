@@ -14,22 +14,18 @@ public record SetCompletion(bool completed) : ICommand;
 
 public class CreateTodoItemHandler : ICommandHandler<TodoItemAggregate, CreateTodoItem>
 {
-    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
+    public void Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
     {
         context.StageEvent(new TodoItemCreated(command.item));
         context.EvaluateCommand(new SetCompletion(false));
-
-        yield break;
     }
 }
 
 public class SetCompletionHandler : ICommandHandler<TodoItemAggregate, SetCompletion>
 {
-    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
+    public void Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
     {
         context.StageEvent(new CompletionSet(command.completed));
-
-        yield break;
     }
 }
 

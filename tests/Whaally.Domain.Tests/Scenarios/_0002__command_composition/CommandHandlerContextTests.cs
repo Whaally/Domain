@@ -36,8 +36,10 @@ public class CommandHandlerContextTests
     [Fact]
     public void RunFromHandler()
     {
+        new TestCommandHandler().Evaluate(Context, new TestCommand());
+        
         new Result()
-            .WithReasons(new TestCommandHandler().Evaluate(Context, new TestCommand()))
+            .WithReasons(Context.Result.Reasons)
             .IsSuccess
             .Should().BeTrue();
     }

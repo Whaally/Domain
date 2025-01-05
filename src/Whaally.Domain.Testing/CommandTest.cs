@@ -32,13 +32,9 @@ public abstract class CommandTest<TAggregate, TCommand> : DomainTest
             Aggregate = Aggregate
         };
         
-        var output = Handler.Evaluate(Context, Command);
-
-        if (output.GetType().GenericTypeArguments.Any())
-            Result = new Result().WithReasons(output);
-        else
-            Result = (Result)output;
+        Handler.Evaluate(Context, Command);
         
+        Result = Context.Result;
         Events = Context.Events;
     }
 }

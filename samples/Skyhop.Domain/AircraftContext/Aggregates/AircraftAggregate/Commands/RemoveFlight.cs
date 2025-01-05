@@ -10,11 +10,9 @@ public record RemoveFlight(string FlightId) : ICommand;
 
 public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {
-    public IEnumerable<IReason> Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
+    public void Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {
         context.StageEvent(new FlightRemoved(
             command.FlightId));
-
-        return [];
     }
 }
