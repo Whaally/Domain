@@ -58,7 +58,7 @@ public class SendEnvelopes(ClusterFixture fixture)
         
         var grain = _cluster.GrainFactory.GetGrain<
             IAggregateHandlerGrain<TestDomain.Aggregate>>(id);
-
+        
         var result = await grain.Evaluate(new CommandEnvelope(
             new CommandMetadata
             {

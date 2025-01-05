@@ -137,7 +137,8 @@ public class DomainContext
             {
                 AggregateId = aggregateId,
                 AggregateType = this.GetCommonAggregateType([ command ]),
-                CreatedAt = DateTimeOffset.UtcNow
+                CreatedAt = DateTimeOffset.UtcNow,
+                TransactionId = Guid.NewGuid().ToString()
             },
             command);
     }
@@ -145,14 +146,15 @@ public class DomainContext
     public virtual Task<IResult<EventEnvelope[]>> Evaluate(
         string aggregateId,
         params ICommand[] commands)
-    {
+    {   
         return _evaluationAgent.Evaluate(
             new CommandEnvelope(
                 new CommandMetadata
                 {
                     AggregateId = aggregateId,
                     AggregateType = this.GetCommonAggregateType(commands),
-                    CreatedAt = DateTimeOffset.UtcNow
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    TransactionId = Guid.NewGuid().ToString()
                 },
                 commands));
     }
