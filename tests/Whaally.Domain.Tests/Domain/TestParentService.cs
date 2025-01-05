@@ -12,10 +12,10 @@ public class TestParentService : IService
 
 public class TestParentServiceHandler : IServiceHandler<TestParentService>
 {
-    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, TestParentService service)
+    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, TestParentService service)
     {
-        await context.EvaluateService(new TestService { Id = service.Id1 });
-        await context.EvaluateService(new TestService { Id = service.Id2 });
+        await context.InvokeService(new TestService { Id = service.Id1 });
+        await context.InvokeService(new TestService { Id = service.Id2 });
 
         yield break;
     }

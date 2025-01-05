@@ -66,7 +66,7 @@ public class SagaContext : ISagaContext
         _envelopes.Add(aggregateId, envelope);
     }
     
-    public virtual async Task<IResultBase> EvaluateService(IService service)
+    public virtual async Task<IResultBase> InvokeService(IService service)
     {
         var result = await _evaluationAgent.Evaluate(
             new ServiceEnvelope(

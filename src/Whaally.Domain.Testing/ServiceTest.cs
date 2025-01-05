@@ -27,7 +27,7 @@ public abstract class ServiceTest<TService> : DomainTest
         };
         
         // TODO: Reconsider this approach and refactor into an IAsyncLifetime structure
-        var output = new Result().WithReasons(Handler.Handle(Context, Service).ToBlockingEnumerable());
+        var output = new Result().WithReasons(Handler.Invoke(Context, Service).ToBlockingEnumerable());
         
         if (output.GetType().GenericTypeArguments.Any())
             Result = new Result().WithReasons(output.Reasons);

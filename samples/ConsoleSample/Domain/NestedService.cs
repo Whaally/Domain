@@ -8,7 +8,7 @@ namespace ConsoleSample.Domain;
 public record NestedService : IService;
 
 public class NestedServiceHandler : IServiceHandler<NestedService> {
-    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, NestedService service)
+    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, NestedService service)
     {
         yield break;
     }

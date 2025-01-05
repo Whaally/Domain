@@ -35,7 +35,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         
         await foreach (var reason in _domainContext
                            .GetServiceHandler(serviceEnvelope.Message.GetType())
-                           .Handle(
+                           .Invoke(
                                serviceContext,
                                serviceEnvelope.Message))
         {

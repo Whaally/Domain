@@ -12,7 +12,7 @@ public class AddItemService : IService
 
 public class AddItemServiceHandler : IServiceHandler<AddItemService>
 {
-    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, AddItemService service)
+    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, AddItemService service)
     {
         var todoItem = Guid.NewGuid();
         
@@ -20,7 +20,7 @@ public class AddItemServiceHandler : IServiceHandler<AddItemService>
             todoItem.ToString(), 
             new CreateTodoItem("do a thing"));
 
-        await context.EvaluateService(new NestedService());
+        await context.InvokeService(new NestedService());
         
         context.StageCommands(
             Guid.NewGuid().ToString(),

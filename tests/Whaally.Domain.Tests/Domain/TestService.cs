@@ -11,7 +11,7 @@ internal class TestService : IService
 
 internal class TestServiceHandler : IServiceHandler<TestService>
 {
-    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, TestService service)
+    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, TestService service)
     {
         context.StageCommands(
             service.Id,

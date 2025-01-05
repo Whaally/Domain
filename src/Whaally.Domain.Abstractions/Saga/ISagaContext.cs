@@ -22,7 +22,7 @@ public interface ISagaContext : IContext
     /// </summary>
     /// <param name="service">The service to evaluate as part of the saga evaluation</param>
     /// <returns>A Result object indicating success or error states.</returns>
-    public Task<IResultBase> EvaluateService(IService service);
+    public Task<IResultBase> InvokeService(IService service);
 
     /// <summary>
     ///     The AggregateHandlerFactory provides access to AggregateHandler instances.

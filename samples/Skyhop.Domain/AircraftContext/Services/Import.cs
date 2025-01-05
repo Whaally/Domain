@@ -8,7 +8,7 @@ public record Import() : IService;
 public class ImportHandler : IServiceHandler<Import>
 {
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    public async IAsyncEnumerable<IReason> Handle(IServiceHandlerContext context, Import service)
+    public async IAsyncEnumerable<IReason> Invoke(IServiceHandlerContext context, Import service)
     {
         // Import things from some external service
         // We might use this construct to send progress updates on long running tasks

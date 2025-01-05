@@ -49,7 +49,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// </summary>
     /// <param name="service">The service to evaluate</param>
     /// <returns>An <c>IResultBase</c> signalling evaluation state</returns>
-    public virtual async Task<IResultBase> EvaluateService<TService>(TService service)
+    public virtual async Task<IResultBase> InvokeService<TService>(TService service)
         where TService : class, IService
     {
         var result = await _evaluationAgent.Evaluate(

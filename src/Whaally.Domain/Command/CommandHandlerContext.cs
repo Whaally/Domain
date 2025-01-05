@@ -37,13 +37,10 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
 
     public string AggregateId { get; init; }
     public string? TransactionId { get; init; }
+    public Result Result { get; init; } = new();
     public ActivityContext? ParentContext { get; init; }
-    
-    public IReadOnlyDictionary<string, object> Attributes { get; init; } 
-        = new Dictionary<string, object>();
-    
-    public IReadOnlyCollection<IEvent> Events 
-        => _events.AsReadOnly();
+    public IReadOnlyDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
+    public IReadOnlyCollection<IEvent> Events => _events.AsReadOnly();
     
     public TAggregate Aggregate
     {
@@ -75,7 +72,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         _events.Add(@event);
     }
     
-    public virtual IResultBase EvaluateCommand<TCommand>(TCommand command)
+    public virtual void EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
         _activity?.AddEvent(new ActivityEvent($"Evaluate {typeof(TCommand).Name}"));
@@ -96,12 +93,12 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                 },
                 _activity);
         
-        var result = new Result().WithReasons(
+        Result.WithReasons(
             _domainContext
                 .GetCommandHandler(command.GetType())
                 .Evaluate(context, command));
         
-        if (!result.IsSuccess) return result;
+        if (!Result.IsSuccess) return;
         
         foreach (var @event in context.Events)
         {
@@ -123,7 +120,5 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             
             _events.Add(@event);
         }
-        
-        return result;
     }
 }

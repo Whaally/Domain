@@ -51,6 +51,6 @@ public interface ICommandHandlerContext<TAggregate>
     public void StageEvent<TEvent>(TEvent @event)
         where TEvent : class, IEvent;
 
-    public IResultBase EvaluateCommand<TCommand>(TCommand command)
+    public void EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand;
 }

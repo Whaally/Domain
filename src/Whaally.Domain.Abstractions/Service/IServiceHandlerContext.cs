@@ -20,7 +20,7 @@ public interface IServiceHandlerContext : IContext, IDisposable
     /// </summary>
     /// <param name="service">The service to be evaluated as part of service evaluation</param>
     /// <returns>A Result object indicating success or error states.</returns>
-    public Task<IResultBase> EvaluateService<TService>(TService service)
+    public Task<IResultBase> InvokeService<TService>(TService service)
         where TService : class, IService;
 
     /// <summary>

@@ -9,7 +9,7 @@ public class TodoItemAddedSaga : ISaga<TodoItemCreated>
 {
     public async IAsyncEnumerable<IReason> Evaluate(ISagaContext context, TodoItemCreated @event)
     {
-        await context.EvaluateService(new NestedService());
+        await context.InvokeService(new NestedService());
 
         yield break;
     }

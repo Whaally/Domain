@@ -19,7 +19,7 @@ public class ServiceTests
         };
 
         var result = new TestServiceHandler()
-            .Handle(context, service)
+            .Invoke(context, service)
             .ToBlockingEnumerable();
 
         result.Should().BeEmpty();
@@ -37,7 +37,7 @@ public class ServiceTests
         };
 
         var result = new TestParentServiceHandler()
-            .Handle(context, service)
+            .Invoke(context, service)
             .ToBlockingEnumerable();
 
         result.Should().BeEmpty();
