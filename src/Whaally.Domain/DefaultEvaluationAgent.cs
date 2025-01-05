@@ -153,10 +153,17 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             });
         
         eventEnvelope.Metadata.ParentContext = activity?.Context;
+
+        var result = new Result();
+
+        await foreach (var reason in saga.Evaluate(
+                           _contextFactory.CreateSagaContext(eventEnvelope.Metadata),
+                           eventEnvelope.Messages.Single()))
+        {
+            result.WithReason(reason);
+        }
         
-        return await saga.Evaluate(
-            _contextFactory.CreateSagaContext(eventEnvelope.Metadata), 
-            eventEnvelope.Messages.Single());
+        return result;
     }
     
     public void Dispose()

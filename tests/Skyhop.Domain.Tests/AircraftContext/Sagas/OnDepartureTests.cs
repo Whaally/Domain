@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
@@ -57,10 +58,10 @@ public class OnDepartureTests : DomainTest
         var @event = new DepartureTimeSet(DateTime.Now);
 
         // Evaluate
-        var result = await saga.Evaluate(context, @event);
+        var result = saga.Evaluate(context, @event).ToBlockingEnumerable();
         
         // Assert
-        Assert.True(result.IsSuccess);
+        result.Should().BeEmpty();
         Assert.Single(context.Commands);
         Assert.IsType<SetFlightInfo>(context.Commands.Single().Messages.Single());
     }

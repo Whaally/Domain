@@ -9,7 +9,7 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 internal class OnArrival : ISaga<ArrivalTimeSet>
 {
-    public async Task<IResultBase> Evaluate(ISagaContext context, ArrivalTimeSet @event)
+    public async IAsyncEnumerable<IReason> Evaluate(ISagaContext context, ArrivalTimeSet @event)
     {
         var snapshot = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)
@@ -24,6 +24,6 @@ internal class OnArrival : ISaga<ArrivalTimeSet>
                     snapshot.DepartureTime,
                     @event.ArrivalTime));
 
-        return Result.Ok();
+        yield break;
     }
 }

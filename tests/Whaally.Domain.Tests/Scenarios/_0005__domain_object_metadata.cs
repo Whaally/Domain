@@ -37,7 +37,7 @@ public class _0005__domain_object_metadata
     
     class TestSaga : ISaga<TestEvent>
     {
-        public Task<IResultBase> Evaluate(ISagaContext context, TestEvent @event) => throw new NotImplementedException();
+        public IAsyncEnumerable<IReason> Evaluate(ISagaContext context, TestEvent @event) => throw new NotImplementedException();
     }
     
     class TestServiceHandler : IServiceHandler<TestService>
