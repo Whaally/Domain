@@ -93,7 +93,7 @@ public class SagaContext : ISagaContext
 
         WithResult(result);
         
-        if (!result.IsSuccess) return;
+        if (result.IsFailed) return;
         
         foreach (var envelope in result.Value)
             StageCommands(

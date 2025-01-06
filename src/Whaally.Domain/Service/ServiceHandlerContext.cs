@@ -52,9 +52,6 @@ public class ServiceHandlerContext : IServiceHandlerContext
     public virtual async Task InvokeService<TService>(TService service)
         where TService : class, IService
     {
-        // Early return. Nothing matters anymore.
-        if (Result.IsFailed) return;
-        
         var result = await _evaluationAgent.Evaluate(
             new ServiceEnvelope(
                 new ServiceMetadata
@@ -68,7 +65,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
         WithResult(result);
         
-        if (!result.IsSuccess) return;
+        if (result.IsFailed) return;
         
         foreach (var envelope in result.Value)
         {

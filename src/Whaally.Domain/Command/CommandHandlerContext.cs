@@ -48,7 +48,6 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             _events.Clear();
         
         _activity?.AddEvent(new ActivityEvent($"Evaluation failed"));
-
     }
 
     public ActivityContext? ParentContext { get; init; }
@@ -91,9 +90,6 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public virtual void EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
-        // Early return
-        if (Result.IsFailed) return;
-        
         _activity?.AddEvent(new ActivityEvent($"Evaluate {typeof(TCommand).Name}"));
         
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
@@ -119,8 +115,6 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         // ToDo: we have the input (command), and the output (context.result). Can we map the results in such way that it is clear what had happened?
         WithResult(context.Result);
         
-        if (!Result.IsSuccess) return;
-        
         foreach (var @event in context.Events)
         {
             _aggregate = _domainContext
@@ -139,7 +133,11 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
                         }),
                     @event);
             
-            _events.Add(@event);
+            // Only add events in case evaluation is successful
+            // Otherwise merely continue evaluation to collect the failures
+            // Doing so could be potentially dangerous as information exposure
+            if (Result.IsSuccess)
+                _events.Add(@event);
         }
     }
 }
