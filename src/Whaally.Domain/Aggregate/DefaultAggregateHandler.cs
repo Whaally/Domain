@@ -126,8 +126,8 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 events.Add(@event);
             }
         }
-        
-        var result = Result.Ok().WithReasons(results.SelectMany(result => result.Reasons));
+
+        var result = new Result().WithReasons(results.SelectMany(q => q.Reasons));
         
         return Task.FromResult<IResult<EventEnvelope>>(
             result.IsSuccess

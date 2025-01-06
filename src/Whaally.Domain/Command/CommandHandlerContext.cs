@@ -42,6 +42,13 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public void WithResult(IResultBase result)
     {
         Result.Reasons.AddRange(result.Reasons);
+
+        // Ensure no events are returned in case of an error
+        if (Result.IsFailed)
+            _events.Clear();
+        
+        _activity?.AddEvent(new ActivityEvent($"Evaluation failed"));
+
     }
 
     public ActivityContext? ParentContext { get; init; }
@@ -57,6 +64,9 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public virtual void StageEvent<TEvent>(TEvent @event)
         where TEvent : class, IEvent
     {
+        // Early return.
+        if (Result.IsFailed) return;
+        
         _activity?.AddEvent(new ActivityEvent($"Stage {typeof(TEvent).Name}"));
         
         _aggregate = _domainContext
@@ -81,6 +91,9 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public virtual void EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {
+        // Early return
+        if (Result.IsFailed) return;
+        
         _activity?.AddEvent(new ActivityEvent($"Evaluate {typeof(TCommand).Name}"));
         
         // Note that we're explicitly isolating the invocation of this command such that there is no mixup between
@@ -104,7 +117,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             .Evaluate(context, command);
         
         // ToDo: we have the input (command), and the output (context.result). Can we map the results in such way that it is clear what had happened?
-        Result.Reasons.AddRange(context.Result.Reasons);
+        WithResult(context.Result);
         
         if (!Result.IsSuccess) return;
         

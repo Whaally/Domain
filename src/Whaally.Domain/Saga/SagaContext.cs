@@ -42,10 +42,18 @@ public class SagaContext : ISagaContext
     public void WithResult(IResultBase result)
     {
         Result.Reasons.AddRange(result.Reasons);
+
+        // Ensure no side effects are collected in case of failure
+        if (Result.IsFailed)
+            _envelopes.Clear();
+        
+        // _activity?.AddEvent(new ActivityEvent($"Evaluation failed"));
     }
 
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
+        if (Result.IsFailed) return;
+        
         var aggregateType = _domainContext.GetCommonAggregateType(commands);
         
         if (!_envelopes.TryGetValue(aggregateId, out var envelope))
@@ -83,7 +91,7 @@ public class SagaContext : ISagaContext
                     TransactionId = TransactionId
                 }, service));
 
-        Result.Reasons.AddRange(result.Reasons);
+        WithResult(result);
         
         if (!result.IsSuccess) return;
         

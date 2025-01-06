@@ -52,6 +52,9 @@ public class ServiceHandlerContext : IServiceHandlerContext
     public virtual async Task InvokeService<TService>(TService service)
         where TService : class, IService
     {
+        // Early return. Nothing matters anymore.
+        if (Result.IsFailed) return;
+        
         var result = await _evaluationAgent.Evaluate(
             new ServiceEnvelope(
                 new ServiceMetadata
@@ -63,7 +66,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
                     TransactionId = TransactionId
                 }, service));
 
-        Result.Reasons.AddRange(result.Reasons);
+        WithResult(result);
         
         if (!result.IsSuccess) return;
         
@@ -77,7 +80,13 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     public void WithResult(IResultBase result)
     {
-        result.Reasons.AddRange(result.Reasons);
+        Result.Reasons.AddRange(result.Reasons);
+
+        // Ensure no side effects are collected in case of failure
+        if (Result.IsFailed)
+            _envelopes.Clear();
+        
+        _activity?.AddEvent(new ActivityEvent($"Evaluation failed"));
     }
 
     /// <summary>
@@ -86,6 +95,9 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// <param name="command">The command to add to the current commands basket</param>
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
+        // Performance optimization? 
+        if (Result.IsFailed) return;
+        
         foreach (var command in commands) _activity?.AddEvent(new ActivityEvent($"Stage {command.GetType().Name}"));
         
         var aggregateType = _domainContext.GetCommonAggregateType(commands);
