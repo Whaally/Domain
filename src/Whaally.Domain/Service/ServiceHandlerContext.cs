@@ -34,7 +34,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
-    public Result Result { get; init; } = new();
+    public IResultBase Result { get; init; } = new Result();
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
     
@@ -63,7 +63,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
                     TransactionId = TransactionId
                 }, service));
 
-        Result.WithReasons(result.Reasons);
+        Result.Reasons.AddRange(result.Reasons);
         
         if (!result.IsSuccess) return;
         
@@ -73,6 +73,11 @@ public class ServiceHandlerContext : IServiceHandlerContext
                 envelope.Metadata.AggregateId, 
                 envelope.Messages.ToArray());
         }
+    }
+
+    public void WithResult(IResultBase result)
+    {
+        result.Reasons.AddRange(result.Reasons);
     }
 
     /// <summary>

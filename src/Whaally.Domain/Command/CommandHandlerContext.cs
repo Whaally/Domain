@@ -37,7 +37,13 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
 
     public string AggregateId { get; init; }
     public string? TransactionId { get; init; }
-    public Result Result { get; init; } = new();
+    public IResultBase Result { get; init; } = new Result();
+    
+    public void WithResult(IResultBase result)
+    {
+        Result.Reasons.AddRange(result.Reasons);
+    }
+
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
     public IReadOnlyCollection<IEvent> Events => _events.AsReadOnly();
@@ -98,7 +104,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             .Evaluate(context, command);
         
         // ToDo: we have the input (command), and the output (context.result). Can we map the results in such way that it is clear what had happened?
-        Result.WithReasons(context.Result.Reasons);
+        Result.Reasons.AddRange(context.Result.Reasons);
         
         if (!Result.IsSuccess) return;
         

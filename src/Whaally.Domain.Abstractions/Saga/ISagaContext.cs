@@ -12,7 +12,13 @@ public interface ISagaContext : IContext
     /// <summary>
     ///     Contains the failure or success reasons for this evaluation.
     /// </summary>
-    public Result Result { get; }
+    public IResultBase Result { get; }
+
+    /// <summary>
+    ///     Set the result for the evaluation of this saga.
+    /// </summary>
+    /// <param name="result"></param>
+    public void WithResult(IResultBase result);
     
     /// <summary>
     ///     Stages a command as the optimistic result of this saga.

@@ -12,7 +12,7 @@ public abstract class CommandTest<TAggregate, TCommand> : DomainTest
     public TCommand Command { get; }
     
     public CommandHandlerContext<TAggregate> Context { get; }
-    public Result Result { get; private init; }
+    public IResultBase Result { get; private init; }
     public IEnumerable<IEvent> Events { get; private init; }
     
     public CommandTest(

@@ -16,7 +16,13 @@ public interface ICommandHandlerContext : IContext, IProvideAggregateInstance
     ///
     ///     Determines the success or failure of the evaluation of this command
     /// </summary>
-    public Result Result { get; }
+    public IResultBase Result { get; }
+ 
+    /// <summary>
+    ///     Set the result for the evaluation of this command
+    /// </summary>
+    /// <param name="result"></param>
+    public void WithResult(IResultBase result);
     
     /// <summary>
     ///     Stages an event as the optimistic result of this command.
@@ -30,6 +36,10 @@ public interface ICommandHandlerContext : IContext, IProvideAggregateInstance
     /// <param name="command"></param>
     public void EvaluateCommand(ICommand command);
 
+    /// <summary>
+    ///     Immediately invokes the provided commands in the context of the current commands' execution
+    /// </summary>
+    /// <param name="commands"></param>
     public void EvaluateCommands(params ICommand[] commands)
         => commands.ToList().ForEach(EvaluateCommand);
 }

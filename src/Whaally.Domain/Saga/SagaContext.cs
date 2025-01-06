@@ -27,7 +27,7 @@ public class SagaContext : ISagaContext
     }
     
     public string? AggregateId { get; init; }
-    public Result Result { get; init; } = new();
+    public IResultBase Result { get; init; } = new Result();
     public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
@@ -38,6 +38,11 @@ public class SagaContext : ISagaContext
     
     public IAggregateHandlerFactory Factory 
         => _services.GetRequiredService<IAggregateHandlerFactory>();
+
+    public void WithResult(IResultBase result)
+    {
+        Result.Reasons.AddRange(result.Reasons);
+    }
 
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
@@ -78,7 +83,7 @@ public class SagaContext : ISagaContext
                     TransactionId = TransactionId
                 }, service));
 
-        Result.WithReasons(result.Reasons);
+        Result.Reasons.AddRange(result.Reasons);
         
         if (!result.IsSuccess) return;
         

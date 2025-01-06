@@ -13,7 +13,7 @@ public class CreateHandler : ICommandHandler<Flight, Create>
     public void Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {
         if (context.Aggregate.IsInitialized) 
-            context.Result.WithError("Flight had already been created");
+            context.WithResult(Result.Fail("Flight had already been created"));
         
         context.StageEvent(new Created());
     }

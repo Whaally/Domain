@@ -15,14 +15,14 @@ public class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
     public void Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
     {
         if (!context.Aggregate.IsInitialized) 
-            context.Result.WithError("Flight does not exist");
+            context.WithResult(Result.Fail("Flight does not exist"));
         
         if (string.IsNullOrWhiteSpace(command.AirfieldId))
-            context.Result.WithError("Airfield was not provided");
+            context.WithResult(Result.Fail("Airfield was not provided"));
 
         if (command.Time == DateTime.MinValue
             || command.Time == DateTime.MaxValue)
-            context.Result.WithError("Departure time was not provided");
+            context.WithResult(Result.Fail("Departure time was not provided"));
 
         context.StageEvent(
             new DepartureTimeSet(command.Time));

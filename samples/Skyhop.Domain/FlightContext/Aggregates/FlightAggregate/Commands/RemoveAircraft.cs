@@ -14,13 +14,13 @@ public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
     {
         if (!context.Aggregate.IsInitialized)
         {
-            context.Result.WithError("Flight does not exist");
+            context.WithResult(Result.Fail("Flight does not exist"));
             return;
         }
 
         if (string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
         {
-            context.Result.WithError("There is no aircraft to remove");
+            context.WithResult(Result.Fail("There is no aircraft to remove"));
             return;
         }   
         

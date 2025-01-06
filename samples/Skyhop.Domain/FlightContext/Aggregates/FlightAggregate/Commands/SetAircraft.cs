@@ -13,10 +13,10 @@ public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
     public void Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
         if (!context.Aggregate.IsInitialized) 
-            context.Result.WithError("Flight does not exist");
+            context.WithResult(Result.Fail("Flight does not exist"));
         
         if (string.IsNullOrWhiteSpace(command.AircraftId))
-            context.Result.WithError("Aircraft was not provided");
+            context.WithResult(Result.Fail("Aircraft was not provided"));
 
         
         if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))

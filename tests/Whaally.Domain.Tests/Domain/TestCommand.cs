@@ -20,6 +20,6 @@ internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
             context.StageEvent(@event.GetType(), @event);
         }
 
-        context.Result.WithReasons(command.Result.Reasons);
+        context.WithResult(command.Result);
     }
 }

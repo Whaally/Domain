@@ -10,7 +10,7 @@ public abstract class ServiceTest<TService> : DomainTest
     public TService Service { get; }
     
     public ServiceHandlerContext Context { get; }
-    public Result Result { get; private init; }
+    public IResultBase Result { get; private init; }
     public IEnumerable<ICommand> Commands { get; private init; }
     
     public ServiceTest(
