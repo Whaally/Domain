@@ -27,8 +27,14 @@ public abstract class ServiceTest<TService> : DomainTest
         };
 
         // TODO: Reconsider this approach and refactor into an IAsyncLifetime structure
-        Handler.Invoke(Context, Service).RunSynchronously();
+        var task = Handler.Invoke(Context, Service);
 
+        if (task is {
+            IsCompleted: false, 
+            IsCanceled: false, 
+            IsFaulted: false
+        }) task.RunSynchronously();
+        
         Result = Context.Result;
         Commands = Context.Commands.SelectMany(q => q.Messages);
     }
