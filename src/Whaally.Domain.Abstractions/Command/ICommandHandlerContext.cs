@@ -29,6 +29,9 @@ public interface ICommandHandlerContext : IContext, IProvideAggregateInstance
     /// </summary>
     /// <param name="command"></param>
     public void EvaluateCommand(ICommand command);
+
+    public void EvaluateCommands(params ICommand[] commands)
+        => commands.ToList().ForEach(EvaluateCommand);
 }
 
 public interface ICommandHandlerContext<TAggregate>
