@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace Skyhop.Hosting;
 

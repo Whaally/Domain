@@ -4,6 +4,7 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace Skyhop.Hosting.Controllers;
 
