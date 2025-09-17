@@ -212,7 +212,6 @@ public class DomainContext
                 metadata ?? new ServiceMetadata
                 {
                     CreatedAt = DateTimeOffset.UtcNow,
-                    ServiceType = service.GetType(),
                     ParentContext = activity?.Context,
                     TransactionId = Guid.NewGuid().ToString()
                 }, service));

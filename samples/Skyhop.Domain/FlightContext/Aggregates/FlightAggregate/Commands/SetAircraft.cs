@@ -10,7 +10,7 @@ public record SetAircraft(string AircraftId) : ICommand;
 
 public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
-    public void Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
         if (!context.Aggregate.IsInitialized) 
             context.WithResult(Result.Fail("Flight does not exist"));

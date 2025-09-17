@@ -8,8 +8,7 @@ public record AddItem(Guid id) : ICommand;
 
 public class AddItemHandler : ICommandHandler<TodoListAggregate, AddItem>
 {
-    public void Evaluate(
-        ICommandHandlerContext<TodoListAggregate> context, 
+    public ICommandResult Evaluate(ICommandHandlerContext<TodoListAggregate> context,
         AddItem command) =>
         context.StageEvent(new ItemAdded(command.id));
 }

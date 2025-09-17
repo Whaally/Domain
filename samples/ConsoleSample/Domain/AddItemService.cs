@@ -9,7 +9,7 @@ public class AddItemService : IService;
 
 public class AddItemServiceHandler : IServiceHandler<AddItemService>
 {
-    public async Task Invoke(IServiceHandlerContext context, AddItemService service)
+    public async Task<IResult> Invoke(IServiceHandlerContext context, AddItemService service)
     {
         var todoItem = Guid.NewGuid();
         

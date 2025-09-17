@@ -7,7 +7,7 @@ namespace ConsoleSample.Domain;
 
 public class TodoItemAddedSaga : ISaga<TodoItemCreated>
 {
-    public async Task Evaluate(ISagaContext context, TodoItemCreated @event)
+    public async Task<ISagaResult> Evaluate(ISagaContext context, TodoItemCreated @event)
     {
         await context.InvokeService(new NestedService());
     }

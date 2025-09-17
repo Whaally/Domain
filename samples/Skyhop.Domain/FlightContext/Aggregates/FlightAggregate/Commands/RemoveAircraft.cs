@@ -10,7 +10,7 @@ public record RemoveAircraft : ICommand;
 
 public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
 {
-    public void Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
     {
         if (!context.Aggregate.IsInitialized)
         {

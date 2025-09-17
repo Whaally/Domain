@@ -7,6 +7,7 @@ namespace Whaally.Domain;
 
 public class DefaultEvaluationAgent : IEvaluationAgent
 {
+    [Obsolete]
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;
@@ -30,19 +31,30 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     {
         // TODO: Can we support evaluation of multiple services? What does this mean for the transactional boundaries?
         using var serviceContext = _contextFactory.CreateServiceHandlerContext(serviceEnvelope.Metadata);
-
-        var result = new Result<CommandEnvelope[]>();
-
-        await _domainContext
+        
+        var output = await _domainContext
             .GetServiceHandler(serviceEnvelope.Message.GetType())
             .Invoke(
                 serviceContext,
                 serviceEnvelope.Message);
 
-        result.WithReasons(serviceContext.Result.Reasons);
-        result.WithValue(serviceContext.Commands.ToArray());
+        // Go through this services' output and evaluate all returned services to the commands they intend to invoke.
+        var intermediate = 
+            (await Task.WhenAll(
+                output.Operations
+                    .Select(async q => q switch
+                    {
+                        ServiceEnvelope s => await Evaluate(s),
+                        CommandEnvelope c => new FluentResults.Result<CommandEnvelope[]>().WithValue([ c ]),
+                        _ => throw new InvalidOperationException()
+                    })))
+            .Select(q => q)
+            .ToList();
 
-        return result;
+        // Todo: merge various CommandEnvelopes based on target type and id
+        return new FluentResults.Result<CommandEnvelope[]>()
+            .WithReasons(intermediate.SelectMany(q => q.Reasons))
+            .WithValue(intermediate.SelectMany(q => q.Value).ToArray());
     }
     
     /// <summary>
@@ -53,6 +65,8 @@ public class DefaultEvaluationAgent : IEvaluationAgent
     /// <exception cref="Exception"></exception>
     public async Task<IResult<EventEnvelope[]>> Evaluate(params CommandEnvelope[] commandEnvelopes)
     {
+        // Todo: merge command envelopes for objects with the same id / type
+        
         List<IResult<EventEnvelope>> results = [];
         
         await Parallel.ForEachAsync(commandEnvelopes, async (envelope, ct) =>
@@ -69,7 +83,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             results.Add(await handler.Evaluate(envelope));
         });
         
-        return new Result<EventEnvelope[]>()
+        return new FluentResults.Result<EventEnvelope[]>()
             .WithValue(results
                 .Select(q => q.Value)
                 .ToArray())
@@ -155,11 +169,26 @@ public class DefaultEvaluationAgent : IEvaluationAgent
         var result = new Result();
 
         var context = _contextFactory.CreateSagaContext(eventEnvelope.Metadata);
-        await saga.Evaluate(
+        var output = await saga.Evaluate(
             context,
             eventEnvelope.Messages.Single());
+        
+        
+        // todo: ensure services are in fact fully evaluated
+        // todo: allow to manage the whole lifecycle from this class. I.e. including service invocation
+        var intermediate = 
+            (await Task.WhenAll(
+                output.Operations
+                    .Select(async q => q switch
+                    {
+                        ServiceEnvelope s => await Evaluate(s),
+                        CommandEnvelope c => new FluentResults.Result<CommandEnvelope[]>().WithValue([ c ]),
+                        _ => throw new InvalidOperationException()
+                    })))
+            .Select(q => q)
+            .ToList();
 
-        result.WithReasons(context.Result.Reasons);
+        result.WithReasons(intermediate.SelectMany(q => q.Reasons));
         
         return result;
     }

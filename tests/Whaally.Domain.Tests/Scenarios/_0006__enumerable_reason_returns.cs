@@ -11,7 +11,7 @@ public class _0006__enumerable_reason_returns
     class TestCommand : ICommand;
     class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
     {
-        public void Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+        public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
         {
             context.WithResult(Result.Fail("Failure"));
         }

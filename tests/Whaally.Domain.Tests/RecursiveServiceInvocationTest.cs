@@ -21,7 +21,7 @@ public class RecursiveServiceInvocationTest
 
     public class RecursiveServiceHandler : IServiceHandler<RecursiveService>
     {
-        public async Task Invoke(IServiceHandlerContext context, RecursiveService service)
+        public async Task<IResult> Invoke(IServiceHandlerContext context, RecursiveService service)
         {
             if (service.Depth == 0)
             {

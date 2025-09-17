@@ -9,6 +9,8 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     where TAggregate : class, IAggregate
 {
     private TAggregate _aggregate = null!;
+    
+    [Obsolete]
     private List<IEvent> _events = [];
     
     private readonly IServiceProvider _services;
@@ -39,6 +41,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     public string? TransactionId { get; init; }
     public IResultBase Result { get; init; } = new Result();
     
+    [Obsolete]
     public void WithResult(IResultBase result)
     {
         Result.Reasons.AddRange(result.Reasons);
@@ -52,6 +55,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
 
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } = new Dictionary<string, object>();
+    [Obsolete]
     public IReadOnlyCollection<IEvent> Events => _events.AsReadOnly();
     
     public TAggregate Aggregate
@@ -60,6 +64,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         init => _aggregate = value;
     }
     
+    [Obsolete]
     public virtual void StageEvent<TEvent>(TEvent @event)
         where TEvent : class, IEvent
     {
@@ -87,6 +92,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
         _events.Add(@event);
     }
     
+    [Obsolete]
     public virtual void EvaluateCommand<TCommand>(TCommand command)
         where TCommand : class, ICommand
     {

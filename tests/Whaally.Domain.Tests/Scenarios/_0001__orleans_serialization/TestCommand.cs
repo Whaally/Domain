@@ -8,7 +8,7 @@ public record TestCommand() : ICommand;
 
 public class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
-    public void Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+    public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
         context.StageEvent(new TestEvent(true));
     }

@@ -4,6 +4,27 @@ namespace Whaally.Domain.Abstractions;
 
 public record CommandMetadata : IMessageMetadata
 {
+    public CommandMetadata() { }
+
+    public CommandMetadata(IMessageMetadata metadata)
+    {
+        Attributes = metadata.Attributes;
+        ParentContext = metadata.ParentContext;
+        CreatedAt = metadata.CreatedAt;
+        TransactionId = metadata.TransactionId;
+    }
+
+    public CommandMetadata(CommandMetadata metadata)
+    {
+        Attributes = metadata.Attributes;
+        ParentContext = metadata.ParentContext;
+        CreatedAt = metadata.CreatedAt;
+        TransactionId = metadata.TransactionId;
+
+        AggregateId = metadata.AggregateId;
+        AggregateType = metadata.AggregateType;
+    }
+    
     public IDictionary<string, object> Attributes { get; set; } 
         = new Dictionary<string, object>();
     

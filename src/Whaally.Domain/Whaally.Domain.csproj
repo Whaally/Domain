@@ -26,6 +26,10 @@
     <ProjectReference Include="..\Whaally.Domain.Abstractions\Whaally.Domain.Abstractions.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Compile Remove="Effect.cs" />
+  </ItemGroup>
+  
   <PropertyGroup>
     <PackageId>Whaally.Domain</PackageId>
     <Description>Decouple domain model from infrastructure allowing independent evolution of

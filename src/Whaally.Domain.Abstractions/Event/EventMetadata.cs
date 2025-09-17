@@ -4,6 +4,18 @@ namespace Whaally.Domain.Abstractions;
 
 public record EventMetadata : IMessageMetadata
 {
+    public EventMetadata() { }
+
+    public EventMetadata(CommandMetadata command)
+    {
+        AggregateId = command.AggregateId;
+        AggregateType = command.AggregateType;
+        Attributes = command.Attributes;
+        ParentContext = command.ParentContext;
+        CreatedAt = command.CreatedAt;
+        TransactionId = command.TransactionId;
+    }
+    
     public string AggregateId { get; set; } = "";
 
     public Type? AggregateType { get; set; }

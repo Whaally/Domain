@@ -10,7 +10,7 @@ public record RemoveFlight(string FlightId) : ICommand;
 
 public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {
-    public void Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {
         context.StageEvent(new FlightRemoved(
             command.FlightId));

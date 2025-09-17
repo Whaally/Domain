@@ -17,12 +17,12 @@ public class _0005__domain_object_metadata
     
     class TestCommandHandler : ICommandHandler
     {
-        public void Evaluate(ICommandHandlerContext context, ICommand command) => throw new NotImplementedException();
+        public ICommandResult Evaluate(ICommandHandlerContext context, ICommand command) => throw new NotImplementedException();
     }
 
     class TestCommandHandlerWithGenerics : ICommandHandler<TestAggregate, TestCommand>
     {
-        public void Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command) => throw new NotImplementedException();
+        public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command) => throw new NotImplementedException();
     }
 
     class TestEventHandler : IEventHandler
@@ -37,12 +37,12 @@ public class _0005__domain_object_metadata
     
     class TestSaga : ISaga<TestEvent>
     {
-        public Task Evaluate(ISagaContext context, TestEvent @event) => throw new NotImplementedException();
+        public Task<ISagaResult> Evaluate(ISagaContext context, TestEvent @event) => throw new NotImplementedException();
     }
     
     class TestServiceHandler : IServiceHandler<TestService>
     {
-        public Task Invoke(IServiceHandlerContext context, TestService service) => throw new NotImplementedException();
+        public Task<IResult> Invoke(IServiceHandlerContext context, TestService service) => throw new NotImplementedException();
     }
     
     class TestSnapshotFactory : ISnapshotFactory<TestAggregate, TestSnapshot>

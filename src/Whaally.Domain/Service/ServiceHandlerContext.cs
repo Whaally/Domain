@@ -7,9 +7,14 @@ namespace Whaally.Domain;
 
 public class ServiceHandlerContext : IServiceHandlerContext
 {
+    [Obsolete]
     private Dictionary<string, CommandEnvelope> _envelopes = new();
+    
     private readonly IServiceProvider _services;
+    
+    [Obsolete]
     private readonly IEvaluationAgent _evaluationAgent;
+    
     private readonly DomainContext _domainContext;
 
     private readonly Activity? _activity;
@@ -34,10 +39,13 @@ public class ServiceHandlerContext : IServiceHandlerContext
 
     public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
+    
+    [Obsolete]
     public IResultBase Result { get; init; } = new Result();
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
     
+    [Obsolete]
     public IReadOnlyCollection<CommandEnvelope> Commands 
         => _envelopes.Values.ToList().AsReadOnly();
 
@@ -49,6 +57,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// </summary>
     /// <param name="service">The service to evaluate</param>
     /// <returns>An <c>IResultBase</c> signalling evaluation state</returns>
+    [Obsolete]
     public virtual async Task InvokeService<TService>(TService service)
         where TService : class, IService
     {
@@ -75,6 +84,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
         }
     }
 
+    [Obsolete]
     public void WithResult(IResultBase result)
     {
         Result.Reasons.AddRange(result.Reasons);
@@ -90,6 +100,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
     /// Adds a command to the commands basket for future evaluation.
     /// </summary>
     /// <param name="command">The command to add to the current commands basket</param>
+    [Obsolete]
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
         // Performance optimization? 

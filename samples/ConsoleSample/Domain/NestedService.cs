@@ -8,7 +8,7 @@ namespace ConsoleSample.Domain;
 public record NestedService : IService;
 
 public class NestedServiceHandler : IServiceHandler<NestedService> {
-    public async Task Invoke(IServiceHandlerContext context, NestedService service)
+    public async Task<IResult> Invoke(IServiceHandlerContext context, NestedService service)
     {
     }
 }

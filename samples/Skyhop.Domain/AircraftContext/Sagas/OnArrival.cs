@@ -9,7 +9,7 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 internal class OnArrival : ISaga<ArrivalTimeSet>
 {
-    public async Task Evaluate(ISagaContext context, ArrivalTimeSet @event)
+    public async Task<ISagaResult> Evaluate(ISagaContext context, ArrivalTimeSet @event)
     {
         var snapshot = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)

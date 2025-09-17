@@ -13,7 +13,7 @@ internal record TestCommand : ICommand
 
 internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
-    public void Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+    public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
         foreach (var @event in command.Events)
         {

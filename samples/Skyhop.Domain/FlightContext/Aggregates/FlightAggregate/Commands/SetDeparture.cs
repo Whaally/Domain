@@ -12,7 +12,7 @@ public record SetDeparture(
 
 public class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
 {
-    public void Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
     {
         if (!context.Aggregate.IsInitialized) 
             context.WithResult(Result.Fail("Flight does not exist"));

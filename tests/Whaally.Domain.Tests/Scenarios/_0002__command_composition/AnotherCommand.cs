@@ -7,7 +7,7 @@ public record AnotherCommand() : ICommand;
 
 public class AnotherCommandHandler : ICommandHandler<Aggregate, AnotherCommand>
 {
-    public void Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
     {
         context.StageEvent(new TestEvent());
     }

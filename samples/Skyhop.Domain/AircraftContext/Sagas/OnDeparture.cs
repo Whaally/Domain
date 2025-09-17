@@ -9,7 +9,7 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 public class OnDeparture : ISaga<DepartureTimeSet>
 {
-    public async Task Evaluate(ISagaContext context, DepartureTimeSet @event)
+    public async Task<ISagaResult> Evaluate(ISagaContext context, DepartureTimeSet @event)
     {
         var snapshot = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)

@@ -11,6 +11,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;
+    
     private readonly IEvaluationAgent _evaluationAgent;
 
     private Activity? _activity = null;

@@ -10,7 +10,7 @@ public record Create() : ICommand;
 
 public class CreateHandler : ICommandHandler<Flight, Create>
 {
-    public void Evaluate(ICommandHandlerContext<Flight> context, Create command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {
         if (context.Aggregate.IsInitialized) 
             context.WithResult(Result.Fail("Flight had already been created"));

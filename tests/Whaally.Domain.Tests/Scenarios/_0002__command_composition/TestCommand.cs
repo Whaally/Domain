@@ -7,7 +7,7 @@ public record TestCommand : ICommand;
 
 public class TestCommandHandler : ICommandHandler<Aggregate, TestCommand>
 {
-    public void Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
+    public ICommandResult Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
     {
         context.EvaluateCommand(new AnotherCommand());
 

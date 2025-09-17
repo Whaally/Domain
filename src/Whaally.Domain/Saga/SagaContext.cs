@@ -9,9 +9,12 @@ namespace Whaally.Domain;
 public class SagaContext : ISagaContext
 {
     private readonly IServiceProvider _services;
+    
+    [Obsolete]
     private readonly IEvaluationAgent _evaluationAgent;
     private readonly DomainContext _domainContext;
     
+    [Obsolete]
     private readonly Dictionary<string, CommandEnvelope> _envelopes = new();
     
     private SagaContext() { throw new Exception($"The private parameterless constructor for type `{nameof(SagaContext)}` should not be used."); }
@@ -27,18 +30,22 @@ public class SagaContext : ISagaContext
     }
     
     public string? AggregateId { get; init; }
+    
+    [Obsolete]
     public IResultBase Result { get; init; } = new Result();
     public string? TransactionId { get; init; }
     public ActivityContext? ParentContext { get; init; }
     public IReadOnlyDictionary<string, object> Attributes { get; init; } 
         = new Dictionary<string, object>();
     
+    [Obsolete]
     public IReadOnlyList<CommandEnvelope> Commands 
         => _envelopes.Values.ToList().AsReadOnly();
     
     public IAggregateHandlerFactory Factory 
         => _services.GetRequiredService<IAggregateHandlerFactory>();
 
+    [Obsolete]
     public void WithResult(IResultBase result)
     {
         Result.Reasons.AddRange(result.Reasons);
@@ -50,6 +57,7 @@ public class SagaContext : ISagaContext
         // _activity?.AddEvent(new ActivityEvent($"Evaluation failed"));
     }
 
+    [Obsolete]
     public virtual void StageCommands(string aggregateId, params ICommand[] commands)
     {
         if (Result.IsFailed) return;
@@ -80,6 +88,7 @@ public class SagaContext : ISagaContext
         _envelopes.Add(aggregateId, envelope);
     }
     
+    [Obsolete]
     public virtual async Task InvokeService(IService service)
     {
         var result = await _evaluationAgent.Evaluate(

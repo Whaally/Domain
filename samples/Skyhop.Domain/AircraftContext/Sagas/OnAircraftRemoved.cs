@@ -11,7 +11,7 @@ namespace Skyhop.Domain.AircraftContext.Sagas;
 
 public class OnAircraftRemoved : ISaga<AircraftRemoved>
 {
-    public async Task Evaluate(ISagaContext context, AircraftRemoved @event)
+    public async Task<ISagaResult> Evaluate(ISagaContext context, AircraftRemoved @event)
     {
         var flight = await context.Factory
             .Instantiate<Flight>(context.AggregateId!)
