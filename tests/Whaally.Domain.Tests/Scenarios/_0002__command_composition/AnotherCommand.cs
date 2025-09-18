@@ -9,6 +9,6 @@ public class AnotherCommandHandler : ICommandHandler<Aggregate, AnotherCommand>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
     {
-        context.StageEvent(new TestEvent());
+        return Command.Ok().Stage(new TestEvent());
     }
 }

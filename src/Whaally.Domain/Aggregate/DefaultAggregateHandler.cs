@@ -92,14 +92,19 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 commandEnvelope.Metadata,
                 _activity);
 
-            _domainContext
+            var output = _domainContext
                 .GetCommandHandler(command.GetType())
                 .Evaluate(commandContext, command);
                 
-            results.Add(commandContext.Result);
+            results.Add(output);
 
-            var intermediateEvents = commandContext.Events.ToList();
+            var intermediateEvents = output.Operations
+                .Select(q => q)
+                .Cast<EventEnvelope>()
+                .SelectMany(q => q.Messages)
+                .ToList();
 
+            // todo: validate the operations did in fact evaluate down to events and no longer contain commands.
             foreach (var intermediateEvent in intermediateEvents)
             {
                 if (cancellationToken?.IsCancellationRequested ?? false)

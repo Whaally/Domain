@@ -12,9 +12,11 @@ public class TestParentService : IService
 
 public class TestParentServiceHandler : IServiceHandler<TestParentService>
 {
-    public async Task<IResult> Invoke(IServiceHandlerContext context, TestParentService service)
+    public async Task<IServiceResult> Invoke(IServiceHandlerContext context, TestParentService service)
     {
-        await context.InvokeService(new TestService { Id = service.Id1 });
-        await context.InvokeService(new TestService { Id = service.Id2 });
+        return Service
+            .Ok()
+            .Invoke(new TestService { Id = service.Id1 })
+            .Invoke(new TestService { Id = service.Id2 });
     }
 }

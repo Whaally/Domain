@@ -15,11 +15,13 @@ internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
+        var result = Command.Ok();
+        
         foreach (var @event in command.Events)
         {
-            context.StageEvent(@event.GetType(), @event);
+            result.Stage(@event);
         }
 
-        context.WithResult(command.Result);
+        return result.WithReasons(command.Result.Reasons);
     }
 }

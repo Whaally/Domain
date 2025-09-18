@@ -21,11 +21,11 @@ public class RecursiveServiceInvocationTest
 
     public class RecursiveServiceHandler : IServiceHandler<RecursiveService>
     {
-        public async Task<IResult> Invoke(IServiceHandlerContext context, RecursiveService service)
+        public Task<IServiceResult> Invoke(IServiceHandlerContext context, RecursiveService service)
         {
             if (service.Depth == 0)
             {
-                return;
+                return Task.FromResult<IServiceResult>(Service.Ok());
             }
 
             var newService = new RecursiveService
@@ -33,7 +33,7 @@ public class RecursiveServiceInvocationTest
                 Depth = service.Depth - 1
             };
                 
-            await context.InvokeService(newService);
+            return Task.FromResult(Service.Ok().Invoke(newService));
         }
     }
 
@@ -50,7 +50,7 @@ public class RecursiveServiceInvocationTest
      */
 
     [Fact]
-    public void RecursiveServiceCanBeEvaluated()
+    public async Task RecursiveServiceCanBeEvaluated()
     {
         var service = new RecursiveService
         {
@@ -61,8 +61,8 @@ public class RecursiveServiceInvocationTest
         var serviceHandlerContext =
             new ServiceHandlerContext(_services, new ServiceMetadata());
 
-        serviceHandler.Invoke(serviceHandlerContext, service);
-
-        serviceHandlerContext.Result.Reasons.Should().BeEmpty();
+        var result = await serviceHandler.Invoke(serviceHandlerContext, service);
+        
+        result.Reasons.Should().BeEmpty();
     }
 }

@@ -18,11 +18,11 @@ public class ServiceTests
             Id = Guid.NewGuid().ToString()
         };
 
-        await new TestServiceHandler()
+        var result = await new TestServiceHandler()
             .Invoke(context, service);
 
-        context.Result.Reasons.Should().BeEmpty();
-        Assert.Equal(service.Id, context.Commands.Single().Metadata.AggregateId);
+        result.Reasons.Should().BeEmpty();
+        Assert.Equal(service.Id, ((CommandEnvelope)result.Operations.Single()).Metadata.AggregateId);
     }
 
     [Fact]
@@ -35,11 +35,11 @@ public class ServiceTests
             Id2 = Guid.NewGuid().ToString()
         };
 
-        await new TestParentServiceHandler()
+        var result = await new TestParentServiceHandler()
             .Invoke(context, service);
 
-        context.Result.Reasons.Should().BeEmpty();
-        Assert.Equal(service.Id1, context.Commands.First().Metadata.AggregateId);
-        Assert.Equal(service.Id2, context.Commands.Last().Metadata.AggregateId);
+        result.Reasons.Should().BeEmpty();
+        Assert.Equal(service.Id1, ((CommandEnvelope)result.Operations.First()).Metadata.AggregateId);
+        Assert.Equal(service.Id2, ((CommandEnvelope)result.Operations.Last()).Metadata.AggregateId);
     }
 }

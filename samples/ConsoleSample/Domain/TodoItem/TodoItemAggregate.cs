@@ -1,4 +1,5 @@
 using FluentResults;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace ConsoleSample.Domain.TodoItem;
@@ -16,8 +17,10 @@ public class CreateTodoItemHandler : ICommandHandler<TodoItemAggregate, CreateTo
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
     {
-        context.StageEvent(new TodoItemCreated(command.item));
-        context.EvaluateCommand(new SetCompletion(false));
+        return Command
+            .Ok()
+            .Stage((new TodoItemCreated(command.item)))
+            .Invoke(new SetCompletion(false));
     }
 }
 
@@ -25,7 +28,7 @@ public class SetCompletionHandler : ICommandHandler<TodoItemAggregate, SetComple
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
     {
-        context.StageEvent(new CompletionSet(command.completed));
+        return Command.Ok().Stage(new CompletionSet(command.completed));
     }
 }
 

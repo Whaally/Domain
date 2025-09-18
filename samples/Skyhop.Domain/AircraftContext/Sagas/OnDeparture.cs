@@ -3,6 +3,7 @@ using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
@@ -17,11 +18,14 @@ public class OnDeparture : ISaga<DepartureTimeSet>
 
         if (!string.IsNullOrWhiteSpace(snapshot.AircraftId)
             && snapshot.AircraftId != null)
-            context.StageCommands(
-                snapshot.AircraftId!,
-                new SetFlightInfo(
-                    context.AggregateId!,
-                    @event.DepartureTime,
-                    snapshot.ArrivalTime));
+            return Saga
+                .Ok()
+                .Stage(snapshot.AircraftId!,
+                    new SetFlightInfo(
+                        context.AggregateId!,
+                        @event.DepartureTime,
+                        snapshot.ArrivalTime));
+
+        return Saga.Ok();
     }
 }

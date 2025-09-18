@@ -11,9 +11,9 @@ internal class TestService : IService
 
 internal class TestServiceHandler : IServiceHandler<TestService>
 {
-    public async Task<IResult> Invoke(IServiceHandlerContext context, TestService service)
+    public async Task<IServiceResult> Invoke(IServiceHandlerContext context, TestService service)
     {
-        context.StageCommands(
+        return Service.Ok().Stage(
             service.Id,
             new TestCommand());
     }

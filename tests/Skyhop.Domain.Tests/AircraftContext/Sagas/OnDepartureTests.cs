@@ -58,11 +58,11 @@ public class OnDepartureTests : DomainTest
         var @event = new DepartureTimeSet(DateTime.Now);
 
         // Evaluate
-        await saga.Evaluate(context, @event);
+        var result = await saga.Evaluate(context, @event);
         
         // Assert
-        context.Result.Reasons.Should().BeEmpty();
-        Assert.Single(context.Commands);
-        Assert.IsType<SetFlightInfo>(context.Commands.Single().Messages.Single());
+        result.Reasons.Should().BeEmpty();
+        Assert.Single(result.Operations);
+        Assert.IsType<SetFlightInfo>(result.Operations.Single().Messages.Single());
     }
 }

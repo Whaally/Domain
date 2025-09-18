@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
@@ -13,6 +14,6 @@ public class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectT
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
     {
-        
+        return Command.Ok();
     }
 }

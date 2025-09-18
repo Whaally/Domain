@@ -1,5 +1,6 @@
 using ConsoleSample.Domain.TodoItem;
 using FluentResults;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -9,6 +10,6 @@ public class TodoItemAddedSaga : ISaga<TodoItemCreated>
 {
     public async Task<ISagaResult> Evaluate(ISagaContext context, TodoItemCreated @event)
     {
-        await context.InvokeService(new NestedService());
+        return Saga.Ok().Invoke(new NestedService());
     }
 }

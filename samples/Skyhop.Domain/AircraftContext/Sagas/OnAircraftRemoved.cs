@@ -5,6 +5,7 @@ using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
@@ -18,7 +19,7 @@ public class OnAircraftRemoved : ISaga<AircraftRemoved>
             .Snapshot<FlightSnapshot>();
 
         // No need to make a change; nothing to remove here.
-        if (flight.AircraftId == @event.AircraftId) return;
+        if (flight.AircraftId == @event.AircraftId) return Saga.Ok();
         
         var aircraft = await context.Factory
             .Instantiate<Aircraft>(@event.AircraftId)
@@ -26,10 +27,12 @@ public class OnAircraftRemoved : ISaga<AircraftRemoved>
         
         if (aircraft.FlightsIds.Contains(context.AggregateId))
         {
-            context.StageCommands(
+            return Saga.Ok().Stage(
                 @event.AircraftId,
                 new RemoveFlight(
                     context.AggregateId!));
         }
+
+        return Saga.Ok();
     }
 }

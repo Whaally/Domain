@@ -1,6 +1,7 @@
 using ConsoleSample.Domain.TodoItem;
 using ConsoleSample.Domain.TodoList.Commands;
 using FluentResults;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace ConsoleSample.Domain;
@@ -9,18 +10,19 @@ public class AddItemService : IService;
 
 public class AddItemServiceHandler : IServiceHandler<AddItemService>
 {
-    public async Task<IResult> Invoke(IServiceHandlerContext context, AddItemService service)
+    public Task<IServiceResult> Invoke(IServiceHandlerContext context, AddItemService service)
     {
         var todoItem = Guid.NewGuid();
-        
-        context.StageCommands(
-            todoItem.ToString(), 
-            new CreateTodoItem("do a thing"));
 
-        await context.InvokeService(new NestedService());
-        
-        context.StageCommands(
-            Guid.NewGuid().ToString(),
-            new AddItem(todoItem));
+        return Task.FromResult(
+            Service
+                .Ok()
+                .Stage(
+                    todoItem.ToString(), 
+                    new CreateTodoItem("do a thing"))
+                .Invoke(new NestedService())
+                .Stage(
+                    Guid.NewGuid().ToString(),
+                    new AddItem(todoItem)));
     }
 }

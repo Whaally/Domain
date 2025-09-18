@@ -7,7 +7,6 @@ namespace Whaally.Domain;
 
 public class DefaultEvaluationAgent : IEvaluationAgent
 {
-    [Obsolete]
     private readonly IServiceProvider _services;
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;

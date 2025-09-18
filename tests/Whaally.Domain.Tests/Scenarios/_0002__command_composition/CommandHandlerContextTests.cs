@@ -5,6 +5,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios._0002__command_composition;
 
+[Obsolete] // todo: remove
 public class CommandHandlerContextTests
 {
     /*
@@ -21,26 +22,4 @@ public class CommandHandlerContextTests
             "")
         {
         };
-    
-    [Fact]
-    public void CanInvokeCommand()
-        => Context.EvaluateCommand(new TestCommand());
-    
-    [Fact]
-    public void ContextContainsCommands()
-    {
-        Context.EvaluateCommand(new TestCommand());
-        Context.Events.Should().NotBeEmpty();
-    }
-    
-    [Fact]
-    public void RunFromHandler()
-    {
-        new TestCommandHandler().Evaluate(Context, new TestCommand());
-        
-        new Result()
-            .WithReasons(Context.Result.Reasons)
-            .IsSuccess
-            .Should().BeTrue();
-    }
 }

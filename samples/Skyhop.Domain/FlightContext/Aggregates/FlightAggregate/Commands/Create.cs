@@ -1,5 +1,6 @@
 using FluentResults;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
+using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
@@ -13,8 +14,8 @@ public class CreateHandler : ICommandHandler<Flight, Create>
     public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {
         if (context.Aggregate.IsInitialized) 
-            context.WithResult(Result.Fail("Flight had already been created"));
+            return Command.Fail("Flight had already been created");
         
-        context.StageEvent(new Created());
+        return Command.Ok().Stage(new Created());
     }
 }

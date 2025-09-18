@@ -35,7 +35,9 @@ public abstract class ServiceTest<TService> : DomainTest
             IsFaulted: false
         }) task.RunSynchronously();
         
-        Result = Context.Result;
-        Commands = Context.Commands.SelectMany(q => q.Messages);
+        Result = task.Result;
+        Commands = task.Result.Operations
+            .Cast<CommandEnvelope>()
+            .SelectMany(q => q.Messages);
     }
 }
