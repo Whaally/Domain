@@ -17,7 +17,7 @@ public class Service : Result<Service>, IServiceResult
         return this;
     }
 
-    public IServiceResult Stage(string aggregateId, params ICommand[] command)
+    public IServiceResult Stage(Guid aggregateId, params ICommand[] command)
     {
         _operations.Add(
             new CommandEnvelope(

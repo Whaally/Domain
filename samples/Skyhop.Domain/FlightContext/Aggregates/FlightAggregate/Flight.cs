@@ -6,9 +6,9 @@ public record Flight : IAggregate
 {
     public bool IsInitialized { get; init; } = false;
     
-    public string? AircraftId { get; init; }
-    public string? DepartureAirfieldId { get; init; }
-    public string? ArrivalAirfieldId { get; init; }
+    public Guid? AircraftId { get; init; }
+    public Guid? DepartureAirfieldId { get; init; }
+    public Guid? ArrivalAirfieldId { get; init; }
 
     
     public string? AircraftRegistration { get; init; }

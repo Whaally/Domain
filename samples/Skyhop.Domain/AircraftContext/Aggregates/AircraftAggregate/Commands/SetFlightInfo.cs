@@ -8,7 +8,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 [Immutable]
 [GenerateSerializer]
 public record SetFlightInfo(
-    string FlightId,
+    Guid FlightId,
     DateTime? Departure,
     DateTime? Arrival) : ICommand;
 

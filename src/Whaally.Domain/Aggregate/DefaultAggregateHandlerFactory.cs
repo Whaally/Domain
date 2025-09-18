@@ -7,12 +7,12 @@ internal class DefaultAggregateHandlerFactory(
     IAggregateFactory aggregateFactory)
     : IAggregateHandlerFactory
 {
-    private readonly Dictionary<string, IAggregateHandler> _dictionary = new();
+    private readonly Dictionary<Guid, IAggregateHandler> _dictionary = new();
 
-    public IAggregateHandler<TAggregate> Instantiate<TAggregate>(string id)
+    public IAggregateHandler<TAggregate> Instantiate<TAggregate>(Guid id)
         where TAggregate : class, IAggregate
     {
-        if (id == null) throw new ArgumentNullException(nameof(id));
+        if (id == Guid.Empty) throw new ArgumentNullException(nameof(id));
         
         if (_dictionary.TryGetValue(id, out var handler)) 
             return (IAggregateHandler<TAggregate>)handler;

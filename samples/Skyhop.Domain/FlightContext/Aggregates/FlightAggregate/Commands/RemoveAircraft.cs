@@ -21,12 +21,12 @@ public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
             return result;
         }
 
-        if (string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
+        if (context.Aggregate.AircraftId == Guid.Empty)
         {
             result.Bind(() => Command.Fail("There is no aircraft to remove"));
             return result;
         }   
         
-        return result.Stage(new AircraftRemoved(context.Aggregate.AircraftId!));
+        return result.Stage(new AircraftRemoved(context.Aggregate.AircraftId!.Value));
     }
 }

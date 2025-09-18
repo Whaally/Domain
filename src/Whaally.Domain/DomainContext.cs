@@ -89,7 +89,7 @@ public class DomainContext
     #endregion
     
     #region Aggregate handlers
-    private IAggregateHandler GetAggregate(Type type, string id)
+    private IAggregateHandler GetAggregate(Type type, Guid id)
     {
         var aggregateHandlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
         
@@ -122,13 +122,13 @@ public class DomainContext
         return handler;
     }
     
-    public virtual IAggregateHandler<TAggregate> GetAggregate<TAggregate>(string id)
+    public virtual IAggregateHandler<TAggregate> GetAggregate<TAggregate>(Guid id)
         where TAggregate : class, IAggregate 
         => (IAggregateHandler<TAggregate>)GetAggregate(typeof(TAggregate), id);
     #endregion
     
     public virtual Task<IResult<EventEnvelope[]>> Evaluate<TCommand>(
-        string aggregateId,
+        Guid aggregateId,
         TCommand command)
         where TCommand : class, ICommand
     {
@@ -144,7 +144,7 @@ public class DomainContext
     }
     
     public virtual Task<IResult<EventEnvelope[]>> Evaluate(
-        string aggregateId,
+        Guid aggregateId,
         params ICommand[] commands)
     {   
         return _evaluationAgent.Evaluate(
@@ -181,7 +181,7 @@ public class DomainContext
     }
     
     public virtual async Task<IResult<EventEnvelope[]>> Invoke(
-        string aggregateId,
+        Guid aggregateId,
         params ICommand[] commands)
     {
         using var activity = _activity;

@@ -23,7 +23,7 @@ public abstract class EventTest<TAggregate, TEvent> : DomainTest
         Event = @event;
         
         var id = Guid.NewGuid();
-        Context = new EventHandlerContext<TAggregate>(id.ToString())
+        Context = new EventHandlerContext<TAggregate>(id)
         {
             ParentContext = default,
             Aggregate = Aggregate

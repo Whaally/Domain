@@ -18,11 +18,11 @@ public class AddItemServiceHandler : IServiceHandler<AddItemService>
             Service
                 .Ok()
                 .Stage(
-                    todoItem.ToString(), 
+                    todoItem, 
                     new CreateTodoItem("do a thing"))
                 .Invoke(new NestedService())
                 .Stage(
-                    Guid.NewGuid().ToString(),
+                    Guid.NewGuid(),
                     new AddItem(todoItem)));
     }
 }

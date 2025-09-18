@@ -9,7 +9,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 [GenerateSerializer]
 public record SetDeparture(
     DateTime Time,
-    string AirfieldId) : ICommand;
+    Guid AirfieldId) : ICommand;
 
 public class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
 {
@@ -20,7 +20,7 @@ public class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
         if (!context.Aggregate.IsInitialized) 
             result.Bind(() => Command.Fail("Flight does not exist"));
         
-        if (string.IsNullOrWhiteSpace(command.AirfieldId))
+        if (command.AirfieldId == Guid.Empty)
             result.Bind(() => Command.Fail("Airfield was not provided"));
 
         if (command.Time == DateTime.MinValue

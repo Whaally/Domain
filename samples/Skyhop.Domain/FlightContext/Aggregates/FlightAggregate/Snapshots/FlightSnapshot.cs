@@ -3,7 +3,7 @@
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
 
 public record FlightSnapshot(
-    string? AircraftId,
+    Guid? AircraftId,
     DateTime? DepartureTime,
     DateTime? ArrivalTime) : ISnapshot;
 

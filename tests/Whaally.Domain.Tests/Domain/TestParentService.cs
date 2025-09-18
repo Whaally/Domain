@@ -6,8 +6,8 @@ namespace Whaally.Domain.Tests.Domain;
 
 public class TestParentService : IService
 {
-    public string Id1 { get; init; } = Guid.NewGuid().ToString();
-    public string Id2 { get; init; } = Guid.NewGuid().ToString();
+    public Guid Id1 { get; init; } = Guid.NewGuid();
+    public Guid Id2 { get; init; } = Guid.NewGuid();
 }
 
 public class TestParentServiceHandler : IServiceHandler<TestParentService>

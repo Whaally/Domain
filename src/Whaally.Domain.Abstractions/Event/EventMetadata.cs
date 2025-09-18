@@ -16,7 +16,7 @@ public record EventMetadata : IMessageMetadata
         TransactionId = command.TransactionId;
     }
     
-    public string AggregateId { get; set; } = "";
+    public Guid AggregateId { get; set; }
 
     public Type? AggregateType { get; set; }
 

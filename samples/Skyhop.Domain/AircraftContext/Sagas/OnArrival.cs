@@ -16,12 +16,11 @@ internal class OnArrival : ISaga<ArrivalTimeSet>
             .Instantiate<Flight>(context.AggregateId!)
             .Snapshot<FlightSnapshot>();
 
-        if (!string.IsNullOrWhiteSpace(snapshot.AircraftId)
-            && snapshot.AircraftId != null)
+        if (snapshot.AircraftId is Guid g)
             Saga.Ok().Stage(
-                snapshot.AircraftId!,
+                g,
                 new SetFlightInfo(
-                    context.AggregateId!,
+                    g,
                     snapshot.DepartureTime,
                     @event.ArrivalTime));
 

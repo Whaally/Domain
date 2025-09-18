@@ -4,7 +4,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
 
 public record AircraftSnapshot(
     int FlightCount,
-    IEnumerable<string> FlightsIds) : ISnapshot;
+    IEnumerable<Guid> FlightsIds) : ISnapshot;
 
 public class AircraftSnapshotFactory : ISnapshotFactory<Aircraft, AircraftSnapshot>
 {

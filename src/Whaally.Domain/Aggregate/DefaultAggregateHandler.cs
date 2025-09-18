@@ -23,9 +23,9 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         init => _aggregate = value;
     }
     
-    public string Id { get; init; }
+    public Guid Id { get; init; }
     
-    public DefaultAggregateHandler(IServiceProvider services, string id)
+    public DefaultAggregateHandler(IServiceProvider services, Guid id)
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
@@ -44,8 +44,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public virtual Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope, CancellationToken? cancellationToken)
     {
-        if (!string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)
-            && commandEnvelope.Metadata.AggregateId != Id)
+        if (commandEnvelope.Metadata.AggregateId != Id)
             throw new Exception("The provided commands seem intended for a different aggregate instance");
         else if (cancellationToken?.IsCancellationRequested ?? false)
             return Task.FromResult<IResult<EventEnvelope>>(
@@ -85,7 +84,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
             _activity?.AddEvent(new ActivityEvent($"Evaluate {command.GetType().Name}"));
             
-            if (string.IsNullOrWhiteSpace(commandEnvelope.Metadata.AggregateId)) commandEnvelope.Metadata.AggregateId = Id;
+            if (commandEnvelope.Metadata.AggregateId == Guid.Empty) commandEnvelope.Metadata.AggregateId = Id;
 
             var commandContext = _contextFactory.CreateCommandHandlerContext(
                 intermediateState,

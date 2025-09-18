@@ -30,7 +30,7 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
         _services = services;
         
         Aggregate = new();
-        AggregateHandler = new TransactionalAggregateHandler<TAggregate>(_services, this.GetPrimaryKey().ToString())
+        AggregateHandler = new TransactionalAggregateHandler<TAggregate>(_services, this.GetPrimaryKey())
         {
             Aggregate = Aggregate
         };

@@ -12,7 +12,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
     
     public CommandHandlerContext(
         IServiceProvider services,
-        string aggregateId,
+        Guid aggregateId,
         Activity? activity = null)
     {
         AggregateId = aggregateId;
@@ -24,7 +24,7 @@ public class CommandHandlerContext<TAggregate> : ICommandHandlerContext<TAggrega
             ?.Instantiate<TAggregate>() ?? null!;
     }
 
-    public string AggregateId { get; init; }
+    public Guid AggregateId { get; init; }
     public string? TransactionId { get; init; }
 
     public ActivityContext? ParentContext { get; init; }

@@ -30,7 +30,7 @@ public class OnAircraftRemoved : ISaga<AircraftRemoved>
             return Saga.Ok().Stage(
                 @event.AircraftId,
                 new RemoveFlight(
-                    context.AggregateId!));
+                    context.AggregateId));
         }
 
         return Saga.Ok();

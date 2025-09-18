@@ -9,5 +9,5 @@ public interface ISagaContext : IContext
     /// </summary>
     public IAggregateHandlerFactory Factory { get; }
 
-    public string? AggregateId { get; }
+    public Guid AggregateId { get; }
 }

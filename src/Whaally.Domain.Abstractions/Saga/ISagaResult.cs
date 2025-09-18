@@ -7,5 +7,5 @@ public interface ISagaResult : IResultBase
     public IEnumerable<IMessageEnvelope> Operations { get; }
     
     public ISagaResult Invoke(IService service);
-    public ISagaResult Stage(string aggregateId, params ICommand[] command);
+    public ISagaResult Stage(Guid aggregateId, params ICommand[] command);
 }

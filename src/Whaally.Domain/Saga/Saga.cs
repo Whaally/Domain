@@ -17,7 +17,7 @@ public class Saga : Result<Saga>, ISagaResult
         return this;
     }
 
-    public ISagaResult Stage(string aggregateId, params ICommand[] command)
+    public ISagaResult Stage(Guid aggregateId, params ICommand[] command)
     {
         _operations.Add(
             new CommandEnvelope(

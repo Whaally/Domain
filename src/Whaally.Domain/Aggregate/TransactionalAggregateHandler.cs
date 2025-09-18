@@ -8,7 +8,7 @@ namespace Whaally.Domain;
 public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler<TAggregate>
     where TAggregate : class, IAggregate
 {
-    public TransactionalAggregateHandler(IServiceProvider services, string id) : base(services, id)
+    public TransactionalAggregateHandler(IServiceProvider services, Guid id) : base(services, id)
     {
     }
     

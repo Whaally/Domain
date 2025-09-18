@@ -19,7 +19,7 @@ public class CommandHandlerContextTests
             new ServiceCollection()
                 .AddDomain()
                 .BuildServiceProvider(),
-            "")
+            Guid.Empty)
         {
         };
 }

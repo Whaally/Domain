@@ -7,7 +7,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 
 [Immutable]
 [GenerateSerializer]
-public record RemoveFlight(string FlightId) : ICommand;
+public record RemoveFlight(Guid FlightId) : ICommand;
 
 public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {

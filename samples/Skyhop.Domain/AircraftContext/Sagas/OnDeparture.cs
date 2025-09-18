@@ -13,16 +13,15 @@ public class OnDeparture : ISaga<DepartureTimeSet>
     public async Task<ISagaResult> Evaluate(ISagaContext context, DepartureTimeSet @event)
     {
         var snapshot = await context.Factory
-            .Instantiate<Flight>(context.AggregateId!)
+            .Instantiate<Flight>(context.AggregateId)
             .Snapshot<FlightSnapshot>();
 
-        if (!string.IsNullOrWhiteSpace(snapshot.AircraftId)
-            && snapshot.AircraftId != null)
+        if (snapshot.AircraftId is Guid g)
             return Saga
                 .Ok()
-                .Stage(snapshot.AircraftId!,
+                .Stage(g!,
                     new SetFlightInfo(
-                        context.AggregateId!,
+                        g!,
                         @event.DepartureTime,
                         snapshot.ArrivalTime));
 

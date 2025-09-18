@@ -32,28 +32,28 @@ public class FlightController : ControllerBase
     public async Task<IResult> New()
     {
         // Trigger or invoke?
-        var result = await _domainContext.Invoke(Guid.NewGuid().ToString(), new Create());
+        var result = await _domainContext.Invoke(Guid.NewGuid(), new Create());
 
         return await result.AsResult();
     }
     
     [HttpPost("{id}/aircraft/clear")]
-    public Task<IResult> RemoveAircraft(string id) =>
+    public Task<IResult> RemoveAircraft(Guid id) =>
         _aggregateHandlerFactory.Instantiate<Flight>(id)
             .EvaluateAndApply(new RemoveAircraft());
 
     [HttpPost("{id}/aircraft/set")]
-    public Task<IResult> SetAircraft(string id, SetAircraft aircraftCommand) =>
+    public Task<IResult> SetAircraft(Guid id, SetAircraft aircraftCommand) =>
         _aggregateHandlerFactory.Instantiate<Flight>(id)
             .EvaluateAndApply(aircraftCommand);
 
     [HttpPost("{id}/departure/set")]
-    public Task<IResult> SetDeparture(string id, SetDeparture departure) =>
+    public Task<IResult> SetDeparture(Guid id, SetDeparture departure) =>
         _aggregateHandlerFactory.Instantiate<Flight>(id)
             .EvaluateAndApply(departure);
 
     [HttpPost("{id}/arrival/set")]
-    public Task<IResult> SetArrival(string id, SetArrival arrival) =>
+    public Task<IResult> SetArrival(Guid id, SetArrival arrival) =>
         _aggregateHandlerFactory.Instantiate<Flight>(id)
             .EvaluateAndApply(arrival);
 }

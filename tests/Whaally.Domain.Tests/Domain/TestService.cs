@@ -6,7 +6,7 @@ namespace Whaally.Domain.Tests.Domain;
 
 internal class TestService : IService
 {
-    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public Guid Id { get; init; } = Guid.NewGuid();
 }
 
 internal class TestServiceHandler : IServiceHandler<TestService>

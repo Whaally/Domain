@@ -78,11 +78,11 @@ public class _0004__aggregate_interfaces
                 {
                     options.AggregateFactory = _ => new TestAggregateFactory();
                 })
-                .BuildServiceProvider(), "");
+                .BuildServiceProvider(), Guid.Empty);
 
     [Fact]
     public void CanCreateNewEventContext()
-        => new EventHandlerContext<ITestAggregate>("");
+        => new EventHandlerContext<ITestAggregate>(Guid.Empty);
     
     [Fact]
     public void CanCreateNewDefaultAggregateHandler()
@@ -92,5 +92,5 @@ public class _0004__aggregate_interfaces
                 {
                     config.AggregateFactory = _ => new TestAggregateFactory();
                 })
-                .BuildServiceProvider(), "");
+                .BuildServiceProvider(), Guid.Empty);
 }

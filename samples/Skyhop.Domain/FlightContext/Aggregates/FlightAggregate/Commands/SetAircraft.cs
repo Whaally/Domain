@@ -7,7 +7,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 
 [Immutable]
 [GenerateSerializer]
-public record SetAircraft(string AircraftId) : ICommand;
+public record SetAircraft(Guid AircraftId) : ICommand;
 
 public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
@@ -17,15 +17,15 @@ public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
         if (!context.Aggregate.IsInitialized) 
             result.Bind(() => Command.Fail("Flight does not exist"));
         
-        if (string.IsNullOrWhiteSpace(command.AircraftId))
+        if (command.AircraftId == Guid.Empty)
             result.Bind(() => Command.Fail("Aircraft was not provided"));
 
         
-        if (!string.IsNullOrWhiteSpace(context.Aggregate.AircraftId))
+        if (context.Aggregate.AircraftId.HasValue)
         {
             result.Stage(
                 new AircraftRemoved(
-                    context.Aggregate.AircraftId));
+                    context.Aggregate.AircraftId.Value));
         }
 
         return result.Stage(new AircraftSet(command.AircraftId));

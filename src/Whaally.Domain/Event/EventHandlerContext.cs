@@ -6,12 +6,12 @@ namespace Whaally.Domain;
 public class EventHandlerContext<TAggregate> : IEventHandlerContext<TAggregate>
     where TAggregate : class, IAggregate
 {
-    public EventHandlerContext(string aggregateId)
+    public EventHandlerContext(Guid aggregateId)
     {
         AggregateId = aggregateId;
     }
     
-    public string AggregateId { get; init; }
+    public Guid AggregateId { get; init; }
     public string? TransactionId { get; init; }
     public TAggregate Aggregate { get; init; } = null!;
     public ActivityContext? ParentContext { get; init; }

@@ -6,7 +6,7 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 [Immutable]
 [GenerateSerializer]
 public record FlightInfoSet(
-    string FlightId,
+    Guid FlightId,
     DateTime? DepartureTime,
     DateTime? ArrivalTime) : IEvent;
 

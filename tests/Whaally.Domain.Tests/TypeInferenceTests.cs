@@ -32,7 +32,7 @@ public class TypeInferenceTests
         var context = new CommandHandlerContext<TestAggregate>(
             new ServiceCollection()
                 .AddDomain()
-                .BuildServiceProvider(), "")
+                .BuildServiceProvider(), Guid.Empty)
         {
             Aggregate = new TestAggregate()
         };
@@ -44,7 +44,7 @@ public class TypeInferenceTests
     [Fact]
     public void EventHandlerContext_Can_Be_Generalized()
     {
-        var context = new EventHandlerContext<TestAggregate>("")
+        var context = new EventHandlerContext<TestAggregate>(Guid.Empty)
         {
             Aggregate = new TestAggregate()
         };

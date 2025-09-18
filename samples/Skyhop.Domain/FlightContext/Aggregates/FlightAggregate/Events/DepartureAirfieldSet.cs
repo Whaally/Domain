@@ -4,7 +4,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 
 [Immutable]
 [GenerateSerializer]
-public record DepartureAirfieldSet(string AirfieldId) : IEvent;
+public record DepartureAirfieldSet(Guid AirfieldId) : IEvent;
 
 public class DepartureAirfieldSetHandler : IEventHandler<Flight, DepartureAirfieldSet>
 {

@@ -28,7 +28,7 @@ public class ConcurrencyTests(ClusterFixture fixture)
         var meta1 = new CommandMetadata
         {
             Attributes = new Dictionary<string, object>(),
-            AggregateId = id.ToString(),
+            AggregateId = id,
             AggregateType = typeof(TestDomain.Aggregate),
             CreatedAt = DateTimeOffset.UtcNow,
             ParentContext = new ActivityContext(),
@@ -42,7 +42,7 @@ public class ConcurrencyTests(ClusterFixture fixture)
             new CommandMetadata
             {
                 Attributes = new Dictionary<string, object>(),
-                AggregateId = id.ToString(),
+                AggregateId = id,
                 AggregateType = typeof(TestDomain.Aggregate),
                 CreatedAt = DateTimeOffset.UtcNow,
                 ParentContext = new ActivityContext(),

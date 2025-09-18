@@ -63,7 +63,7 @@ public class SendEnvelopes(ClusterFixture fixture)
             new CommandMetadata
             {
                 Attributes = new Dictionary<string, object>(),
-                AggregateId = id.ToString(),
+                AggregateId = id,
                 AggregateType = typeof(TestDomain.Aggregate),
                 CreatedAt = DateTimeOffset.UtcNow,
                 ParentContext = new ActivityContext(),

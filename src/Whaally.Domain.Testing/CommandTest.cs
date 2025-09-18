@@ -26,7 +26,7 @@ public abstract class CommandTest<TAggregate, TCommand> : DomainTest
         var id = Guid.NewGuid();
         
         // ToDo: Fix this usage
-        Context = new CommandHandlerContext<TAggregate>(Services, id.ToString())
+        Context = new CommandHandlerContext<TAggregate>(Services, id)
         {
             ParentContext = default,
             Aggregate = Aggregate

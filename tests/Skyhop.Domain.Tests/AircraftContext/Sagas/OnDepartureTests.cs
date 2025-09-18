@@ -16,9 +16,9 @@ public class OnDepartureTests : DomainTest
 {
     [Fact(Skip = "Since sagas are triggered asynchronously, these tests are no longer representative of actual behaviour")]
     public async Task DepartureTimeSet_Should_Trigger_OnDeparture() {
-        var aircraftId = Guid.NewGuid().ToString();
-        var flightId = Guid.NewGuid().ToString();
-        var departureAirfieldId = Guid.NewGuid().ToString();
+        var aircraftId = Guid.NewGuid();
+        var flightId = Guid.NewGuid();
+        var departureAirfieldId = Guid.NewGuid();
 
         await Domain.Invoke(flightId,
             new Create(),
@@ -38,14 +38,14 @@ public class OnDepartureTests : DomainTest
     [Fact]
     public async Task OnDeparture_Should_Stage_SetFlightInfo()
     {
-        var flightId = Guid.NewGuid().ToString();
+        var flightId = Guid.NewGuid();
         
         // First we're instantiating a flight as a snapshot of it will be retrieved by the saga
         await AggregateFactory
             .Instantiate<Flight>(flightId)
             .Trigger(
                 new Create(),
-                new SetAircraft(Guid.NewGuid().ToString()));
+                new SetAircraft(Guid.NewGuid()));
         
         // Then we're creating the saga, and instantiating the arguments required for evaluation
         var saga = new OnDeparture();

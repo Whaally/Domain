@@ -8,8 +8,8 @@ namespace Skyhop.Domain.Tests.FlightContext.Commands;
 
 public class SetAircraft_Command_Tests : DomainTest
 {
-    string _flightId = Guid.NewGuid().ToString();
-    string _aircraftId = Guid.NewGuid().ToString();
+    Guid _flightId = Guid.NewGuid();
+    Guid _aircraftId = Guid.NewGuid();
 
     [Fact]
     public async Task Test_AircraftSet()
@@ -32,7 +32,7 @@ public class SetAircraft_Command_Tests : DomainTest
 
         var result = await aggregate.Trigger(
             new Create(),
-            new SetAircraft(""));
+            new SetAircraft(Guid.Empty));
 
         Assert.Single(result.Errors);
     }
