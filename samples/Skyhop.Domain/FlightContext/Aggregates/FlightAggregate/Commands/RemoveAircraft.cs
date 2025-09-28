@@ -16,17 +16,11 @@ public class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
         var result = Command.Ok();
         
         if (!context.Aggregate.IsInitialized)
-        {
-            result.Bind(() => Command.Fail("Flight does not exist"));
-            return result;
-        }
+            return result.Bind(() => Command.Fail("Flight does not exist"));
 
         if (context.Aggregate.AircraftId == Guid.Empty)
-        {
-            result.Bind(() => Command.Fail("There is no aircraft to remove"));
-            return result;
-        }   
+            return result.Bind(() => Command.Fail("There is no aircraft to remove"));
         
-        return result.Stage(new AircraftRemoved(context.Aggregate.AircraftId!.Value));
+        return result.Stage(new AircraftRemoved(context.Aggregate.AircraftId));
     }
 }

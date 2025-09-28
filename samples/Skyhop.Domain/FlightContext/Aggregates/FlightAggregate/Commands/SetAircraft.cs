@@ -15,17 +15,17 @@ public class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
     {
         var result = Command.Ok();
         if (!context.Aggregate.IsInitialized) 
-            result.Bind(() => Command.Fail("Flight does not exist"));
+            result = result.Bind(() => Command.Fail("Flight does not exist"));
         
         if (command.AircraftId == Guid.Empty)
-            result.Bind(() => Command.Fail("Aircraft was not provided"));
+            result = result.Bind(() => Command.Fail("Aircraft was not provided"));
 
         
-        if (context.Aggregate.AircraftId.HasValue)
+        if (context.Aggregate.AircraftId != Guid.Empty)
         {
             result.Stage(
                 new AircraftRemoved(
-                    context.Aggregate.AircraftId.Value));
+                    context.Aggregate.AircraftId));
         }
 
         return result.Stage(new AircraftSet(command.AircraftId));

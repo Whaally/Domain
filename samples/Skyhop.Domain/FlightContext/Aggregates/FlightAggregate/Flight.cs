@@ -5,10 +5,10 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 public record Flight : IAggregate
 {
     public bool IsInitialized { get; init; } = false;
-    
-    public Guid? AircraftId { get; init; }
-    public Guid? DepartureAirfieldId { get; init; }
-    public Guid? ArrivalAirfieldId { get; init; }
+
+    public Guid AircraftId { get; init; } = Guid.Empty;
+    public Guid DepartureAirfieldId { get; init; } = Guid.Empty;
+    public Guid ArrivalAirfieldId { get; init; } = Guid.Empty;
 
     
     public string? AircraftRegistration { get; init; }

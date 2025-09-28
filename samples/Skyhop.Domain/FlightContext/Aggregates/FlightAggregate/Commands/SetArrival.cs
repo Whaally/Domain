@@ -18,14 +18,14 @@ public class SetArrivalHandler : ICommandHandler<Flight, SetArrival>
         var result = Command.Ok();
         
         if (!context.Aggregate.IsInitialized) 
-            result.Bind(() => Command.Fail("Flight does not exist"));
+            result = result.Bind(() => Command.Fail("Flight does not exist"));
         
         if (command.AirfieldId == Guid.Empty)
-            result.Bind(() => Command.Fail("Airfield was not provided"));
+            result = result.Bind(() => Command.Fail("Airfield was not provided"));
 
         if (command.Time == DateTime.MinValue
             || command.Time == DateTime.MaxValue)
-            result.Bind(() => Command.Fail("Arrival time was not provided"));
+            result = result.Bind(() => Command.Fail("Arrival time was not provided"));
 
         
         result.Stage(new ArrivalTimeSet(command.Time));

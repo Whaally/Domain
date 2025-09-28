@@ -11,7 +11,7 @@ public class RemoveAircraft_Command_Tests : DomainTest
     [Fact]
     public async Task Requires_Flight_To_Be_Iniitalized()
     {
-        var flight = AggregateFactory.Instantiate<Flight>(Guid.Empty);
+        var flight = AggregateFactory.Instantiate<Flight>(Guid.NewGuid());
 
         Assert.Single(
             (await flight.Evaluate(
@@ -24,10 +24,9 @@ public class RemoveAircraft_Command_Tests : DomainTest
     [Fact]
     public async Task Requires_Aircraft_To_Be_Defined()
     {
-        var flight = AggregateFactory.Instantiate<Flight>(Guid.Empty);
+        var flight = AggregateFactory.Instantiate<Flight>(Guid.NewGuid());
 
-        await flight.Apply(
-            (await flight.Evaluate(new Create())).Value);
+        await flight.Apply((await flight.Evaluate(new Create())).Value);
 
         var result = await flight.Evaluate(new RemoveAircraft());
 
@@ -37,7 +36,7 @@ public class RemoveAircraft_Command_Tests : DomainTest
     [Fact]
     public async Task Aircraft_Can_Be_Removed()
     {
-        var flight = AggregateFactory.Instantiate<Flight>(Guid.Empty);
+        var flight = AggregateFactory.Instantiate<Flight>(Guid.NewGuid());
         
         await flight.Trigger(
             new Create(),
