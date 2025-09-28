@@ -44,9 +44,10 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public virtual Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope, CancellationToken? cancellationToken)
     {
-        if (commandEnvelope.Metadata.AggregateId != Id)
+        if (commandEnvelope.Metadata.AggregateId != Guid.Empty && commandEnvelope.Metadata.AggregateId != Id)
             throw new Exception("The provided commands seem intended for a different aggregate instance");
-        else if (cancellationToken?.IsCancellationRequested ?? false)
+        
+        if (cancellationToken?.IsCancellationRequested ?? false)
             return Task.FromResult<IResult<EventEnvelope>>(
                 Result.Fail<EventEnvelope>("Operation was cancelled"));
         

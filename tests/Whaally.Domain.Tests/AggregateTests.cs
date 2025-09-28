@@ -19,9 +19,9 @@ public class AggregateTests
     [Fact]
     public async Task Aggregate_Accepts_Command()
     {
-        var service = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
+        var ag = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
 
-        var result = await service.Evaluate(
+        var result = await ag.Evaluate(
             new TestCommand
             {
                 Result = Result.Ok()
