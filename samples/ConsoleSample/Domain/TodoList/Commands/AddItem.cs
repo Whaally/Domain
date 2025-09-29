@@ -11,5 +11,5 @@ public class AddItemHandler : ICommandHandler<TodoListAggregate, AddItem>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoListAggregate> context,
         AddItem command) =>
-        Command.Ok().Stage(new ItemAdded(command.id));
+        new Command().Stage(new ItemAdded(command.id));
 }

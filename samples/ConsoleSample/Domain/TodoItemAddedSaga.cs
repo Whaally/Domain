@@ -8,8 +8,6 @@ namespace ConsoleSample.Domain;
 
 public class TodoItemAddedSaga : ISaga<TodoItemCreated>
 {
-    public async Task<ISagaResult> Evaluate(ISagaContext context, TodoItemCreated @event)
-    {
-        return Saga.Ok().Invoke(new NestedService());
-    }
+    public async Task<ISagaResult> Evaluate(ISagaContext context, TodoItemCreated @event) 
+        => new Saga().Invoke(new NestedService());
 }

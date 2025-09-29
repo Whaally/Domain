@@ -17,8 +17,7 @@ public class CreateTodoItemHandler : ICommandHandler<TodoItemAggregate, CreateTo
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
     {
-        return Command
-            .Ok()
+        return new Command()
             .Stage((new TodoItemCreated(command.item)))
             .Invoke(new SetCompletion(false));
     }
@@ -28,7 +27,7 @@ public class SetCompletionHandler : ICommandHandler<TodoItemAggregate, SetComple
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
     {
-        return Command.Ok().Stage(new CompletionSet(command.completed));
+        return new Command().Stage(new CompletionSet(command.completed));
     }
 }
 

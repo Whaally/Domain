@@ -15,8 +15,7 @@ public class AddItemServiceHandler : IServiceHandler<AddItemService>
         var todoItem = Guid.NewGuid();
 
         return Task.FromResult(
-            Service
-                .Ok()
+            new Service()
                 .Stage(
                     todoItem, 
                     new CreateTodoItem("do a thing"))
