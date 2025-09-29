@@ -17,13 +17,13 @@ internal class OnArrival : ISaga<ArrivalTimeSet>
             .Snapshot<FlightSnapshot>();
 
         if (snapshot.AircraftId is Guid g)
-            Saga.Ok().Stage(
+            new Saga().Stage(
                 g,
                 new SetFlightInfo(
                     g,
                     snapshot.DepartureTime,
                     @event.ArrivalTime));
 
-        return Saga.Ok();
+        return new Saga();
     }
 }

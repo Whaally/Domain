@@ -13,6 +13,7 @@ public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {
-        return Command.Ok().Stage(new FlightRemoved(command.FlightId));
+        return new Command()
+            .Stage(new FlightRemoved(command.FlightId));
     }
 }

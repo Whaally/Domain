@@ -16,9 +16,7 @@ public class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
     {
-        return Command.Ok().Stage(new FlightInfoSet(
-            command.FlightId,
-            command.Departure,
-            command.Arrival));
+        return new Command().Stage(
+            new FlightInfoSet(command.FlightId, command.Departure, command.Arrival));
     }
 }

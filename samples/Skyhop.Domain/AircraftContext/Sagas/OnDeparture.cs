@@ -17,14 +17,13 @@ public class OnDeparture : ISaga<DepartureTimeSet>
             .Snapshot<FlightSnapshot>();
 
         if (snapshot.AircraftId is Guid g)
-            return Saga
-                .Ok()
+            return new Saga()
                 .Stage(g!,
                     new SetFlightInfo(
                         g!,
                         @event.DepartureTime,
                         snapshot.ArrivalTime));
 
-        return Saga.Ok();
+        return new Saga();
     }
 }

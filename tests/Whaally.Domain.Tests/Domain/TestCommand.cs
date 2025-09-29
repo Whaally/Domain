@@ -15,7 +15,7 @@ internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
-        var result = Command.Ok();
+        var result = new Command();
         
         foreach (var @event in command.Events)
         {

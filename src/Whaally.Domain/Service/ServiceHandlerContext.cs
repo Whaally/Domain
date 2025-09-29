@@ -19,10 +19,7 @@ public class ServiceHandlerContext : IServiceHandlerContext
             ActivityKind.Internal,
             name: $"Evaluate {metadata.ServiceType?.Name}",
             parentContext: metadata.ParentContext ?? default,
-            tags: new Dictionary<string, object?>
-            {
-                
-            });
+            tags: new Dictionary<string, object?>());
         
         ParentContext = _activity?.Context;
     }

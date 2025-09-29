@@ -10,6 +10,6 @@ public class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
-        return Command.Ok().Stage(new TestEvent(true));
+        return new Command().Stage(new TestEvent(true));
     }
 }

@@ -19,7 +19,7 @@ public class OnAircraftRemoved : ISaga<AircraftRemoved>
             .Snapshot<FlightSnapshot>();
 
         // No need to make a change; nothing to remove here.
-        if (flight.AircraftId == @event.AircraftId) return Saga.Ok();
+        if (flight.AircraftId == @event.AircraftId) return new Saga();
         
         var aircraft = await context.Factory
             .Instantiate<Aircraft>(@event.AircraftId)
@@ -27,12 +27,12 @@ public class OnAircraftRemoved : ISaga<AircraftRemoved>
         
         if (aircraft.FlightsIds.Contains(context.AggregateId))
         {
-            return Saga.Ok().Stage(
+            return new Saga().Stage(
                 @event.AircraftId,
                 new RemoveFlight(
                     context.AggregateId));
         }
 
-        return Saga.Ok();
+        return new Saga();
     }
 }

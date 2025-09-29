@@ -14,8 +14,7 @@ public class TestParentServiceHandler : IServiceHandler<TestParentService>
 {
     public async Task<IServiceResult> Invoke(IServiceHandlerContext context, TestParentService service)
     {
-        return Service
-            .Ok()
+        return new Service()
             .Invoke(new TestService { Id = service.Id1 })
             .Invoke(new TestService { Id = service.Id2 });
     }

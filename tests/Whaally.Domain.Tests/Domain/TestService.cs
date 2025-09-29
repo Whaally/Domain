@@ -13,7 +13,7 @@ internal class TestServiceHandler : IServiceHandler<TestService>
 {
     public async Task<IServiceResult> Invoke(IServiceHandlerContext context, TestService service)
     {
-        return Service.Ok().Stage(
+        return new Service().Stage(
             service.Id,
             new TestCommand());
     }

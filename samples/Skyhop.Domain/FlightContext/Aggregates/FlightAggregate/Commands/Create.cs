@@ -14,8 +14,9 @@ public class CreateHandler : ICommandHandler<Flight, Create>
     public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {
         if (context.Aggregate.IsInitialized) 
-            return Command.Fail("Flight had already been created");
+            return new Command()
+                .WithError("Flight had already been created");
         
-        return Command.Ok().Stage(new Created());
+        return new Command().Stage(new Created());
     }
 }

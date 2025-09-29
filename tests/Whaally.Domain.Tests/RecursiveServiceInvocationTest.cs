@@ -25,7 +25,7 @@ public class RecursiveServiceInvocationTest
         {
             if (service.Depth == 0)
             {
-                return Task.FromResult<IServiceResult>(Service.Ok());
+                return Task.FromResult<IServiceResult>(new Service());
             }
 
             var newService = new RecursiveService
@@ -33,7 +33,7 @@ public class RecursiveServiceInvocationTest
                 Depth = service.Depth - 1
             };
                 
-            return Task.FromResult(Service.Ok().Invoke(newService));
+            return Task.FromResult(new Service().Invoke(newService));
         }
     }
 

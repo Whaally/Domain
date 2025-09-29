@@ -13,7 +13,7 @@ public class _0006__enumerable_reason_returns
     {
         public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
         {
-            return Command.Fail("Failure");
+            return new Command().WithError("Failure");
         }
     }
 

@@ -12,8 +12,6 @@ public record CorrectTotalFlightCount(
 
 public class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command)
-    {
-        return Command.Ok();
-    }
+    public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command) 
+        => new Command();
 }

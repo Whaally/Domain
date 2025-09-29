@@ -14,6 +14,6 @@ public class CorrectTotalFlightTimeHandler : ICommandHandler<Aircraft, CorrectTo
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
     {
-        return Command.Ok();
+        return new Command();
     }
 }

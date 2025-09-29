@@ -12,7 +12,7 @@ public class ImportHandler : IServiceHandler<Import>
     public async Task<IServiceResult> Invoke(IServiceHandlerContext context, Import service)
     {
         // Import things from some external service
-        return Service.Ok();
+        return new Service();
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }
