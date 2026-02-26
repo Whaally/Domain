@@ -5,6 +5,7 @@ namespace Whaally.Domain.Tests.Domain;
 [Immutable, GenerateSerializer]
 internal record TestEvent : IEvent
 {
+    [Id(0)]
     public Guid AggregateId { get; init; }
 }
 

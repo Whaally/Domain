@@ -1,11 +1,7 @@
-using System.Reflection;
+using JasperFx.Events.Daemon;
 using Marten;
-using Marten.Events.Daemon.Resiliency;
-using Orleans.EventSourcing;
-using Orleans.Runtime;
 using Serilog;
 using Whaally.Domain;
-using Whaally.Domain.Abstractions;
 using Whaally.Domain.Infrastructure.OrleansHost;
 
 namespace Skyhop.Hosting;
@@ -58,8 +54,6 @@ public class Program
                 options.Connection(builder.Configuration.GetConnectionString("PostgreSQL")!);
                 options.Events.MetadataConfig.EnableAll();
             });
-            
-            martenBuilder.OptimizeArtifactWorkflow();
             
             /*
              * For integration tests we want to disable the projection daemon running with this instance. Instead we'll

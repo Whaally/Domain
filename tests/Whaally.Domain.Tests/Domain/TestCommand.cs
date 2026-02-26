@@ -6,8 +6,11 @@ namespace Whaally.Domain.Tests.Domain;
 [Immutable, GenerateSerializer]
 internal record TestCommand : ICommand
 {
+    [Id(0)]
     public string? AggregateId { get; init; }
+    [Id(1)]
     public IEnumerable<IEvent> Events { get; init; } = new IEvent[] { };
+    [Id(2)]
     public Result Result { get; init; } = Result.Ok();
 }
 

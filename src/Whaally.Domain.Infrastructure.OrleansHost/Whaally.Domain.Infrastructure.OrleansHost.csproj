@@ -12,7 +12,6 @@
 		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" />
 		<PackageReference Include="Microsoft.Orleans.EventSourcing" />
 		<PackageReference Include="Microsoft.Orleans.Sdk" />
-		<PackageReference Include="System.Text.Json" />
 	</ItemGroup>
 
 	<ItemGroup>

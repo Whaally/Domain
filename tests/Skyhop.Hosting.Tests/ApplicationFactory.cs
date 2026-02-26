@@ -8,7 +8,9 @@ namespace Skyhop.Hosting.Tests;
 public class ApplicationFactory<TProgram> : WebApplicationFactory<TProgram> 
     where TProgram : class
 {
+#pragma warning disable CS0618 // Type or member is obsolete
     public PostgreSqlContainer Database = new PostgreSqlBuilder().Build();
+#pragma warning restore CS0618 // Type or member is obsolete
 
     public override async ValueTask DisposeAsync()
     {
