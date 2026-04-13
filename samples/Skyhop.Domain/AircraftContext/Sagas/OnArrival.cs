@@ -5,10 +5,12 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
 
-internal class OnArrival : ISaga<ArrivalTimeSet>
+[GenerateMetadata]
+internal partial class OnArrival : ISaga<ArrivalTimeSet>
 {
     public async Task<ISagaResult> Evaluate(ISagaContext context, ArrivalTimeSet @event)
     {

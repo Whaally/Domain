@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="5.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.3" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Orleans.EventSourcing" />
@@ -11,6 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\samples\Skyhop.Domain\Skyhop.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Whaally.Domain.Analyzers\Whaally.Domain.Analyzers.csproj" />
     <ProjectReference Include="..\..\src\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence\Whaally.Domain.Infrastructure.OrleansHost.MartenPersistence.csproj" />
     <ProjectReference Include="..\..\src\Whaally.Domain.Infrastructure.OrleansHost\Whaally.Domain.Infrastructure.OrleansHost.csproj" />
     <ProjectReference Include="..\..\src\Whaally.Domain\Whaally.Domain.csproj" />

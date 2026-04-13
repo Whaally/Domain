@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <LangVersion>latest</LangVersion>
+
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DotNetGraph" 
+                          Version="3.3.0"
+                          GeneratePathProperty="true" 
+                          PrivateAssets="all"/>
+        
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+        
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="CommandResultInvocationGenerator.cs" />
+    </ItemGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+            <TargetPathWithTargetPlatformMoniker Include="$(PKGDotNetGraph)\lib\netstandard2.0\DotNetGraph.dll" IncludeRuntimeDependency="false" />
+            <!-- Pack both our DLL and the dependencies into a generated Nuget Package -->
+            <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+            <None Include="$(PKGDotNetGraph)\lib\netstandard2.0\DotNetGraph.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+        </ItemGroup>
+    </Target>
+    
+</Project>

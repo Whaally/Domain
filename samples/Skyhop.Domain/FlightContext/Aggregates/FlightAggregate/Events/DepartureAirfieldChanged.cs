@@ -1,4 +1,5 @@
 ﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 
@@ -8,7 +9,8 @@ public record DepartureAirfieldChanged(
     Guid PreviousAirfieldId,
     Guid CurrentAirfieldId) : IEvent;
 
-public class DepartureAirfieldChangedHandler : IEventHandler<Flight, DepartureAirfieldChanged>
+[GenerateMetadata]
+public partial class DepartureAirfieldChangedHandler : IEventHandler<Flight, DepartureAirfieldChanged>
 {
     public Flight Apply(IEventHandlerContext<Flight> context, DepartureAirfieldChanged @event) =>
         context.Aggregate with

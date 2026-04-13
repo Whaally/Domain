@@ -1,6 +1,7 @@
 ﻿using FluentResults;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 
@@ -10,7 +11,8 @@ public record CorrectTotalFlightTime(
     TimeSpan TotalTime,
     string Reason) : ICommand;
 
-public class CorrectTotalFlightTimeHandler : ICommandHandler<Aircraft, CorrectTotalFlightTime>
+[GenerateMetadata]
+public partial class CorrectTotalFlightTimeHandler : ICommandHandler<Aircraft, CorrectTotalFlightTime>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
     {

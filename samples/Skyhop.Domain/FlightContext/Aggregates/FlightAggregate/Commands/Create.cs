@@ -2,6 +2,7 @@ using FluentResults;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 
@@ -9,7 +10,8 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 [GenerateSerializer]
 public record Create() : ICommand;
 
-public class CreateHandler : ICommandHandler<Flight, Create>
+[GenerateMetadata]
+public partial class CreateHandler : ICommandHandler<Flight, Create>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {

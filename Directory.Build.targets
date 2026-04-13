@@ -41,6 +41,7 @@
 		<PackageReference Update="Swashbuckle.AspNetCore" Version="10.1.4"/>
 		<PackageReference Update="System.Text.Json" Version="10.0.3" />
 		<PackageReference Update="System.Diagnostics.DiagnosticSource" Version="10.0.3" />
+        <PackageReference Update="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
 	</ItemGroup>
 
 </Project>

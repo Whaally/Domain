@@ -2,6 +2,7 @@
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 
@@ -12,7 +13,8 @@ public record SetFlightInfo(
     DateTime? Departure,
     DateTime? Arrival) : ICommand;
 
-public class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
+[GenerateMetadata]
+public partial class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
     {

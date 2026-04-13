@@ -1,4 +1,5 @@
 ﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 
@@ -8,7 +9,8 @@ public record TotalFlightCountCorrected(
     DateTime Timestamp,
     int Number) : IEvent;
 
-public class TotalFlightCountCorrectedHandler : IEventHandler<Aircraft, TotalFlightCountCorrected>
+[GenerateMetadata]
+public partial class TotalFlightCountCorrectedHandler : IEventHandler<Aircraft, TotalFlightCountCorrected>
 {
     public Aircraft Apply(IEventHandlerContext<Aircraft> context, TotalFlightCountCorrected @event)
         => context.Aggregate with

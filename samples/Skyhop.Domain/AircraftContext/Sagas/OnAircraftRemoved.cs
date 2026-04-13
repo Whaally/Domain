@@ -7,10 +7,12 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
 
-public class OnAircraftRemoved : ISaga<AircraftRemoved>
+[GenerateMetadata]
+public partial class OnAircraftRemoved : ISaga<AircraftRemoved>
 {
     public async Task<ISagaResult> Evaluate(ISagaContext context, AircraftRemoved @event)
     {

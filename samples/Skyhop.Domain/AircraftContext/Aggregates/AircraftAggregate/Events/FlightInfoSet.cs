@@ -1,5 +1,6 @@
 ﻿using Skyhop.Domain.Infrastructure;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 
@@ -10,7 +11,8 @@ public record FlightInfoSet(
     DateTime? DepartureTime,
     DateTime? ArrivalTime) : IEvent;
 
-public class FlightInfoSetHandler : IEventHandler<Aircraft, FlightInfoSet>
+[GenerateMetadata]
+public partial class FlightInfoSetHandler : IEventHandler<Aircraft, FlightInfoSet>
 {
     public Aircraft Apply(IEventHandlerContext<Aircraft> context, FlightInfoSet @event)
     {

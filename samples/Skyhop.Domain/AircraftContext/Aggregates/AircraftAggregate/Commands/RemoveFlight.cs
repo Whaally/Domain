@@ -2,6 +2,7 @@
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 
@@ -9,7 +10,8 @@ namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 [GenerateSerializer]
 public record RemoveFlight(Guid FlightId) : ICommand;
 
-public class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
+[GenerateMetadata]
+public partial class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {

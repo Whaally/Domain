@@ -1,4 +1,5 @@
 ﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 
@@ -6,7 +7,8 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 [GenerateSerializer]
 public record AircraftSet(Guid AircraftId) : IEvent;
 
-public class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
+[GenerateMetadata]
+public partial class AircraftSetHandler : IEventHandler<Flight, AircraftSet>
 {
     public Flight Apply(IEventHandlerContext<Flight> context, AircraftSet @event) =>
         context.Aggregate with

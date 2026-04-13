@@ -1,4 +1,5 @@
 using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 
@@ -6,7 +7,8 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 [GenerateSerializer]
 public record Created() : IEvent;
 
-public class CreatedHandler : IEventHandler<Flight, Created>
+[GenerateMetadata]
+public partial class CreatedHandler : IEventHandler<Flight, Created>
 {
     public Flight Apply(IEventHandlerContext<Flight> context, Created @event) =>
         context.Aggregate with
