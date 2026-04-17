@@ -2,6 +2,40 @@ namespace Whaally.Domain.Analyzers;
 
 public class MetadataGenerator
 {
+    public static string ForAggregate(AggregateMeta aggregateMeta)
+    {
+        return 
+            $$"""
+            using Whaally.Domain.Abstractions.Generated;
+                 
+            namespace {{aggregateMeta.Aggregate.Namespace}};
+                 
+            public sealed class {{aggregateMeta.Aggregate.Name}}Metadata : IAggregateMetadata {
+                private {{aggregateMeta.Aggregate.Name}}Metadata() { }
+                public static readonly {{aggregateMeta.Aggregate.Name}}Metadata Instance = new();
+                
+                public static readonly string Namespace = "{{aggregateMeta.Aggregate.Namespace}}";
+                public static readonly string Name = "{{aggregateMeta.Aggregate.Name}}";
+                
+                public static readonly string Description = "";
+                
+                public IEnumerable<ICommandMetadata> Commands { get; } = [
+                    {{string.Join(
+                        ",\r\n        ", 
+                        aggregateMeta.Commands
+                            .Select(command => $"{command.Namespace}.{command.Name}Metadata.Instance"))}}
+                ];
+                    
+                public IEnumerable<IEventMetadata> Events { get; } = [
+                    {{string.Join(
+                        ",\r\n        ", 
+                        aggregateMeta.Events
+                            .Select(@event => $"{@event.Namespace}.{@event.Name}Metadata.Instance"))}}
+                ];
+            }
+            """;
+    }
+    
     public static string ForService(ServiceMeta serviceMeta)
     {
         return 

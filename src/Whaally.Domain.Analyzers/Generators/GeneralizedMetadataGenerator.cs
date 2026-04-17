@@ -29,7 +29,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
 
         IncrementalValuesProvider<IMetadataModel> domainComponents = context.SyntaxProvider.ForAttributeWithMetadataName(
             "Whaally.Domain.Analyzers.GenerateMetadataAttribute",
-            predicate: (node, _) => node is ClassDeclarationSyntax { BaseList: not null },
+            predicate: (node, _) => node is TypeDeclarationSyntax { BaseList: not null },
             transform: (syntaxContext, _) =>
             {
                 if (syntaxContext.SemanticModel.GetDeclaredSymbol(syntaxContext.TargetNode) is not INamedTypeSymbol handlerClass) return null;
@@ -37,34 +37,36 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                 if (handlerClass
                         .AllInterfaces
                         .SingleOrDefault(q =>
-                            q.MetadataName is "IServiceHandler`1"
+                            q.MetadataName is "IAggregate" 
+                                or "IServiceHandler`1"
                                 or "ICommandHandler`2"
                                 or "IEventHandler`2"
                                 or "ISaga`1") is not { } handlerDefinition) return null;
 
                 var invocationExpressions = handlerClass
                     .GetMembers()
-                    .Single(m => m is
+                    .SingleOrDefault(m => m is
                     {
                         Name: "Invoke" or "Evaluate" or "Apply" // retrieve the handler method
                     })
-                    .DeclaringSyntaxReferences[0]
+                    ?.DeclaringSyntaxReferences[0]
                     .GetSyntax()
                     .DescendantNodes()
                     .OfType<InvocationExpressionSyntax>();
                     
                 var operations = invocationExpressions
-                    .Select(q => syntaxContext.SemanticModel.GetOperation(q) as IInvocationOperation)
+                    ?.Select(q => syntaxContext.SemanticModel.GetOperation(q) as IInvocationOperation)
                     .Where(q => q is
                     {
                         TargetMethod.Name: "Invoke" or "Stage",
                         Instance.Type: not null
                     })
                     .Where(q => q != null)!
-                    .ToList();
+                    .ToList() ?? [];
 
                 return (IMetadataModel?)(handlerDefinition.MetadataName switch
                 {
+                    "IAggregate" => new AggregateMeta(handlerClass),
                     "IServiceHandler`1" => new ServiceMeta(
                         service: (INamedTypeSymbol)handlerDefinition.TypeArguments[0], handler: handlerClass,
                         services: operations.Where(q => q!.TargetMethod.Name == "Invoke")
@@ -101,6 +103,10 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
             })
             .Where(q => q != null)!;
 
+        IncrementalValuesProvider<AggregateMeta> aggregate = domainComponents
+            .Select((q, _) => q as AggregateMeta)
+            .Where(q => q != null)!;
+
         // split up all domain components into subcollections for easier matching
         IncrementalValuesProvider<ServiceMeta> service = domainComponents
             .Select((q, _) => q as ServiceMeta)
@@ -124,6 +130,38 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
         var events = @event.Collect();
         var sagas = saga.Collect();
 
+        // first try to figure out which commands and events belong to a given aggregate
+        aggregate = aggregate
+            .Combine(commands)
+            .Select((input, _) =>
+            {
+                AggregateMeta single = input.Left;
+                ImmutableArray<CommandMeta> collection = input.Right;
+        
+                single.Commands.AddRange(
+                    collection
+                        .Where(q => q.Aggregate == single.Aggregate)
+                        .Select(q => q.Command));
+        
+                return single;
+            });
+        
+        aggregate = aggregate
+            .Combine(events)
+            .Select((input, _) =>
+            {
+                AggregateMeta single = input.Left;
+                ImmutableArray<EventMeta> collection = input.Right;
+        
+                single.Events.AddRange(
+                    collection
+                        .Where(q => q.Aggregate == single.Aggregate)
+                        .Select(q => q.Event));
+        
+                return single;
+            });
+        
+        
         // for services, determine all possible callers from within the domain
         service = service
             .Combine(services)
@@ -236,6 +274,17 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
         // note that we cannot yet call events from events
         
         // for sagas it is already known which events trigger them due to type info
+        
+        context.RegisterSourceOutput(
+            aggregate,
+            (spc, meta) =>
+            {
+                spc.AddSource(
+                    $"{meta.Aggregate.Namespace}.{meta.Aggregate.Name}.g.cs",
+                    SourceText.From(
+                        MetadataGenerator.ForAggregate(meta),
+                        Encoding.UTF8));
+            });
         
         context.RegisterSourceOutput(
             service,

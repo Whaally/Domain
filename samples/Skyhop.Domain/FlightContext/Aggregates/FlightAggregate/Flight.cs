@@ -1,7 +1,9 @@
 ﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 
+[GenerateMetadata]
 public record Flight : IAggregate
 {
     public bool IsInitialized { get; init; } = false;

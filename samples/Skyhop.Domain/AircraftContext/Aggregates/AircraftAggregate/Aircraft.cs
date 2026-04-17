@@ -1,7 +1,9 @@
 ﻿using Whaally.Domain.Abstractions;
+using Whaally.Domain.Analyzers;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 
+[GenerateMetadata]
 public record Aircraft : IAggregate
 {
     public string? Registration { get; init; }

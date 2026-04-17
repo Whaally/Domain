@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Xml;
 using Microsoft.CodeAnalysis;
 
 namespace Whaally.Domain.Analyzers;
@@ -10,14 +8,12 @@ public class AggregateMeta : IMetadataModel
 {
     public AggregateMeta(INamedTypeSymbol aggregate) 
     {
-        Name = aggregate.Name;
-        Namespace = aggregate.ContainingNamespace.ToDisplayString();
+        Aggregate = new ObjectMeta(aggregate.Name, aggregate.ContainingNamespace.ToDisplayString());
         
         // public string? XmlComment => Aggregate.GetDocumentationCommentXml(CultureInfo.InvariantCulture);
     }
     
-    public string Name { get; }
-    public string Namespace { get; }
+    public ObjectMeta Aggregate { get; }
     
     
     /// <summary>
