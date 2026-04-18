@@ -6,11 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<PackageReference Include="DotNetGraph" Version="3.3.0" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\samples\Skyhop.Domain\Skyhop.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="CircularReferenceTest\" />
   </ItemGroup>
 
 </Project>

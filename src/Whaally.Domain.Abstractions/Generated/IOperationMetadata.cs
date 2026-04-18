@@ -2,7 +2,9 @@ namespace Whaally.Domain.Abstractions.Generated;
 
 public interface IOperationMetadata
 {
-    
+    public string Namespace { get; }
+    public string Name { get; }
+    public string Description { get; }
 }
 
 public interface IServiceMetadata : IOperationMetadata
@@ -20,7 +22,7 @@ public interface ICommandMetadata : IOperationMetadata
     IEnumerable<ICommandMetadata> CallingCommands { get; }
     
     IEnumerable<ICommandMetadata> Invoked { get; }
-    IEnumerable<IEventMetadata> Staged { get; }
+    IEventMetadata[] Staged { get; }
 }
 
 public interface IEventMetadata : IOperationMetadata
