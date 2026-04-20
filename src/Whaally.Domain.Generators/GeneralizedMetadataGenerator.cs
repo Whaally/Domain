@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Whaally.Domain.Analyzers.Generators;
+namespace Whaally.Domain.Generators;
 
 [Generator]
 public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
@@ -19,7 +19,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                 i.AddSource(
                     "GenerateMetadataAttribute.g.cs",
                     """
-                    namespace Whaally.Domain.Analyzers
+                    namespace Whaally.Domain.Generators
                     {
                         [global::Microsoft.CodeAnalysis.EmbeddedAttribute]
                         internal class GenerateMetadataAttribute: global::System.Attribute {} 
@@ -28,7 +28,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
             });
 
         IncrementalValuesProvider<IMetadataModel> domainComponents = context.SyntaxProvider.ForAttributeWithMetadataName(
-            "Whaally.Domain.Analyzers.GenerateMetadataAttribute",
+            "Whaally.Domain.Generators.GenerateMetadataAttribute",
             predicate: (node, _) => node is TypeDeclarationSyntax { BaseList: not null },
             transform: (syntaxContext, _) =>
             {

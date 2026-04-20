@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace Whaally.Domain.Analyzers;
+namespace Whaally.Domain.Generators;
 
 /* todo: slop: clean up */
 internal static class ArgumentTypeResolver

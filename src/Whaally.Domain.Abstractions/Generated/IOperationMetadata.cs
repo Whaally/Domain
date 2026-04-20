@@ -22,7 +22,7 @@ public interface ICommandMetadata : IOperationMetadata
     IEnumerable<ICommandMetadata> CallingCommands { get; }
     
     IEnumerable<ICommandMetadata> Invoked { get; }
-    IEventMetadata[] Staged { get; }
+    IEnumerable<IEventMetadata> Staged { get; }
 }
 
 public interface IEventMetadata : IOperationMetadata

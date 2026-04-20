@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain.Abstractions;
-using Whaally.Domain.Analyzers.Generators;
+using Whaally.Domain.Generators;
 
 namespace Whaally.Domain.Tests.SourceGenerators;
 
@@ -27,7 +27,7 @@ public class SagaMetadataGeneratorTest
                         using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
                         using Whaally.Domain;
                         using Whaally.Domain.Abstractions;
-                        using Whaally.Domain.Analyzers;
+                        using Whaally.Domain.Generators;
                         
                         namespace Skyhop.Domain.AircraftContext.Sagas;
                         
@@ -58,7 +58,7 @@ public class SagaMetadataGeneratorTest
                         using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
                         using Whaally.Domain;
                         using Whaally.Domain.Abstractions;
-                        using Whaally.Domain.Analyzers;
+                        using Whaally.Domain.Generators;
                         
                         namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
                         

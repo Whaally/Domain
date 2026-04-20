@@ -12,10 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Whaally.Domain\Whaally.Domain.csproj" />
-    <ProjectReference 
-            Include="..\..\src\Whaally.Domain.Analyzers\Whaally.Domain.Analyzers.csproj"
-            OutputItemType="Analyzer"
-            ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\Whaally.Domain.Generators\Whaally.Domain.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace Whaally.Domain.Analyzers;
+namespace Whaally.Domain.Generators;
 
 public class MetadataGenerator
 {

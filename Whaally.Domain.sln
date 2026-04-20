@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Testing", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrleansTests", "tests\OrleansTests\OrleansTests.csproj", "{E9587BCF-9AEA-410E-9B78-38C0CBD7BB72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Analyzers", "src\Whaally.Domain.Analyzers\Whaally.Domain.Analyzers.csproj", "{FE275667-2001-44B0-99B1-49B5EEB8BC7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Generators", "src\Whaally.Domain.Generators\Whaally.Domain.Generators.csproj", "{FE275667-2001-44B0-99B1-49B5EEB8BC7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,7 +113,7 @@ Global
 		{B941C601-66E6-4764-AC79-139A3484FF26} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 		{F31853A3-42FA-4A3E-91F2-091D1CE94E04} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 		{E9587BCF-9AEA-410E-9B78-38C0CBD7BB72} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
-		{FE275667-2001-44B0-99B1-49B5EEB8BC7E} = {F34E58C9-5FE8-4ED5-B88D-02AEE1D30907}
+		{FE275667-2001-44B0-99B1-49B5EEB8BC7E} = {675431A2-F61A-4941-A1A3-2EBFB596E44E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68BCF0DD-5501-460A-B702-728C2A93C91C}

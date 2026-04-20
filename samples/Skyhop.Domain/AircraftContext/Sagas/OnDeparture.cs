@@ -5,7 +5,7 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
-using Whaally.Domain.Analyzers;
+using Whaally.Domain.Generators;
 
 namespace Skyhop.Domain.AircraftContext.Sagas;
 

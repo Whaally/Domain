@@ -1,6 +1,6 @@
 ﻿using Skyhop.Domain.Infrastructure;
 using Whaally.Domain.Abstractions;
-using Whaally.Domain.Analyzers;
+using Whaally.Domain.Generators;
 
 namespace Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 

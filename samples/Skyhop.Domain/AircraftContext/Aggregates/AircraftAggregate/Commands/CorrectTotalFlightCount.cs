@@ -10,7 +10,7 @@ public record CorrectTotalFlightCount(
     int FlightCount,
     string Reason) : ICommand;
 
-[Whaally.Domain.Analyzers.GenerateMetadata]
+[Whaally.Domain.Generators.GenerateMetadata]
 public partial class CorrectTotalFlightCountHandler : ICommandHandler<Aircraft, CorrectTotalFlightCount>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightCount command) 
