@@ -5,6 +5,8 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
+// todo: the evaluation agent acts as a distributed unit of work. Rename to clarify this insight.
+
 public class DefaultEvaluationAgent : IEvaluationAgent
 {
     private readonly IServiceProvider _services;

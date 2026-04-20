@@ -2,6 +2,8 @@
 
 namespace Whaally.Domain.Abstractions;
 
+// todo: the evaluation agent acts as a distributed unit of work. Rename to clarify this insight.
+
 /// <summary>
 ///     Central component providing behaviour for the high-level interaction between different domain components.
 /// </summary>
