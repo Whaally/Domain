@@ -1,7 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
-using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Generators;
 
@@ -22,25 +22,28 @@ public class AggregateMetadataGeneratorTest
                         """
                         using Whaally.Domain.Abstractions;
                         using Whaally.Domain.Generators;
+                        using System.ComponentModel.DataAnnotations;
                         
                         namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
                         
                         [GenerateMetadata]
-                        public record Flight : IAggregate { }
+                        public record Flight : IAggregate { 
+                            [Required(AllowEmptyStrings = true)]
+                            public string Email { get; init; }
+                        }
                         """)
-                },
-                GeneratedSources =
-                {
-
                 },
                 AdditionalReferences =
                 {
                     typeof(IAggregate).Assembly,
                     typeof(Command).Assembly,
+                    typeof(ValidationAttribute).Assembly,
                     MetadataReference.CreateFromFile(typeof(IEnumerable<>).Assembly.Location),
                 }
             }
         };
+        
+        
 
         await test.RunAsync();
     }

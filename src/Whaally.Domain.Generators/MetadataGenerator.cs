@@ -6,7 +6,9 @@ public class MetadataGenerator
     {
         return 
             $$"""
-            using Whaally.Domain.Abstractions.Generated;
+            #nullable enable
+            
+            using Whaally.Domain.Generators;
                  
             namespace {{aggregateMeta.Aggregate.Namespace}};
                  
@@ -28,12 +30,21 @@ public class MetadataGenerator
                         aggregateMeta.Commands
                             .Select(command => $"{command.Namespace}.{command.Name}Metadata.Instance"))}}
                 };
-                    
+                
                 public IEnumerable<IEventMetadata> Events => new IEventMetadata[] {
                     {{string.Join(
                         ",\r\n        ", 
                         aggregateMeta.Events
                             .Select(@event => $"{@event.Namespace}.{@event.Name}Metadata.Instance"))}}
+                };
+                
+                public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
+                    {{string.Join(
+                        ",\r\n        ",
+                        // aggregateMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
+                        // aggregateMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
+                        aggregateMeta.Properties.Select(q => q.ToGeneratorString())
+                        )}}
                 };
             }
             """;
@@ -43,7 +54,9 @@ public class MetadataGenerator
     {
         return 
             $$"""
-              using Whaally.Domain.Abstractions.Generated;
+              #nullable enable
+              
+              using Whaally.Domain.Generators;
 
               namespace {{serviceMeta.Service.Namespace}};
 
@@ -86,6 +99,16 @@ public class MetadataGenerator
                           serviceMeta.Commands
                               .Select(command => $"{command.Namespace}.{command.Name}Metadata.Instance"))}}                
                   };
+                  
+                  public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
+                      {{string.Join(
+                            ",\r\n        ", 
+                            // serviceMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
+                            []
+                            )
+                      
+                      }}
+                  };
               }
               """;
     }
@@ -94,7 +117,9 @@ public class MetadataGenerator
     {
         return 
             $$"""
-            using Whaally.Domain.Abstractions.Generated;
+            #nullable enable
+            
+            using Whaally.Domain.Generators;
                  
             namespace {{commandMeta.Command.Namespace}};
                  
@@ -144,6 +169,16 @@ public class MetadataGenerator
                         commandMeta.Events
                             .Select(@event => $"{@event.Namespace}.{@event.Name}Metadata.Instance"))}}
                 };
+                
+                public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
+                    {{string.Join(
+                            ",\r\n        ", 
+                            // commandMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
+                            []
+                            )
+                    
+                    }}
+                };
             }
             """;
     }
@@ -152,7 +187,9 @@ public class MetadataGenerator
     {
         return 
             $$"""
-            using Whaally.Domain.Abstractions.Generated;
+            #nullable enable
+            
+            using Whaally.Domain.Generators;
              
             namespace {{eventMeta.Event.Namespace}};
              
@@ -183,6 +220,16 @@ public class MetadataGenerator
                 };
                 
                 public IEnumerable<ISagaMetadata> Triggers => new ISagaMetadata[] { };
+                
+                public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
+                    {{
+                        string.Join(
+                            ",\r\n        ", 
+                            // eventMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
+                            []
+                        )
+                    }}
+                };
             }
             """;
     }
@@ -191,7 +238,9 @@ public class MetadataGenerator
     {
         return 
             $$"""
-            using Whaally.Domain.Abstractions.Generated;
+            #nullable enable
+            
+            using Whaally.Domain.Generators;
 
             namespace {{sagaMeta.Handler.Namespace}};
 

@@ -19,12 +19,93 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                 i.AddSource(
                     "GenerateMetadataAttribute.g.cs",
                     """
-                    namespace Whaally.Domain.Generators
+                    namespace Whaally.Domain.Generators;
+                    
+                    [global::Microsoft.CodeAnalysis.EmbeddedAttribute]
+                    internal class GenerateMetadataAttribute: global::System.Attribute {}
+                    """);
+
+                i.AddSource(
+                    "PropertyMeta.g.cs",
+                    """
+                    namespace Whaally.Domain.Generators;
+                    
+                    public sealed record PropertyMetadata(string Name, IEnumerable<ValidationRule> Rules)
                     {
-                        [global::Microsoft.CodeAnalysis.EmbeddedAttribute]
-                        internal class GenerateMetadataAttribute: global::System.Attribute {} 
+                        public string Name { get; } = Name;
+                        
+                        public IEnumerable<ValidationRule> Rules { get; } = Rules;
+                    }
+                    """
+                    );
+                
+                i.AddSource(
+                    "ValidationRule.g.cs",
+                    """
+                    #nullable enable
+                    
+                    namespace Whaally.Domain.Generators; 
+                    
+                    public sealed record ValidationRule(string Name, IDictionary<string, object?> Arguments)
+                    {
+                        public string Name { get; } = Name;
+                        public IDictionary<string, object?> Arguments { get; } = Arguments;
                     }
                     """);
+
+                i.AddSource(
+                    "IOperationMetadata.g.cs",
+                    """
+                    namespace Whaally.Domain.Generators;
+                    
+                    public interface IOperationMetadata
+                    {
+                        public string Namespace { get; }
+                        public string Name { get; }
+                        public string Description { get; }
+                    }
+                    
+                    public interface IServiceMetadata : IOperationMetadata
+                    {
+                        IEnumerable<ISagaMetadata> CallingSagas { get; }
+                        IEnumerable<IServiceMetadata> CallingServices { get; }
+                        
+                        IEnumerable<IServiceMetadata> Invoked { get; }
+                        IEnumerable<ICommandMetadata> Staged { get; }
+                    }
+                    
+                    public interface ICommandMetadata : IOperationMetadata
+                    {
+                        IEnumerable<IServiceMetadata> CallingServices { get; }
+                        IEnumerable<ICommandMetadata> CallingCommands { get; }
+                        
+                        IEnumerable<ICommandMetadata> Invoked { get; }
+                        IEnumerable<IEventMetadata> Staged { get; }
+                    }
+                    
+                    public interface IEventMetadata : IOperationMetadata
+                    {
+                        IEnumerable<ICommandMetadata> CallingCommands { get; }
+                        
+                        IEnumerable<IEventMetadata> Invoked { get; }
+                        
+                        IEnumerable<ISagaMetadata> Triggers { get; }
+                    }
+                    
+                    public interface ISagaMetadata : IOperationMetadata
+                    {
+                        IEventMetadata Trigger { get; }
+                        
+                        IEnumerable<IServiceMetadata> Invoked { get; }
+                        IEnumerable<ICommandMetadata> Staged { get; }
+                    }
+                    
+                    public interface IAggregateMetadata : IOperationMetadata
+                    {
+                        
+                    }
+                    """
+                );
             });
 
         IncrementalValuesProvider<IMetadataModel> domainComponents = context.SyntaxProvider.ForAttributeWithMetadataName(
@@ -33,7 +114,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
             transform: (syntaxContext, _) =>
             {
                 if (syntaxContext.SemanticModel.GetDeclaredSymbol(syntaxContext.TargetNode) is not INamedTypeSymbol handlerClass) return null;
-
+                
                 if (handlerClass
                         .AllInterfaces
                         .SingleOrDefault(q =>
@@ -42,7 +123,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                                 or "ICommandHandler`2"
                                 or "IEventHandler`2"
                                 or "ISaga`1") is not { } handlerDefinition) return null;
-
+                
                 var invocationExpressions = handlerClass
                     .GetMembers()
                     .SingleOrDefault(m => m is
@@ -53,7 +134,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                     .GetSyntax()
                     .DescendantNodes()
                     .OfType<InvocationExpressionSyntax>();
-                    
+                
                 var operations = invocationExpressions
                     ?.Select(q => syntaxContext.SemanticModel.GetOperation(q) as IInvocationOperation)
                     .Where(q => q is
@@ -88,7 +169,8 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                             .OfType<INamedTypeSymbol>()),
                     "IEventHandler`2" => new EventMeta(aggregate: (INamedTypeSymbol)handlerDefinition.TypeArguments[0],
                         @event: (INamedTypeSymbol)handlerDefinition.TypeArguments[1], handler: handlerClass),
-                    "ISaga`1" => new SagaMeta(@event: (INamedTypeSymbol)handlerDefinition.TypeArguments[0],
+                    "ISaga`1" => new SagaMeta(
+                        @event: (INamedTypeSymbol)handlerDefinition.TypeArguments[0],
                         handler: handlerClass,
                         services: operations.Where(q => q!.TargetMethod.Name == "Invoke")
                             .SelectMany(q => q!.Arguments.SelectMany(ArgumentTypeResolver.GetConcreteArgumentType))
@@ -296,7 +378,7 @@ public sealed class GeneralizedMetadataGenerator : IIncrementalGenerator
                         MetadataGenerator.ForService(meta),
                         Encoding.UTF8));
             });
-
+        
         context.RegisterSourceOutput(
             command,
             (spc, meta) =>

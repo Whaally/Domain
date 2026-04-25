@@ -9,7 +9,9 @@ public class AggregateMeta : IMetadataModel
     public AggregateMeta(INamedTypeSymbol aggregate) 
     {
         Aggregate = new ObjectMeta(aggregate.Name, aggregate.ContainingNamespace.ToDisplayString());
-        
+
+        Properties = aggregate.GetPropertyMeta().ToList();
+
         // public string? XmlComment => Aggregate.GetDocumentationCommentXml(CultureInfo.InvariantCulture);
     }
     
@@ -25,6 +27,8 @@ public class AggregateMeta : IMetadataModel
     ///     Events targeted towards this aggregate
     /// </summary>
     public List<ObjectMeta> Events { get; set; } = [];
+
+    public List<PropertyMeta> Properties { get; set; } = [];
 }
 
 public class CommandMeta : IMetadataModel
@@ -47,6 +51,9 @@ public class CommandMeta : IMetadataModel
         Events = events
             .Select(q => new ObjectMeta(q.Name, q.ContainingNamespace.ToDisplayString()))
             .ToList();
+
+        Properties = command.GetPropertyMeta().ToList();
+        
         // public string? XmlComment => Command.GetDocumentationCommentXml(CultureInfo.InvariantCulture);
     }
 
@@ -78,6 +85,8 @@ public class CommandMeta : IMetadataModel
     ///     Events emitted through this command
     /// </summary>
     public List<ObjectMeta> Events { get; set; } = [];
+    
+    public List<PropertyMeta> Properties { get; set; } = [];
 }
 
 public class EventMeta : IMetadataModel
@@ -90,7 +99,9 @@ public class EventMeta : IMetadataModel
         Aggregate = new ObjectMeta(aggregate.Name, aggregate.ContainingNamespace.ToDisplayString());
         Event = new ObjectMeta(@event.Name, @event.ContainingNamespace.ToDisplayString());
         Handler = new ObjectMeta(handler.Name, handler.ContainingNamespace.ToDisplayString());
-        
+
+        Properties = @event.GetPropertyMeta().ToList();
+
         // public string? XmlComment => Event.GetDocumentationCommentXml(CultureInfo.InvariantCulture);
     }
     
@@ -118,6 +129,8 @@ public class EventMeta : IMetadataModel
     ///     Sagas triggered by this event
     /// </summary>
     public List<ObjectMeta> Sagas { get; set; } = [];
+    
+    public List<PropertyMeta> Properties { get; set; } = [];
 }
 
 public class SagaMeta : IMetadataModel
@@ -185,6 +198,8 @@ public class ServiceMeta : IMetadataModel
         Commands = commands
             .Select(q => new ObjectMeta(q.Name, q.ContainingNamespace.ToDisplayString()))
             .ToList();
+
+        Properties = service.GetPropertyMeta().ToList();
         
         //public string? XmlComment => Service.GetDocumentationCommentXml(CultureInfo.InvariantCulture);
     }
@@ -213,4 +228,6 @@ public class ServiceMeta : IMetadataModel
     ///     Commands invoked through this service
     /// </summary>
     public List<ObjectMeta> Commands { get; set; } = [];
+    
+    public List<PropertyMeta> Properties { get; set; } = [];
 }
