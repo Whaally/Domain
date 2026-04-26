@@ -2,12 +2,10 @@
 
 namespace Whaally.Domain.Abstractions;
 
-// todo: the evaluation agent acts as a distributed unit of work. Rename to clarify this insight.
-
 /// <summary>
 ///     Central component providing behaviour for the high-level interaction between different domain components.
 /// </summary>
-public interface IEvaluationAgent : IDisposable
+public interface IUnitOfWork : IDisposable
 {   
     /// <summary>
     ///     Invokes a saga, meaning it runs the saga, and consequently invokes all resulting events as well
@@ -21,7 +19,7 @@ public interface IEvaluationAgent : IDisposable
 
     /// <summary>
     ///     Evaluates a service, meaning it will run the service and collect its output as a number of commands, but not
-    ///     continue eavaluating these commands.
+    ///     continue evaluating these commands.
     /// 
     ///     Should be side effect free
     /// </summary>

@@ -8,7 +8,7 @@ namespace Whaally.Domain;
 
 /*
  * DEVELOPMENT NOTE:
- * - Do not inject dependencies to this class (IAggregateHandlerFactory & IEvaluationAgent) as concrete instances.
+ * - Do not inject dependencies to this class (IAggregateHandlerFactory & IUnitOfWork) as concrete instances.
  *   Doing so causes an infinite loop as this class is often injected as dependency to those.
  */
 public class DomainContext
@@ -16,8 +16,8 @@ public class DomainContext
     internal static ActivitySource ActivitySource = new("Whaally.Domain");
     
     private readonly IServiceProvider _services;
-    private IEvaluationAgent _evaluationAgent => _services.GetRequiredService<IEvaluationAgent>();
-    private Activity? _activity => ActivitySource.StartActivity(
+    private IUnitOfWork NewUnitOfWork() => _services.GetRequiredService<IUnitOfWork>();
+    private Activity? NewActivity() => ActivitySource.StartActivity(
         ActivityKind.Internal,
         name: nameof(DomainContext),
         tags: new Dictionary<string, object?>
@@ -143,11 +143,13 @@ public class DomainContext
             command);
     }
     
-    public virtual Task<IResult<EventEnvelope[]>> Evaluate(
+    public virtual async Task<IResult<EventEnvelope[]>> Evaluate(
         Guid aggregateId,
         params ICommand[] commands)
-    {   
-        return _evaluationAgent.Evaluate(
+    {
+        using var unitOfWork = NewUnitOfWork();
+        
+        return await unitOfWork.Evaluate(
             new CommandEnvelope(
                 new CommandMetadata
                 {
@@ -163,18 +165,19 @@ public class DomainContext
         CommandMetadata metadata,
         params ICommand[] commands)
     {
-        using var evaluationAgent = _evaluationAgent;
-
-        return await _evaluationAgent.Evaluate(new CommandEnvelope(metadata, commands));
+        using var unitOfWork = NewUnitOfWork();
+        
+        return await unitOfWork
+            .Evaluate(new CommandEnvelope(metadata, commands));
     }
-    
+
     public virtual async Task<IResult<EventEnvelope[]>> Invoke(
         CommandMetadata metadata,
         params ICommand[] commands)
     {
-        using var evaluationAgent = _evaluationAgent;
+        using var unitOfWork = NewUnitOfWork();
         
-        return await evaluationAgent.Invoke(
+        return await unitOfWork.Invoke(
             new CommandEnvelope(
                 metadata,
                 commands));
@@ -184,10 +187,10 @@ public class DomainContext
         Guid aggregateId,
         params ICommand[] commands)
     {
-        using var activity = _activity;
-        using var evaluationAgent = _evaluationAgent;
+        using var activity = NewActivity();
+        using var unitOfWork = NewUnitOfWork();
 
-        return await evaluationAgent.Invoke(
+        return await unitOfWork.Invoke(
             new CommandEnvelope(
                 new CommandMetadata
                 {
@@ -204,10 +207,10 @@ public class DomainContext
         IService service,
         ServiceMetadata? metadata = null)
     {
-        using var activity = _activity;
-        using var evaluationAgent = _evaluationAgent;
+        using var activity = NewActivity();
+        using var unitOfWork = NewUnitOfWork();
         
-        return await evaluationAgent.Invoke(
+        return await unitOfWork.Invoke(
             new ServiceEnvelope(
                 metadata ?? new ServiceMetadata
                 {

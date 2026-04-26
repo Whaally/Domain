@@ -5,28 +5,16 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-// todo: the evaluation agent acts as a distributed unit of work. Rename to clarify this insight.
-
-public class DefaultEvaluationAgent : IEvaluationAgent
+public class UnitOfWork(IServiceProvider services) : IUnitOfWork
 {
-    private readonly IServiceProvider _services;
-    private readonly DomainContext _domainContext;
-    private readonly IContextFactory _contextFactory;
-    private readonly IAggregateHandlerFactory _handlerFactory;
-    
-    public DefaultEvaluationAgent(IServiceProvider services)
-    {
-        _services = services;
-        _domainContext = _services.GetRequiredService<DomainContext>();
-        _contextFactory = _services.GetRequiredService<IContextFactory>();
-        _handlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
-    }
+    private readonly DomainContext _domainContext = services.GetRequiredService<DomainContext>();
+    private readonly IContextFactory _contextFactory = services.GetRequiredService<IContextFactory>();
+    private readonly IAggregateHandlerFactory _handlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="serviceEnvelope"></param>
-    /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
     public async Task<IResult<CommandEnvelope[]>> Evaluate(ServiceEnvelope serviceEnvelope)
     {
@@ -160,10 +148,7 @@ public class DefaultEvaluationAgent : IEvaluationAgent
             name: $"Invoke {saga.GetType().Name}",
             parentContext: default,
             links: [ new ActivityLink(eventEnvelope.Metadata.ParentContext ?? default) ],
-            tags: new Dictionary<string, object?>
-            {
-                
-            });
+            tags: new Dictionary<string, object?>());
         
         eventEnvelope.Metadata.ParentContext = activity?.Context;
 

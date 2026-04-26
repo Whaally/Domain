@@ -42,8 +42,8 @@ public class DomainOptions
     ///
     ///     Has a transient lifetime.
     /// </summary>
-    public Func<IServiceProvider, IEvaluationAgent> EvaluationAgent
-        = services => new DefaultEvaluationAgent(services);
+    public Func<IServiceProvider, IUnitOfWork> EvaluationAgent
+        = services => new UnitOfWork(services);
 
     /// <summary>
     ///     Supplies command handlers used in this domain.

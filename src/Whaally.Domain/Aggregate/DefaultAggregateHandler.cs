@@ -12,7 +12,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     private readonly DomainContext _domainContext;
     private readonly IContextFactory _contextFactory;
     
-    private readonly IEvaluationAgent _evaluationAgent;
+    private readonly IUnitOfWork _unitOfWork;
 
     private Activity? _activity = null;
     
@@ -30,7 +30,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
         _contextFactory = _services.GetRequiredService<IContextFactory>();
-        _evaluationAgent = _services.GetRequiredService<IEvaluationAgent>();
+        _unitOfWork = _services.GetRequiredService<IUnitOfWork>();
         
         Id = id;
         
@@ -186,7 +186,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         _aggregate = intermediateState;
 
         // Implicitly continue the operations
-        await _evaluationAgent.Continue(eventEnvelope);
+        await _unitOfWork.Continue(eventEnvelope);
 
         _activity?.Dispose();
         _activity = null;
