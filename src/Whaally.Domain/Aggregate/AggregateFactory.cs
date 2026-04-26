@@ -2,7 +2,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class DefaultAggregateFactory : IAggregateFactory
+public class AggregateFactory : IAggregateFactory
 {
     public T Instantiate<T>()
         where T : class

@@ -4,7 +4,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class DefaultContextFactory(IServiceProvider services) : IContextFactory
+public class ContextFactory(IServiceProvider services) : IContextFactory
 {
     public ISagaContext CreateSagaContext(EventMetadata metadata, Activity? activity = null)
         => new SagaContext(

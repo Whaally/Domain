@@ -17,7 +17,7 @@ public class DomainOptions
     ///     Has a singleton lifetime.
     /// </summary>
     public Func<IServiceProvider, IAggregateFactory> AggregateFactory 
-        = _ => new DefaultAggregateFactory();
+        = _ => new AggregateFactory();
 
     /// <summary>
     ///     Supplies an aggregate handler factory.
@@ -25,7 +25,7 @@ public class DomainOptions
     ///     Has a singleton lifetime.
     /// </summary>
     public Func<IServiceProvider, IAggregateHandlerFactory> AggregateHandlerFactory 
-        = services => new DefaultAggregateHandlerFactory(
+        = services => new AggregateHandlerFactory(
             services, 
             services.GetRequiredService<IAggregateFactory>());
 
@@ -35,7 +35,7 @@ public class DomainOptions
     ///     Has a singleton lifetime.
     /// </summary>
     public Func<IServiceProvider, IContextFactory> ContextFactory
-        = services => new DefaultContextFactory(services);
+        = services => new ContextFactory(services);
     
     /// <summary>
     ///     Instantiates an evaluate agent, coordinating operations across nodes.

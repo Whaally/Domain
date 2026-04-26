@@ -5,7 +5,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class TransactionalAggregateHandler<TAggregate> : DefaultAggregateHandler<TAggregate>
+public class TransactionalAggregateHandler<TAggregate> : AggregateHandler<TAggregate>
     where TAggregate : class, IAggregate
 {
     public TransactionalAggregateHandler(IServiceProvider services, Guid id) : base(services, id)

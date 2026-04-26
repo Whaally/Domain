@@ -2,7 +2,7 @@
 
 namespace Whaally.Domain;
 
-internal class DefaultAggregateHandlerFactory(
+internal class AggregateHandlerFactory(
     IServiceProvider serviceProvider,
     IAggregateFactory aggregateFactory)
     : IAggregateHandlerFactory
@@ -17,7 +17,7 @@ internal class DefaultAggregateHandlerFactory(
         if (_dictionary.TryGetValue(id, out var handler)) 
             return (IAggregateHandler<TAggregate>)handler;
         
-        handler = new DefaultAggregateHandler<TAggregate>(serviceProvider, id)
+        handler = new AggregateHandler<TAggregate>(serviceProvider, id)
         {
             Aggregate = aggregateFactory.Instantiate<TAggregate>()
         };

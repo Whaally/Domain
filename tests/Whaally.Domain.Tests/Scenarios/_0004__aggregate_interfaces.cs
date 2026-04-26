@@ -86,7 +86,7 @@ public class _0004__aggregate_interfaces
     
     [Fact]
     public void CanCreateNewDefaultAggregateHandler()
-        => new DefaultAggregateHandler<ITestAggregate>(
+        => new AggregateHandler<ITestAggregate>(
             new ServiceCollection()
                 .AddDomain(config =>
                 {

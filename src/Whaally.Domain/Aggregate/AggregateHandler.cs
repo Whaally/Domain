@@ -5,7 +5,7 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
+public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     where TAggregate : class, IAggregate
 {
     private readonly IServiceProvider _services;
@@ -25,7 +25,7 @@ public class DefaultAggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     
     public Guid Id { get; init; }
     
-    public DefaultAggregateHandler(IServiceProvider services, Guid id)
+    public AggregateHandler(IServiceProvider services, Guid id)
     {
         _services = services;
         _domainContext = _services.GetRequiredService<DomainContext>();
