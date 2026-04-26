@@ -27,10 +27,9 @@ public class AggregateMetadataGeneratorTest
                         namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
                         
                         [GenerateMetadata]
-                        public record Flight : IAggregate { 
-                            [Required(AllowEmptyStrings = true)]
-                            public string Email { get; init; }
-                        }
+                        public record Flight(
+                            [Required]
+                            string Number) : IAggregate;
                         """)
                 },
                 AdditionalReferences =

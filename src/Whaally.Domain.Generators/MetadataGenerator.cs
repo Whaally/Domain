@@ -39,12 +39,13 @@ public class MetadataGenerator
                 };
                 
                 public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
-                    {{string.Join(
-                        ",\r\n        ",
-                        // aggregateMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
-                        // aggregateMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
-                        aggregateMeta.Properties.Select(q => q.ToGeneratorString())
-                        )}}
+                    {{
+                        string.Join(
+                            ",\r\n",
+                            aggregateMeta.Properties.Select(q => q.ToGeneratorString()))
+                            .Indent()
+                            .Indent()
+                    }}
                 };
             }
             """;
@@ -101,12 +102,12 @@ public class MetadataGenerator
                   };
                   
                   public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
-                      {{string.Join(
-                            ",\r\n        ", 
-                            // serviceMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
-                            []
-                            )
-                      
+                      {{
+                          string.Join(
+                                  ",\r\n",
+                                  serviceMeta.Properties.Select(q => q.ToGeneratorString()))
+                              .Indent()
+                              .Indent()
                       }}
                   };
               }
@@ -171,12 +172,12 @@ public class MetadataGenerator
                 };
                 
                 public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
-                    {{string.Join(
-                            ",\r\n        ", 
-                            // commandMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
-                            []
-                            )
-                    
+                    {{
+                        string.Join(
+                                ",\r\n",
+                                commandMeta.Properties.Select(q => q.ToGeneratorString()))
+                            .Indent()
+                            .Indent()
                     }}
                 };
             }
@@ -224,10 +225,10 @@ public class MetadataGenerator
                 public IEnumerable<PropertyMetadata> Properties => new PropertyMetadata[] {
                     {{
                         string.Join(
-                            ",\r\n        ", 
-                            // eventMeta.Properties.Select(prop => $"new PropertyMetadata(\"{prop.Name}\", \"{prop.DataType}\")")
-                            []
-                        )
+                                ",\r\n",
+                                eventMeta.Properties.Select(q => q.ToGeneratorString()))
+                            .Indent()
+                            .Indent()
                     }}
                 };
             }

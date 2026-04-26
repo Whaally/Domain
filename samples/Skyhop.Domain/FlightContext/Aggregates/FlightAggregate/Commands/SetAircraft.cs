@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using System.ComponentModel.DataAnnotations;
+using FluentResults;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
@@ -8,7 +9,9 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 
 [Immutable]
 [GenerateSerializer]
-public record SetAircraft(Guid AircraftId) : ICommand;
+public record SetAircraft(
+    [Required]
+    Guid AircraftId) : ICommand;
 
 [GenerateMetadata]
 public partial class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>

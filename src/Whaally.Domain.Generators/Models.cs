@@ -79,14 +79,14 @@ public class CommandMeta : IMetadataModel
     /// <summary>
     ///     Commands invoked through this command
     /// </summary>
-    public List<ObjectMeta> InvokedCommands { get; set; } = [];
+    public List<ObjectMeta> InvokedCommands { get; set; }
     
     /// <summary>
     ///     Events emitted through this command
     /// </summary>
-    public List<ObjectMeta> Events { get; set; } = [];
+    public List<ObjectMeta> Events { get; set; }
     
-    public List<PropertyMeta> Properties { get; set; } = [];
+    public List<PropertyMeta> Properties { get; set; }
 }
 
 public class EventMeta : IMetadataModel
@@ -130,7 +130,7 @@ public class EventMeta : IMetadataModel
     /// </summary>
     public List<ObjectMeta> Sagas { get; set; } = [];
     
-    public List<PropertyMeta> Properties { get; set; } = [];
+    public List<PropertyMeta> Properties { get; set; }
 }
 
 public class SagaMeta : IMetadataModel
@@ -172,12 +172,12 @@ public class SagaMeta : IMetadataModel
     /// <summary>
     ///     Services this saga invokes
     /// </summary>
-    public List<ObjectMeta> Services { get; set; } = [];
+    public List<ObjectMeta> Services { get; set; }
 
     /// <summary>
     ///     Commands this saga invokes
     /// </summary>
-    public List<ObjectMeta> Commands { get; set; } = [];
+    public List<ObjectMeta> Commands { get; set; }
 }
 
 public class ServiceMeta : IMetadataModel
@@ -222,12 +222,12 @@ public class ServiceMeta : IMetadataModel
     /// <summary>
     ///     Services invoked by this service
     /// </summary>
-    public List<ObjectMeta> InvokedServices { get; set; } = [];
+    public List<ObjectMeta> InvokedServices { get; set; }
     
     /// <summary>
     ///     Commands invoked through this service
     /// </summary>
-    public List<ObjectMeta> Commands { get; set; } = [];
+    public List<ObjectMeta> Commands { get; set; }
     
-    public List<PropertyMeta> Properties { get; set; } = [];
+    public List<PropertyMeta> Properties { get; set; }
 }

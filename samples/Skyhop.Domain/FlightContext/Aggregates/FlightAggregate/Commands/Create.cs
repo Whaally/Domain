@@ -8,7 +8,7 @@ namespace Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 
 [Immutable]
 [GenerateSerializer]
-public record Create() : ICommand;
+public record Create : ICommand;
 
 [GenerateMetadata]
 public partial class CreateHandler : ICommandHandler<Flight, Create>

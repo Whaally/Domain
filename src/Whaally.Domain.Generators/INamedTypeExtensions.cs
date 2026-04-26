@@ -9,23 +9,9 @@ public static class INamedTypeExtensions
         var properties = symbol.GetMembers()
             .OfType<IPropertySymbol>()
             .Where(q => !q.IsReadOnly);
-        
-        // foreach (var prop in properties)
-        // {
-        //     var attributes = prop.GetAttributes()
-        //         .Where(q => q.AttributeClass is
-        //         {
-        //             BaseType.MetadataName: "ValidationAttribute" or "DataTypeAttribute"
-        //         });
-        //
-        //     foreach (var att in attributes)
-        //     {
-        //         var cArgs = att.ConstructorArguments;
-        //         var nArgs = att.NamedArguments;
-        //         
-        //         
-        //     }
-        // }
+
+        // todo: get properties on primary constructors, then merge with object properties.
+        //       primarily to be able to decorate the constructor arguments with attributes as well. 
         
         return properties
             .Select(prop =>
@@ -33,9 +19,22 @@ public static class INamedTypeExtensions
                     prop.MetadataName,
                     prop.GetAttributes()
                         .Select(att =>
-                            new ValidationRule(
-                                att.AttributeClass?.ToDisplayString() ?? "",
-                                att.NamedArguments.ToDictionary(q => q.Key, q => q.Value.Value)))))
+                        {
+                            var constructorParams = att.AttributeConstructor?.Parameters.Select(q => q.Name) ?? [];
+                            var constructorArguments = att.ConstructorArguments.Select(q => q.Value ?? q.Values);
+
+                            KeyValuePair<string, object?>[] args =
+                            [
+                                ..constructorParams.Zip(constructorArguments,
+                                    (a, b) => new KeyValuePair<string, object?>(a, b)),
+                                ..att.NamedArguments.Select(q =>
+                                    new KeyValuePair<string, object?>(q.Key, q.Value.Value))
+                            ];
+                            
+                            return new ValidationRule(
+                                att.AttributeClass?.Name.Replace("Attribute", "") ?? "",
+                                args.ToDictionary(q => q.Key, q => q.Value));
+                        })))
             .ToList();
     }
 
@@ -44,7 +43,7 @@ public static class INamedTypeExtensions
         new PropertyMetadata(
             "{{propertyMeta.Name}}",
             new ValidationRule[] {
-                {{string.Join(",\r\n        ", propertyMeta.Rules.Select(ToGeneratorString))}}
+                {{ string.Join(",\r\n        ", propertyMeta.Rules.Select(ToGeneratorString)).Indent().Indent() }}
             })
         """;
 
@@ -59,6 +58,6 @@ public static class INamedTypeExtensions
 
     private static string ToGeneratorString(this KeyValuePair<string, object?> kvp) =>
         $$"""
-        [ "{{ kvp.Key }}" ] = "{{kvp.Value}}" 
+        [ "{{ System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(kvp.Key) }}" ] = "{{kvp.Value}}" 
         """;
 }

@@ -1,7 +1,7 @@
 namespace Whaally.Domain.Generators;
 
 public sealed record ValidationRule(
-    string Name, 
+    string Name,
     IDictionary<string, object?> Arguments)
 {
     public string Name { get; } = Name;
