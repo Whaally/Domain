@@ -1,4 +1,3 @@
-using FluentResults;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios._0002__command_composition;
@@ -9,6 +8,6 @@ public class AnotherCommandHandler : ICommandHandler<Aggregate, AnotherCommand>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
     {
-        return new Command().Stage(new TestEvent());
+        return Command.Stage(new TestEvent());
     }
 }

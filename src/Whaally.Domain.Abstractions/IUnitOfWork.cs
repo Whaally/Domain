@@ -1,6 +1,4 @@
-﻿using FluentResults;
-
-namespace Whaally.Domain.Abstractions;
+﻿namespace Whaally.Domain.Abstractions;
 
 /// <summary>
 ///     Central component providing behaviour for the high-level interaction between different domain components.
@@ -15,7 +13,7 @@ public interface IUnitOfWork : IDisposable
     /// <param name="saga"></param>
     /// <param name="event"></param>
     /// <returns></returns>
-    public Task<IResultBase> Invoke(ISaga saga, EventEnvelope @event);
+    public Task<IResult> Invoke(ISaga saga, EventEnvelope @event);
 
     /// <summary>
     ///     Evaluates a service, meaning it will run the service and collect its output as a number of commands, but not
@@ -24,7 +22,6 @@ public interface IUnitOfWork : IDisposable
     ///     Should be side effect free
     /// </summary>
     /// <param name="service"></param>
-    /// <typeparam name="TService"></typeparam>
     /// <returns></returns>
     public Task<IResult<CommandEnvelope[]>> Evaluate(ServiceEnvelope service);
 
@@ -44,7 +41,7 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    public Task<IResultBase> Apply(params EventEnvelope[] events);
+    public Task<IResult> Apply(params EventEnvelope[] events);
     
     /// <summary>
     ///     Continue from an event onwards. Finds relevant sagas and invokes these
@@ -53,7 +50,7 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     /// <param name="events"></param>
     /// <returns></returns>
-    public Task<IResultBase> Continue(EventEnvelope events);
+    public Task<IResult> Continue(EventEnvelope events);
 
     public Task Abort(params CommandMetadata[] metadata);
 
@@ -64,7 +61,6 @@ public interface IUnitOfWork : IDisposable
     ///     Possibly incurs side effects
     /// </summary>
     /// <param name="commandEnvelopes"></param>
-    /// <param name="commands"></param>
     /// <returns></returns>
     public async Task<IResult<EventEnvelope[]>> Invoke(params CommandEnvelope[] commandEnvelopes)
     {
@@ -81,24 +77,24 @@ public interface IUnitOfWork : IDisposable
         // ToDo: Check if there is only a single aggregate involved. If so, directly run the Trigger on the aggregate handler for performance benefits.
         var commandResult = await Evaluate(commandEnvelopes);
         
-        if (commandResult.IsFailed)
+        if (commandResult.IsFailure)
         {
             await Abort(commandEnvelopes
                 .Select(q => q.Metadata)
                 .ToArray());
             
-            return Result.Fail<EventEnvelope[]>(commandResult.Errors);
+            return new Result<EventEnvelope[]>(commandResult.Errors);
         }
         
-        var eventResult = await Apply(commandResult.Value);
+        var eventResult = await Apply(commandResult.Value ?? throw new ArgumentException());
 
-        if (eventResult.IsFailed)
+        if (eventResult.IsFailure)
         {
             await Abort(commandEnvelopes
                 .Select(q => q.Metadata)
                 .ToArray());
             
-            return Result.Fail<EventEnvelope[]>(eventResult.Errors);
+            return new Result<EventEnvelope[]>(eventResult.Errors);
         }
         
         return commandResult;
@@ -111,11 +107,10 @@ public interface IUnitOfWork : IDisposable
             serviceEnvelope.Metadata.TransactionId = Guid.NewGuid().ToString();
         
         var serviceResult = await Evaluate(serviceEnvelope);
+
+        if (serviceResult.IsFailure)
+            return new Result<EventEnvelope[]>(serviceResult.Errors);
         
-        if (serviceResult.IsFailed)
-            return new Result<EventEnvelope[]>()
-                .WithReasons(serviceResult.Reasons);
-        
-        return await Invoke(serviceResult.Value);
+        return await Invoke(serviceResult.Value ?? throw new ArgumentException());
     }
 }

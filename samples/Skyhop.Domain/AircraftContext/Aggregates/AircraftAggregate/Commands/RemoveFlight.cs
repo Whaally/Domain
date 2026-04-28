@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
+﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Generators;
@@ -15,7 +14,6 @@ public partial class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFligh
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {
-        return new Command()
-            .Stage(new FlightRemoved(command.FlightId));
+        return Command.Stage(new FlightRemoved(command.FlightId));
     }
 }

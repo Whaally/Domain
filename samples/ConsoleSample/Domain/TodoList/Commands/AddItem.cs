@@ -1,5 +1,4 @@
 using ConsoleSample.Domain.TodoList.Events;
-using FluentResults;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
@@ -11,5 +10,5 @@ public class AddItemHandler : ICommandHandler<TodoListAggregate, AddItem>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoListAggregate> context,
         AddItem command) =>
-        new Command().Stage(new ItemAdded(command.id));
+        Command.Stage(new ItemAdded(command.id));
 }

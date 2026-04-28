@@ -1,6 +1,4 @@
-﻿using FluentResults;
-
-namespace Whaally.Domain.Abstractions;
+﻿namespace Whaally.Domain.Abstractions;
 
 public interface IAggregateHandler
 {
@@ -8,37 +6,33 @@ public interface IAggregateHandler
     ///     Trigger a command to evaluate the command and applying all related side effects when applicable.
     /// </summary>
     /// <param name="commandEnvelope"></param>
-    /// <param name="commands">The commands to trigger evaluation and application of side effects for</param>
     /// <returns>Events which had been applied to the aggregate</returns>
     public async Task<IResult<EventEnvelope>> Trigger(CommandEnvelope commandEnvelope)
     {
         var commandResult = await Evaluate(commandEnvelope);
 
-        if (commandResult.IsFailed)
+        if (commandResult.IsFailure)
             return commandResult;
 
-        var eventResult = await Apply(commandResult.Value);
+        var eventResult = await Apply(commandResult.Value ?? throw new ArgumentException());
 
-        return eventResult.IsFailed 
-            ? Result.Fail<EventEnvelope>(eventResult.Errors) 
+        return eventResult.IsFailure
+            ? new Result<EventEnvelope>(eventResult.Errors) 
             : commandResult;
     }
-    
+
     /// <summary>
     ///     Evaluate the provided commands against the current state.
     /// </summary>
-    /// <param name="commands">The commands to evaluate</param>
     /// <returns>async result containing events if successful</returns>
     public Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope);
 
 
-    
     /// <summary>
     ///     Apply the provided events to the current state.
     /// </summary>
-    /// <param name="events">The events to apply</param>
     /// <returns>async Task</returns>
-    public Task<IResultBase> Apply(EventEnvelope eventEnvelope);
+    public Task<IResult> Apply(EventEnvelope eventEnvelope);
 
     /// <summary>
     ///     Allows abortion of a running transaction

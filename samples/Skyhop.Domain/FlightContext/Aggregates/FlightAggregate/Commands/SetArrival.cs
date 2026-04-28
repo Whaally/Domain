@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using FluentResults;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
@@ -20,7 +19,7 @@ public partial class SetArrivalHandler : ICommandHandler<Flight, SetArrival>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, SetArrival command)
     {
-        var result = new Command();
+        var result = Command.Result;
         
         if (!context.Aggregate.IsInitialized) 
             result = result.WithError("Flight does not exist");

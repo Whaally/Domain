@@ -1,6 +1,4 @@
-﻿using FluentResults;
-using Microsoft.Extensions.Logging;
-using Orleans.Concurrency;
+﻿using Orleans.Concurrency;
 using Orleans.EventSourcing;
 using Orleans.EventSourcing.CustomStorage;
 using Orleans.Serialization.Invocation;
@@ -19,18 +17,14 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
     {
         return true;
     }
-    
-    private readonly IServiceProvider _services;
-    
+
     protected IAggregateHandler<TAggregate> AggregateHandler;
-    protected TAggregate Aggregate = new();
+    protected TAggregate Aggregate;
     
     public AbstractAggregateHandlerGrain(IServiceProvider services)
     {
-        _services = services;
-        
         Aggregate = new();
-        AggregateHandler = new TransactionalAggregateHandler<TAggregate>(_services, this.GetPrimaryKey())
+        AggregateHandler = new TransactionalAggregateHandler<TAggregate>(services, this.GetPrimaryKey())
         {
             Aggregate = Aggregate
         };
@@ -63,9 +57,9 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
     public async Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope) =>
         await AggregateHandler.Evaluate(commandEnvelope);
 
-    public async Task<IResultBase> Apply(EventEnvelope eventEnvelope)
+    public async Task<IResult> Apply(EventEnvelope eventEnvelope)
     {
-        if (eventEnvelope.Messages?.Count() == 0) return Result.Ok();
+        if (!eventEnvelope.Messages.Any()) return Result.Success();
 
         RaiseEvent(eventEnvelope);
 
@@ -84,7 +78,7 @@ public abstract class AbstractAggregateHandlerGrain<TAggregate> :
          */
         await ConfirmEvents();
         
-        return Result.Ok();
+        return Result.Success();
     }
 
     public Task Abort(IMessageMetadata metadata)

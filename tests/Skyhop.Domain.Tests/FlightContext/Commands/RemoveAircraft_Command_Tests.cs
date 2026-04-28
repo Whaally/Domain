@@ -26,7 +26,7 @@ public class RemoveAircraft_Command_Tests : DomainTest
     {
         var flight = AggregateFactory.Instantiate<Flight>(Guid.NewGuid());
 
-        await flight.Apply((await flight.Evaluate(new Create())).Value);
+        await flight.Apply((await flight.Evaluate(new Create())).Value!);
 
         var result = await flight.Evaluate(new RemoveAircraft());
 

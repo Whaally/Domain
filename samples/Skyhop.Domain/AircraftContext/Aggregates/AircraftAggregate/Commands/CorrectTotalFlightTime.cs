@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Whaally.Domain;
+﻿using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Generators;
 
@@ -16,6 +15,6 @@ public partial class CorrectTotalFlightTimeHandler : ICommandHandler<Aircraft, C
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
     {
-        return new Command();
+        return Command.Result;
     }
 }

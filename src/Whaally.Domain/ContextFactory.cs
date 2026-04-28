@@ -4,6 +4,11 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
+/// <summary>
+///     Responsible for creation of the context object injected into handler methods for services, commands, events and
+///         sagas.
+/// </summary>
+/// <param name="services"></param>
 public class ContextFactory(IServiceProvider services) : IContextFactory
 {
     public ISagaContext CreateSagaContext(EventMetadata metadata, Activity? activity = null)

@@ -21,7 +21,7 @@ public class ServiceTests
         var result = await new TestServiceHandler()
             .Invoke(context, service);
 
-        result.Reasons.Should().BeEmpty();
+        result.Errors.Should().BeEmpty();
         Assert.Equal(service.Id, ((CommandEnvelope)result.Operations.Single()).Metadata.AggregateId);
     }
 
@@ -38,7 +38,7 @@ public class ServiceTests
         var result = await new TestParentServiceHandler()
             .Invoke(context, service);
         
-        result.Reasons.Should().BeEmpty();
+        result.Errors.Should().BeEmpty();
         
         // for evaluation into commands, invoke the service through the evaluation agent
         // Assert.Equal(service.Id1, ((CommandEnvelope)result.Operations.First()).Metadata.AggregateId);

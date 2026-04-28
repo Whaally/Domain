@@ -16,17 +16,17 @@ public static class DomainHelpers
 
         var result = await aggregate.Evaluate(commands);
 
-        if (result.IsFailed)
+        if (result.IsFailure)
             return TypedResults.ValidationProblem(
-                result.Reasons.ToDictionary(q => q.Message, q => new string[] { }));
+                result.Errors.ToDictionary(q => q.ErrorMessage!, q => new string[] { }));
 
-        if (!result.Value.Messages.Any())
+        if (!result.Value?.Messages.Any() ?? false)
             return TypedResults.Ok();
         
-        await aggregate.Apply(result.Value);
+        await aggregate.Apply(result.Value!);
 
-        var response = JsonSerializer.Serialize<object[]>(
-            result.Value.Messages.ToArray());
+        var response = JsonSerializer.Serialize(
+            result.Value!.Messages.ToArray<object>());
 
         // Using this primitive approach at the moment as the `TypedResults.Json` method
         // does not properly serialize the returned events.

@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Whaally.Domain.Abstractions;
+﻿using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Domain;
 
@@ -11,20 +10,27 @@ internal record TestCommand : ICommand
     [Id(1)]
     public IEnumerable<IEvent> Events { get; init; } = new IEvent[] { };
     [Id(2)]
-    public Result Result { get; init; } = Result.Ok();
+    public Result Result { get; init; } = Result.Success();
 }
 
 internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
-        var result = new Command();
+        var result = Command.Result;
         
         foreach (var @event in command.Events)
         {
             result.Stage(@event);
         }
 
-        return result.WithReasons(command.Result.Reasons);
+        foreach (var error in command.Result.Errors)
+        {
+            result.WithError(
+                error.ErrorMessage!, 
+                error.MemberNames.ToArray());
+        }
+
+        return result;
     }
 }

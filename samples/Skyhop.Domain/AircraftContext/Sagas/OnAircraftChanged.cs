@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
+﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Snapshots;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
@@ -21,7 +20,7 @@ internal partial class OnAircraftChanged : ISaga<AircraftSet>
             .Snapshot<FlightSnapshot>();
         
         // There is no need to make a change as the flight is up to date with the latest state
-        if (flight.AircraftId != @event.AircraftId) return new Saga();
+        if (flight.AircraftId != @event.AircraftId) return new SagaResult();
         
         var aircraft = await context.Factory
             .Instantiate<Aircraft>(@event.AircraftId)
@@ -29,7 +28,7 @@ internal partial class OnAircraftChanged : ISaga<AircraftSet>
         
         if (!aircraft.FlightsIds.Contains(context.AggregateId))
         {
-            return new Saga()
+            return new SagaResult()
                 .Stage(
                     @event.AircraftId,
                     new SetFlightInfo(
@@ -38,6 +37,6 @@ internal partial class OnAircraftChanged : ISaga<AircraftSet>
                         flight.ArrivalTime));
         }
         
-        return new Saga();
+        return new SagaResult();
     }
 }

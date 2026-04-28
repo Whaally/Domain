@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Orleans.Concurrency;
+﻿using Orleans.Concurrency;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Infrastructure.OrleansHost;
@@ -15,14 +14,14 @@ public interface IAggregateHandlerGrain<TAggregate> : IGrainWithGuidKey,
     new Task Abort(IMessageMetadata metadata);
 
     [AlwaysInterleave]
-    new Task<IResultBase> Apply(EventEnvelope eventEnvelope);
+    new Task<IResult> Apply(EventEnvelope eventEnvelope);
 
     Task IAggregateHandler.Abort(IMessageMetadata metadata)
     {
         return Abort(metadata);
     }
 
-    Task<IResultBase> IAggregateHandler.Apply(EventEnvelope eventEnvelope)
+    Task<IResult> IAggregateHandler.Apply(EventEnvelope eventEnvelope)
     {
         return Apply(eventEnvelope);
     }

@@ -1,6 +1,5 @@
 using ConsoleSample.Domain.TodoItem;
 using ConsoleSample.Domain.TodoList.Commands;
-using FluentResults;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
@@ -15,7 +14,7 @@ public class AddItemServiceHandler : IServiceHandler<AddItemService>
         var todoItem = Guid.NewGuid();
 
         return Task.FromResult(
-            new Service()
+            new ServiceResult()
                 .Stage(
                     todoItem, 
                     new CreateTodoItem("do a thing"))

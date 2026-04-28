@@ -1,4 +1,3 @@
-using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;

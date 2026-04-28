@@ -1,8 +1,6 @@
-using FluentResults;
-
 namespace Whaally.Domain.Abstractions;
 
-public interface ISagaResult : IResultBase
+public interface ISagaResult : IResult
 {
     public IEnumerable<IMessageEnvelope> Operations { get; }
     

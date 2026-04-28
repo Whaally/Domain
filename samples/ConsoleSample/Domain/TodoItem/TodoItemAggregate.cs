@@ -1,4 +1,3 @@
-using FluentResults;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 
@@ -17,8 +16,8 @@ public class CreateTodoItemHandler : ICommandHandler<TodoItemAggregate, CreateTo
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
     {
-        return new Command()
-            .Stage((new TodoItemCreated(command.item)))
+        return Command
+            .Stage(new TodoItemCreated(command.item))
             .Invoke(new SetCompletion(false));
     }
 }
@@ -27,19 +26,19 @@ public class SetCompletionHandler : ICommandHandler<TodoItemAggregate, SetComple
 {
     public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
     {
-        return new Command().Stage(new CompletionSet(command.completed));
+        return Command.Stage(new CompletionSet(command.completed));
     }
 }
 
-public record TodoItemCreated(string item) : IEvent;
-public record CompletionSet(bool completed) : IEvent;
+public record TodoItemCreated(string Item) : IEvent;
+public record CompletionSet(bool Completed) : IEvent;
 
 public class TodoItemCreatedHandler : IEventHandler<TodoItemAggregate, TodoItemCreated>
 {
     public TodoItemAggregate Apply(IEventHandlerContext<TodoItemAggregate> context, TodoItemCreated @event)
         => context.Aggregate with
         {
-            item = @event.item
+            item = @event.Item
         };
 }
 
@@ -48,6 +47,6 @@ public class CompletionHandler : IEventHandler<TodoItemAggregate, CompletionSet>
     public TodoItemAggregate Apply(IEventHandlerContext<TodoItemAggregate> context, CompletionSet @event)
         => context.Aggregate with
         {
-            Completed = @event.completed
+            Completed = @event.Completed
         };
 }

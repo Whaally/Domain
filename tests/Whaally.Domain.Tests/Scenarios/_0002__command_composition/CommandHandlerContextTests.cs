@@ -1,5 +1,4 @@
 using FluentAssertions;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 

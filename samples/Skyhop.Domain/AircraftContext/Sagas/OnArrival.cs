@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
+﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Snapshots;
@@ -19,13 +18,13 @@ internal partial class OnArrival : ISaga<ArrivalTimeSet>
             .Snapshot<FlightSnapshot>();
 
         if (snapshot.AircraftId is Guid g)
-            new Saga().Stage(
+            new SagaResult().Stage(
                 g,
                 new SetFlightInfo(
                     g,
                     snapshot.DepartureTime,
                     @event.ArrivalTime));
 
-        return new Saga();
+        return new SagaResult();
     }
 }

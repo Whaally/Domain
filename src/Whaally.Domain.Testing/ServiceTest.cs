@@ -1,4 +1,3 @@
-using FluentResults;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Testing;
@@ -10,7 +9,7 @@ public abstract class ServiceTest<TService> : DomainTest
     public TService Service { get; }
     
     public ServiceHandlerContext Context { get; }
-    public IResultBase Result { get; private init; }
+    public IResult Result { get; private init; }
     public IEnumerable<ICommand> Commands { get; private init; }
     
     public ServiceTest(

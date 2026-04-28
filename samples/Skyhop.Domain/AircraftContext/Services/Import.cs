@@ -1,4 +1,3 @@
-using FluentResults;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Generators;
@@ -14,7 +13,7 @@ public partial class ImportHandler : IServiceHandler<Import>
     public async Task<IServiceResult> Invoke(IServiceHandlerContext context, Import service)
     {
         // Import things from some external service
-        return new Service();
+        return new ServiceResult();
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

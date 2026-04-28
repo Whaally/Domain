@@ -21,7 +21,7 @@ public class SetAircraft_Command_Tests : DomainTest
             new SetAircraft(_aircraftId));
         
         Assert.Empty(result.Errors);
-        Assert.Equal(2, result.Value.Messages.Count());
+        Assert.Equal(2, result.Value?.Messages.Count());
         Assert.IsAssignableFrom<EventEnvelope>(result.Value);
     }
 

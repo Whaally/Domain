@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using FluentAssertions;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -35,11 +34,11 @@ public class _0004__aggregate_interfaces
     {
         public Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope) 
             => throw new NotImplementedException();
-        public Task<IResultBase> Apply(EventEnvelope eventEnvelope) 
+        public Task<IResult> Apply(EventEnvelope eventEnvelope) 
             => throw new NotImplementedException();
         public Task<IResult<EventEnvelope[]>> Evaluate(params CommandEnvelope[] commands)
             => throw new NotImplementedException();
-        public Task<IResultBase> Apply(params EventEnvelope[] events)
+        public Task<IResult> Apply(params EventEnvelope[] events)
             => throw new NotImplementedException();
         public Task Abort(IMessageMetadata metadata) 
             => throw new NotImplementedException();

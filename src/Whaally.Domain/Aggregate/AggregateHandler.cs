@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -49,7 +48,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         
         if (cancellationToken?.IsCancellationRequested ?? false)
             return Task.FromResult<IResult<EventEnvelope>>(
-                Result.Fail<EventEnvelope>("Operation was cancelled"));
+                Result<EventEnvelope>.Fail("Operation was cancelled"));
         
         // TODO: Allow concurrent uses, though queue subsequent operations
         if (_activity != null
@@ -60,13 +59,10 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             ActivityKind.Internal,
             name: $"Aggregate {Aggregate.GetType().Name}",
             parentContext: commandEnvelope.Metadata.ParentContext ?? default,
-            tags: new Dictionary<string, object?>
-            {
-
-            });
+            tags: new Dictionary<string, object?>());
 
         var events = new List<IEvent>();
-        var results = new List<IResultBase>();
+        var results = new List<IResult>();
 
         TAggregate intermediateState = _aggregate;
 
@@ -109,7 +105,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             {
                 if (cancellationToken?.IsCancellationRequested ?? false)
                     return Task.FromResult<IResult<EventEnvelope>>(
-                        Result.Fail<EventEnvelope>("Operation was cancelled"));
+                        Result<EventEnvelope>.Fail("Operation was cancelled"));
                 
                 var @event = intermediateEvent;
 
@@ -133,34 +129,35 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             }
         }
 
-        var result = new Result().WithReasons(results.SelectMany(q => q.Reasons));
+        var result = new Result(results.SelectMany(q => q.Errors));
         
         return Task.FromResult<IResult<EventEnvelope>>(
             result.IsSuccess
-                ? result.ToResult(new EventEnvelope(
-                    new EventMetadata
-                    {
-                        AggregateId = commandEnvelope.Metadata.AggregateId,
-                        AggregateType = Aggregate.GetType(),
-                        CreatedAt = DateTimeOffset.UtcNow,
-                        Attributes = commandEnvelope.Metadata.Attributes,
-                        ParentContext = _activity?.Context,
-                        TransactionId = commandEnvelope.Metadata.TransactionId
-                    },
-                    events))
-                : result);
+                ? new Result<EventEnvelope>(
+                    new EventEnvelope(
+                        new EventMetadata
+                        {
+                            AggregateId = commandEnvelope.Metadata.AggregateId,
+                            AggregateType = Aggregate.GetType(),
+                            CreatedAt = DateTimeOffset.UtcNow,
+                            Attributes = commandEnvelope.Metadata.Attributes,
+                            ParentContext = _activity?.Context,
+                            TransactionId = commandEnvelope.Metadata.TransactionId
+                        },
+                        events))
+                : new Result<EventEnvelope>(result.Errors));
     }
 
-    public virtual Task<IResultBase> Apply(EventEnvelope eventEnvelope) => Apply(eventEnvelope, null);
+    public virtual Task<IResult> Apply(EventEnvelope eventEnvelope) => Apply(eventEnvelope, null);
     
-    public virtual async Task<IResultBase> Apply(EventEnvelope eventEnvelope, CancellationToken? cancellationToken)
+    public virtual async Task<IResult> Apply(EventEnvelope eventEnvelope, CancellationToken? cancellationToken)
     {
         if (!eventEnvelope.Messages.Any())
         {
             _activity?.Dispose();
             _activity = null;
             
-            return Result.Ok();
+            return Result.Success();
         }
         else if (cancellationToken?.IsCancellationRequested ?? false)
             return Result.Fail("Operation was cancelled");
@@ -191,7 +188,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
         _activity?.Dispose();
         _activity = null;
         
-        return Result.Ok();
+        return Result.Success();
     }
 
     public virtual Task Abort(IMessageMetadata metadata)

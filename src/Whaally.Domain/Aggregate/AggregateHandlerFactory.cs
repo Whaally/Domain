@@ -2,6 +2,12 @@
 
 namespace Whaally.Domain;
 
+/// <summary>
+///     Object responsible for instantiating new aggregate handler instances. As the handler can assume the role of
+///         either a concrete instance or a proxy to one this may be the place to link in the placement strategy.
+/// </summary>
+/// <param name="serviceProvider"></param>
+/// <param name="aggregateFactory"></param>
 internal class AggregateHandlerFactory(
     IServiceProvider serviceProvider,
     IAggregateFactory aggregateFactory)
@@ -21,9 +27,9 @@ internal class AggregateHandlerFactory(
         {
             Aggregate = aggregateFactory.Instantiate<TAggregate>()
         };
-
+        
         _dictionary.Add(id, handler);
-
+        
         return (IAggregateHandler<TAggregate>)handler;
     }
 }

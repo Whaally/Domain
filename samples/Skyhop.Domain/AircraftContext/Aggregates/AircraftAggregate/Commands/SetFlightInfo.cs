@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
+﻿using Skyhop.Domain.AircraftContext.Aggregates.AircraftAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Generators;
@@ -18,7 +17,7 @@ public partial class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightI
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
     {
-        return new Command().Stage(
+        return Command.Stage(
             new FlightInfoSet(command.FlightId, command.Departure, command.Arrival));
     }
 }

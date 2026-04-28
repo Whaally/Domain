@@ -61,7 +61,7 @@ public class OnDepartureTests : DomainTest
         var result = await saga.Evaluate(context, @event);
         
         // Assert
-        result.Reasons.Should().BeEmpty();
+        result.Errors.Should().BeEmpty();
         Assert.Single(result.Operations);
         Assert.IsType<SetFlightInfo>(result.Operations.Single().Messages.Single());
     }

@@ -1,5 +1,6 @@
-﻿using System.Diagnostics;
-using FluentResults;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -34,16 +35,18 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
                     .Select(async q => q switch
                     {
                         ServiceEnvelope s => await Evaluate(s),
-                        CommandEnvelope c => new FluentResults.Result<CommandEnvelope[]>().WithValue([ c ]),
+                        CommandEnvelope c => new Result<CommandEnvelope[]>([ c ]),
                         _ => throw new InvalidOperationException()
                     })))
             .Select(q => q)
             .ToList();
 
         // Todo: merge various CommandEnvelopes based on target type and id
-        return new FluentResults.Result<CommandEnvelope[]>()
-            .WithReasons(intermediate.SelectMany(q => q.Reasons))
-            .WithValue(intermediate.SelectMany(q => q.Value).ToArray());
+        return new Result<CommandEnvelope[]>(
+            intermediate
+                .SelectMany(q => q.Value ?? throw new ArgumentException())
+                .ToArray(),
+            intermediate.SelectMany(q => q.Errors));
     }
     
     /// <summary>
@@ -55,12 +58,20 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
     public async Task<IResult<EventEnvelope[]>> Evaluate(params CommandEnvelope[] commandEnvelopes)
     {
         // Todo: merge command envelopes for objects with the same id / type
+        // todo: pre-emptively validate the provided DTOs using their validation attributes
         
         List<IResult<EventEnvelope>> results = [];
         
         await Parallel.ForEachAsync(commandEnvelopes, async (envelope, ct) =>
         {
             if (!envelope.Messages.Any()) return;
+
+            foreach (var message in envelope.Messages)
+            {
+                var context = new ValidationContext(message);
+                var validationResults = new Collection<ValidationResult>();
+                Validator.TryValidateObject(message, context, validationResults);
+            }
             
             if (envelope.Metadata.AggregateType == null)
                 envelope.Metadata.AggregateType = _domainContext.GetCommonAggregateType(envelope.Messages);
@@ -71,12 +82,13 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
             
             results.Add(await handler.Evaluate(envelope));
         });
-        
-        return new FluentResults.Result<EventEnvelope[]>()
-            .WithValue(results
+
+        return new Result<EventEnvelope[]>(
+            results
                 .Select(q => q.Value)
-                .ToArray())
-            .WithReasons(results.SelectMany(q => q.Reasons));
+                .OfType<EventEnvelope>()
+                .ToArray(),
+            results.SelectMany(q => q.Errors));
     }
     
     /// <summary>
@@ -85,9 +97,9 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
     /// <param name="eventEnvelopes"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task<IResultBase> Apply(params EventEnvelope[] eventEnvelopes)
+    public async Task<IResult> Apply(params EventEnvelope[] eventEnvelopes)
     {
-        List<IResultBase> results = new(eventEnvelopes.Length);
+        List<IResult> results = new(eventEnvelopes.Length);
 
         await Parallel.ForEachAsync(eventEnvelopes, async (envelope, ct) =>
         {
@@ -102,8 +114,7 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
             results.Add(await handler.Apply(envelope));
         });
         
-        return new Result()
-            .WithReasons(results.SelectMany(q => q.Reasons));
+        return new Result(results.SelectMany(q => q.Errors));
     }
     
     /// <summary>
@@ -111,7 +122,7 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
     /// </summary>
     /// <param name="eventEnvelope"></param>
     /// <returns></returns>
-    public Task<IResultBase> Continue(EventEnvelope eventEnvelope)
+    public Task<IResult> Continue(EventEnvelope eventEnvelope)
     {
         foreach (var @event in eventEnvelope.Messages)
         {
@@ -122,7 +133,7 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
             }
         }
         
-        return Task.FromResult<IResultBase>(Result.Ok());
+        return Task.FromResult<IResult>(Result.Success());
     }
     
     public Task Abort(params CommandMetadata[] metadata)
@@ -138,7 +149,7 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
     /// <param name="saga"></param>
     /// <param name="eventEnvelope"></param>
     /// <returns></returns>
-    public async Task<IResultBase> Invoke(ISaga saga, EventEnvelope eventEnvelope)
+    public async Task<IResult> Invoke(ISaga saga, EventEnvelope eventEnvelope)
     {
         if (eventEnvelope.Messages.Count() != 1)
             throw new ArgumentException($"Expected {nameof(eventEnvelope)} to contain one message");
@@ -152,13 +163,10 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
         
         eventEnvelope.Metadata.ParentContext = activity?.Context;
 
-        var result = new Result();
-
         var context = _contextFactory.CreateSagaContext(eventEnvelope.Metadata);
         var output = await saga.Evaluate(
             context,
             eventEnvelope.Messages.Single());
-        
         
         // todo: ensure services are in fact fully evaluated
         // todo: allow to manage the whole lifecycle from this class. I.e. including service invocation
@@ -168,15 +176,13 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
                     .Select(async q => q switch
                     {
                         ServiceEnvelope s => await Evaluate(s),
-                        CommandEnvelope c => new FluentResults.Result<CommandEnvelope[]>().WithValue([ c ]),
+                        CommandEnvelope c => new Result<CommandEnvelope[]>([ c ]),
                         _ => throw new InvalidOperationException()
                     })))
             .Select(q => q)
             .ToList();
 
-        result.WithReasons(intermediate.SelectMany(q => q.Reasons));
-        
-        return result;
+        return new Result(intermediate.SelectMany(q => q.Errors));
     }
     
     public void Dispose()

@@ -1,5 +1,4 @@
 using FluentAssertions;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Tests.Domain;
@@ -24,11 +23,11 @@ public class AggregateTests
         var result = await ag.Evaluate(
             new TestCommand
             {
-                Result = Result.Ok()
+                Result = Result.Success()
             });
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Messages.Should().BeEmpty();
+        result.Value?.Messages.Should().BeEmpty();
     }
 
     [Fact]
@@ -42,7 +41,7 @@ public class AggregateTests
                 Result = Result.Fail("Failure")
             });
 
-        Assert.True(operationResult.IsFailed);
+        Assert.True(operationResult.IsFailure);
         Assert.Throws<InvalidOperationException>(() => operationResult.Value);
     }
 
@@ -55,11 +54,11 @@ public class AggregateTests
             new TestCommand
             {
                 Events = [new TestEvent()],
-                Result = Result.Ok()
+                Result = Result.Success()
             });
 
         Assert.True(result.IsSuccess);
-        Assert.Single(result.Value.Messages);
+        Assert.Single(result.Value!.Messages);
     }
 
     [Fact]
@@ -77,11 +76,11 @@ public class AggregateTests
                 new TestCommand
                 {
                     Events = [ new TestEvent() ],
-                    Result = Result.Ok()
+                    Result = Result.Success()
                 }));
 
         Assert.True(result.IsSuccess);
-        Assert.Single(result.Value.Messages);
+        Assert.Single(result.Value!.Messages);
 
         result.Value.Metadata.AggregateId.Should().Be(guid);
     }

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 
@@ -11,87 +10,69 @@ namespace Whaally.Domain;
  * - Do not inject dependencies to this class (IAggregateHandlerFactory & IUnitOfWork) as concrete instances.
  *   Doing so causes an infinite loop as this class is often injected as dependency to those.
  */
-public class DomainContext
+public class DomainContext(
+    IServiceProvider services,
+    IEnumerable<Type>? commandHandlerTypes = null,
+    IEnumerable<Type>? eventHandlerTypes = null,
+    IEnumerable<Type>? serviceHandlerTypes = null,
+    IEnumerable<Type>? sagaTypes = null,
+    IEnumerable<Type>? snapshotFactoryTypes = null)
 {
     internal static ActivitySource ActivitySource = new("Whaally.Domain");
-    
-    private readonly IServiceProvider _services;
-    private IUnitOfWork NewUnitOfWork() => _services.GetRequiredService<IUnitOfWork>();
+
+    private IUnitOfWork NewUnitOfWork() => services.GetRequiredService<IUnitOfWork>();
     private Activity? NewActivity() => ActivitySource.StartActivity(
         ActivityKind.Internal,
         name: nameof(DomainContext),
-        tags: new Dictionary<string, object?>
-        {
-            
-        });
-    
-    public DomainContext(
-        IServiceProvider services,
-        IEnumerable<Type>? commandHandlerTypes = null,
-        IEnumerable<Type>? eventHandlerTypes = null,
-        IEnumerable<Type>? serviceHandlerTypes = null,
-        IEnumerable<Type>? sagaTypes = null,
-        IEnumerable<Type>? snapshotFactoryTypes = null)
-    {
-        _services = services;
+        tags: new Dictionary<string, object?>());
 
-        CommandHandlers = (commandHandlerTypes ?? [])
-            .Select(CommandHandlerMeta.From)
-            .ToList()
-            .AsReadOnly();
-        
-        EventHandlers = (eventHandlerTypes ?? [])
-            .Select(EventHandlerMeta.From)
-            .ToList()
-            .AsReadOnly();
-        
-        ServiceHandlers = (serviceHandlerTypes ?? [])
-            .Select(ServiceHandlerMeta.From)
-            .ToList()
-            .AsReadOnly();
-        
-        Sagas = (sagaTypes ?? [])
-            .Select(SagaMeta.From)
-            .ToList()
-            .AsReadOnly();
-        
-        SnapshotFactories = (snapshotFactoryTypes ?? [])
-            .Select(SnapshotFactoryMeta.From)
-            .ToList()
-            .AsReadOnly();
-    }
-    
     #region handler metadata
     /// <summary>
     ///     Metadata about the command handlers registered with this domain instance.
     /// </summary>
-    public IReadOnlyList<CommandHandlerMeta> CommandHandlers { get; }
-    
+    public IReadOnlyList<CommandHandlerMeta> CommandHandlers { get; } = (commandHandlerTypes ?? [])
+        .Select(CommandHandlerMeta.From)
+        .ToList()
+        .AsReadOnly();
+
     /// <summary>
     ///     Metadata about the event handlers registered with this domain.
     /// </summary>
-    public IReadOnlyList<EventHandlerMeta> EventHandlers { get; }
-    
+    public IReadOnlyList<EventHandlerMeta> EventHandlers { get; } = (eventHandlerTypes ?? [])
+        .Select(EventHandlerMeta.From)
+        .ToList()
+        .AsReadOnly();
+
     /// <summary>
     ///     Metadata about the service handlers registered with this domain.
     /// </summary>
-    public IReadOnlyList<ServiceHandlerMeta> ServiceHandlers { get; }
-    
+    public IReadOnlyList<ServiceHandlerMeta> ServiceHandlers { get; } = (serviceHandlerTypes ?? [])
+        .Select(ServiceHandlerMeta.From)
+        .ToList()
+        .AsReadOnly();
+
     /// <summary>
     ///     Metadata about the sagas registered with this domain.
     /// </summary>
-    public IReadOnlyList<SagaMeta> Sagas { get; }
-    
+    public IReadOnlyList<SagaMeta> Sagas { get; } = (sagaTypes ?? [])
+        .Select(SagaMeta.From)
+        .ToList()
+        .AsReadOnly();
+
     /// <summary>
     ///     Metadata about the snapshot factories registered with this domain.
     /// </summary>
-    public IReadOnlyList<SnapshotFactoryMeta> SnapshotFactories { get; }
+    public IReadOnlyList<SnapshotFactoryMeta> SnapshotFactories { get; } = (snapshotFactoryTypes ?? [])
+        .Select(SnapshotFactoryMeta.From)
+        .ToList()
+        .AsReadOnly();
+
     #endregion
     
     #region Aggregate handlers
     private IAggregateHandler GetAggregate(Type type, Guid id)
     {
-        var aggregateHandlerFactory = _services.GetRequiredService<IAggregateHandlerFactory>();
+        var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
         
         if (type.IsAssignableTo(typeof(IAggregate)))
         {
@@ -221,17 +202,17 @@ public class DomainContext
     }
     
     public IServiceHandler GetServiceHandler(Type serviceType) => 
-        (IServiceHandler)_services.GetRequiredService(
+        (IServiceHandler)services.GetRequiredService(
             ServiceHandlers
                 .Single(q => q.ServiceType == serviceType)
                 .HandlerType);
     
     public IEnumerable<ISaga> GetSaga(Type eventType) =>
         Sagas.Where(q => q.EventType == eventType)
-            .Select(q => (ISaga)_services.GetRequiredService(q.HandlerType));
+            .Select(q => (ISaga)services.GetRequiredService(q.HandlerType));
     
     public IEventHandler GetEventHandler(Type eventType) =>
-        (IEventHandler)_services.GetRequiredService(
+        (IEventHandler)services.GetRequiredService(
             EventHandlers
                 .Single(q => q.EventType == eventType)
                 .HandlerType);
@@ -239,7 +220,7 @@ public class DomainContext
     // TODO: See if we can also require the aggregate type as argument to validate that we're executing the correct handlers
     //       Same goes for the event handlers though.
     public ICommandHandler GetCommandHandler(Type commandType) =>
-        (ICommandHandler)_services.GetRequiredService(
+        (ICommandHandler)services.GetRequiredService(
             CommandHandlers
                 .Single(q => q.CommandType == commandType)
                 .HandlerType);

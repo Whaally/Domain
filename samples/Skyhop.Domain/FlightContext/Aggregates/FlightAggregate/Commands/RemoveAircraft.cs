@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
+﻿using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Generators;
@@ -15,7 +14,7 @@ public partial class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircr
 {
     public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
     {
-        var result = new Command();
+        var result = Command.Result;
         
         if (!context.Aggregate.IsInitialized)
             return result.WithError("Flight does not exist");

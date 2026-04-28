@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Whaally.Domain.Abstractions;
 using Whaally.Domain.Tests.Domain;
@@ -25,7 +24,7 @@ public class RecursiveServiceInvocationTest
         {
             if (service.Depth == 0)
             {
-                return Task.FromResult<IServiceResult>(new Service());
+                return Task.FromResult<IServiceResult>(new ServiceResult());
             }
 
             var newService = new RecursiveService
@@ -33,7 +32,7 @@ public class RecursiveServiceInvocationTest
                 Depth = service.Depth - 1
             };
                 
-            return Task.FromResult(new Service().Invoke(newService));
+            return Task.FromResult(new ServiceResult().Invoke(newService));
         }
     }
 
@@ -63,6 +62,6 @@ public class RecursiveServiceInvocationTest
 
         var result = await serviceHandler.Invoke(serviceHandlerContext, service);
         
-        result.Reasons.Should().BeEmpty();
+        result.Errors.Should().BeEmpty();
     }
 }

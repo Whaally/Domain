@@ -1,4 +1,3 @@
-using FluentResults;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
@@ -15,7 +14,7 @@ public static class IAggregateHandlerExtensions
             new CommandMetadata(),
             commands));
     
-    public static Task<IResultBase> Apply(this IAggregateHandler aggregateHandler, params IEvent[] events)
+    public static Task<IResult> Apply(this IAggregateHandler aggregateHandler, params IEvent[] events)
         => aggregateHandler.Apply(new EventEnvelope(
             new EventMetadata(),
             events));

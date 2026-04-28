@@ -6,10 +6,6 @@
     <ItemGroup>
         <None Include="..\..\assets\whaally-logo.png" Pack="true" PackagePath="\" />
     </ItemGroup>
-    
-    <ItemGroup>
-        <PackageReference Include="FluentResults" />
-    </ItemGroup>
 
     <PropertyGroup>
         <PackageId>Whaally.Domain.Abstractions</PackageId>

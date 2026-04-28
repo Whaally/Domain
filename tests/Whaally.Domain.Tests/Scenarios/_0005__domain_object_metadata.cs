@@ -1,5 +1,4 @@
 using FluentAssertions;
-using FluentResults;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios;

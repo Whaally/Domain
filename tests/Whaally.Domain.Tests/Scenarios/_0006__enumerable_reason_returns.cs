@@ -1,5 +1,4 @@
 using FluentAssertions;
-using FluentResults;
 using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain.Tests.Scenarios;
@@ -13,7 +12,7 @@ public class _0006__enumerable_reason_returns
     {
         public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
         {
-            return new Command().WithError("Failure");
+            return Command.WithError("Failure");
         }
     }
 

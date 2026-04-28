@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using FluentResults;
 using Nito.AsyncEx;
 using Whaally.Domain.Abstractions;
 
@@ -16,16 +15,16 @@ public class TransactionalAggregateHandler<TAggregate> : AggregateHandler<TAggre
     {
         var @lock = await AcquireLock(commandEnvelope.Metadata);
         if (@lock == null)
-            return await Task.FromResult<IResult<EventEnvelope>>(Result.Fail<EventEnvelope>("Could not acquire lock"));
+            return await Task.FromResult<IResult<EventEnvelope>>(Result<EventEnvelope>.Fail("Could not acquire lock"));
         
         return await base.Evaluate(commandEnvelope, @lock.Value.cancellationToken);
     }
     
-    public override async Task<IResultBase> Apply(EventEnvelope eventEnvelope)
+    public override async Task<IResult> Apply(EventEnvelope eventEnvelope)
     {
         var @lock = await AcquireLock(eventEnvelope.Metadata);
         if (@lock == null)
-            return await Task.FromResult<IResultBase>(Result.Fail<IResultBase>("Could not acquire lock"));
+            return await Task.FromResult<IResult>(Result.Fail("Could not acquire lock"));
         
         var result = await base.Apply(eventEnvelope, @lock.Value.cancellationToken);
         
