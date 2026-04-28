@@ -37,22 +37,22 @@ public class FlightController : ControllerBase
     }
     
     [HttpPost("{id}/aircraft/clear")]
-    public Task<IResult> RemoveAircraft(Guid id) =>
-        _aggregateHandlerFactory.Instantiate<Flight>(id)
+    public async Task<IResult> RemoveAircraft(Guid id) =>
+        await (await _aggregateHandlerFactory.Instantiate<Flight>(id))
             .EvaluateAndApply(new RemoveAircraft());
 
     [HttpPost("{id}/aircraft/set")]
-    public Task<IResult> SetAircraft(Guid id, SetAircraft aircraftCommand) =>
-        _aggregateHandlerFactory.Instantiate<Flight>(id)
+    public async Task<IResult> SetAircraft(Guid id, SetAircraft aircraftCommand) =>
+        await (await _aggregateHandlerFactory.Instantiate<Flight>(id))
             .EvaluateAndApply(aircraftCommand);
 
     [HttpPost("{id}/departure/set")]
-    public Task<IResult> SetDeparture(Guid id, SetDeparture departure) =>
-        _aggregateHandlerFactory.Instantiate<Flight>(id)
+    public async Task<IResult> SetDeparture(Guid id, SetDeparture departure) =>
+        await (await _aggregateHandlerFactory.Instantiate<Flight>(id))
             .EvaluateAndApply(departure);
 
     [HttpPost("{id}/arrival/set")]
-    public Task<IResult> SetArrival(Guid id, SetArrival arrival) =>
-        _aggregateHandlerFactory.Instantiate<Flight>(id)
+    public async Task<IResult> SetArrival(Guid id, SetArrival arrival) =>
+        await (await _aggregateHandlerFactory.Instantiate<Flight>(id))
             .EvaluateAndApply(arrival);
 }

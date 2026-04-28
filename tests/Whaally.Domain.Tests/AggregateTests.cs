@@ -18,7 +18,7 @@ public class AggregateTests
     [Fact]
     public async Task Aggregate_Accepts_Command()
     {
-        var ag = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
+        var ag = await _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
 
         var result = await ag.Evaluate(
             new TestCommand
@@ -33,7 +33,7 @@ public class AggregateTests
     [Fact]
     public async Task Aggregate_Command_Evaluation_May_Fail()
     {
-        var service = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
+        var service = await _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
 
         var operationResult = await service.Evaluate(
             new TestCommand
@@ -48,7 +48,7 @@ public class AggregateTests
     [Fact]
     public async Task Successful_Command_Evaluation_Provides_Events()
     {
-        var aggregateHandler = _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
+        var aggregateHandler = await _aggregateHandlerFactory.Instantiate<TestAggregate>(Guid.NewGuid());
 
         var result = await aggregateHandler.Evaluate(
             new TestCommand
@@ -65,7 +65,7 @@ public class AggregateTests
     public async Task AggregateId_Should_Be_Set_On_Event_Metadata()
     {
         var guid = Guid.NewGuid();
-        var aggregateHandler = _aggregateHandlerFactory.Instantiate<TestAggregate>(guid);
+        var aggregateHandler = await _aggregateHandlerFactory.Instantiate<TestAggregate>(guid);
 
         var result = await aggregateHandler.Evaluate(
             new CommandEnvelope(

@@ -8,9 +8,8 @@ using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Commands;
 using Skyhop.Domain.FlightContext.Aggregates.FlightAggregate.Events;
 using Whaally.Domain;
 using Whaally.Domain.Abstractions;
-using Timer = System.Timers.Timer;
 
-namespace Skyhop.Domain.Tests.FlightContext.Commands;
+namespace Skyhop.Domain.Tests.AircraftContext.Sagas;
 
 public class OnDepartureTests : DomainTest
 {
@@ -28,11 +27,11 @@ public class OnDepartureTests : DomainTest
                 departureAirfieldId
             ));
         
-        var aircraft = await AggregateFactory
-            .Instantiate<Aircraft>(aircraftId)
-            .Snapshot<AircraftSnapshot>();
+        var aircraft = await AggregateFactory.Instantiate<Aircraft>(aircraftId);
+            
+        var aircraftSnapshot = await aircraft.Snapshot<AircraftSnapshot>();
         
-        Assert.Contains(flightId, aircraft.FlightsIds);
+        Assert.Contains(flightId, aircraftSnapshot.FlightsIds);
     }
 
     [Fact]
@@ -41,11 +40,11 @@ public class OnDepartureTests : DomainTest
         var flightId = Guid.NewGuid();
         
         // First we're instantiating a flight as a snapshot of it will be retrieved by the saga
-        await AggregateFactory
-            .Instantiate<Flight>(flightId)
-            .Trigger(
-                new Create(),
-                new SetAircraft(Guid.NewGuid()));
+        var flight = await AggregateFactory.Instantiate<Flight>(flightId);
+        
+        await flight.Trigger(
+            new Create(),
+            new SetAircraft(Guid.NewGuid()));
         
         // Then we're creating the saga, and instantiating the arguments required for evaluation
         var saga = new OnDeparture();

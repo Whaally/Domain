@@ -14,7 +14,7 @@ public class SetAircraft_Command_Tests : DomainTest
     [Fact]
     public async Task Test_AircraftSet()
     {
-        var flight = AggregateFactory.Instantiate<Flight>(_flightId);
+        var flight = await AggregateFactory.Instantiate<Flight>(_flightId);
 
         var result = await flight.Trigger(
             new Create(),
@@ -28,7 +28,7 @@ public class SetAircraft_Command_Tests : DomainTest
     [Fact]
     public async Task AircraftSet_Requires_Aircraft_Id()
     {
-        var aggregate = AggregateFactory.Instantiate<Flight>(_flightId);
+        var aggregate = await AggregateFactory.Instantiate<Flight>(_flightId);
 
         var result = await aggregate.Trigger(
             new Create(),

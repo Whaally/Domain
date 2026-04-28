@@ -11,23 +11,12 @@ public class DomainTests
         .BuildServiceProvider();
     
     [Fact]
-    public async Task CanEvaluateServiceThroughDomainObject()
-    {
-        var domain = _services
-            .GetRequiredService<DomainContext>();
-
-        var result = await domain.Invoke(new TestService());
-        
-        Assert.True(result.IsSuccess);
-    }
-
-    [Fact]
-    public async Task CanEvaluateServiceThroughEvaluationAgent()
+    public async Task CanEvaluateService()
     {
         var domain = _services.GetRequiredService<DomainContext>();
 
         var result = await domain.Invoke(new TestService());
-
+        
         Assert.True(result.IsSuccess);
     }
 }

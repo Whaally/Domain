@@ -76,7 +76,7 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
             if (envelope.Metadata.AggregateType == null)
                 envelope.Metadata.AggregateType = _domainContext.GetCommonAggregateType(envelope.Messages);
             
-            var handler = _handlerFactory.Instantiate(
+            var handler = await _handlerFactory.Instantiate(
                 envelope.Metadata.AggregateType,
                 envelope.Metadata.AggregateId);
             
@@ -86,7 +86,6 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
         return new Result<EventEnvelope[]>(
             results
                 .Select(q => q.Value)
-                .OfType<EventEnvelope>()
                 .ToArray(),
             results.SelectMany(q => q.Errors));
     }
@@ -107,7 +106,7 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
             
             var aggregateType = _domainContext.GetCommonAggregateType(envelope.Messages);
 
-            var handler = _handlerFactory.Instantiate(
+            var handler = await _handlerFactory.Instantiate(
                 aggregateType,
                 envelope.Metadata.AggregateId);
             

@@ -15,13 +15,13 @@ internal class AggregateHandlerFactory(
 {
     private readonly Dictionary<Guid, IAggregateHandler> _dictionary = new();
 
-    public IAggregateHandler<TAggregate> Instantiate<TAggregate>(Guid id)
+    public Task<IAggregateHandler<TAggregate>> Instantiate<TAggregate>(Guid id)
         where TAggregate : class, IAggregate
     {
-        if (id == Guid.Empty) throw new ArgumentNullException(nameof(id));
+        if (id == Guid.Empty) throw new ArgumentException(nameof(id));
         
         if (_dictionary.TryGetValue(id, out var handler)) 
-            return (IAggregateHandler<TAggregate>)handler;
+            return Task.FromResult((IAggregateHandler<TAggregate>)handler);
         
         handler = new AggregateHandler<TAggregate>(serviceProvider, id)
         {
@@ -30,6 +30,6 @@ internal class AggregateHandlerFactory(
         
         _dictionary.Add(id, handler);
         
-        return (IAggregateHandler<TAggregate>)handler;
+        return Task.FromResult((IAggregateHandler<TAggregate>)handler);
     }
 }

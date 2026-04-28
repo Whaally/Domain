@@ -70,13 +70,13 @@ public class DomainContext(
     #endregion
     
     #region Aggregate handlers
-    private IAggregateHandler GetAggregate(Type type, Guid id)
+    private async Task<IAggregateHandler> GetAggregate(Type type, Guid id)
     {
         var aggregateHandlerFactory = services.GetRequiredService<IAggregateHandlerFactory>();
         
         if (type.IsAssignableTo(typeof(IAggregate)))
         {
-            return aggregateHandlerFactory.Instantiate(type, id);
+            return await aggregateHandlerFactory.Instantiate(type, id);
         }
         
         Type? aggregateType = null;
@@ -93,7 +93,7 @@ public class DomainContext(
         if (aggregateType == null) 
             throw new Exception($"Aggregate type could not be resolved for {type.FullName}");
             
-        var handler = aggregateHandlerFactory.Instantiate(
+        var handler = await aggregateHandlerFactory.Instantiate(
             aggregateType,
             id);
         

@@ -4,13 +4,10 @@ using Whaally.Domain.Abstractions;
 
 namespace Whaally.Domain;
 
-public class TransactionalAggregateHandler<TAggregate> : AggregateHandler<TAggregate>
+public class TransactionalAggregateHandler<TAggregate>(IServiceProvider services, Guid id) 
+    : AggregateHandler<TAggregate>(services, id) 
     where TAggregate : class, IAggregate
 {
-    public TransactionalAggregateHandler(IServiceProvider services, Guid id) : base(services, id)
-    {
-    }
-    
     public override async Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope)
     {
         var @lock = await AcquireLock(commandEnvelope.Metadata);
