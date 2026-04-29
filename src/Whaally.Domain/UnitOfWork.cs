@@ -85,7 +85,8 @@ public class UnitOfWork(IServiceProvider services) : IUnitOfWork
 
         return new Result<EventEnvelope[]>(
             results
-                .Select(q => q.Value)
+                .Select(q => q.ValueOrDefault)
+                .OfType<EventEnvelope>()
                 .ToArray(),
             results.SelectMany(q => q.Errors));
     }

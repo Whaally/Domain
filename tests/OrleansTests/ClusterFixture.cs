@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Orleans.Configuration;
 using Orleans.TestingHost;
 using Whaally.Domain;
 using Whaally.Domain.Infrastructure.OrleansHost;

@@ -13,4 +13,8 @@ public interface IResult
 public interface IResult<T> : IResult
 {   
     T Value { get; }
+
+    T? ValueOrDefault => IsSuccess 
+        ? Value 
+        : default;
 }

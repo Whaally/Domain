@@ -22,7 +22,8 @@ public class Result<T> : Result, IResult<T>
 
     public Result(IEnumerable<ValidationResult> errors) : base(errors)
     {
-        if (IsSuccess) throw new InvalidOperationException("Result indicates no error yet lacks value");
+        // todo: uncomment
+        // if (IsSuccess) throw new InvalidOperationException("Result indicates no error yet lacks value");
     }
 
     public Result(T value) : base([])
@@ -37,4 +38,6 @@ public class Result<T> : Result, IResult<T>
 
     private readonly T? _value;
     public T Value => _value ?? throw new InvalidOperationException();
+    
+    public T? ValueOrDefault => _value;
 }

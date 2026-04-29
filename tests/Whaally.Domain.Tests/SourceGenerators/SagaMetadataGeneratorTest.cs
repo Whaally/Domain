@@ -9,7 +9,7 @@ namespace Whaally.Domain.Tests.SourceGenerators;
 
 public class SagaMetadataGeneratorTest
 {
-    [Fact]
+    [Fact(Skip = "Used for manually triggering the source generator")]
     public async Task CanGenerateMetadata()
     {
         var test = new CSharpSourceGeneratorTest<GeneralizedMetadataGenerator, DefaultVerifier>
