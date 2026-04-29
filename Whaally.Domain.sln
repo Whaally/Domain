@@ -38,6 +38,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrleansTests", "tests\Orlea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Whaally.Domain.Generators", "src\Whaally.Domain.Generators\Whaally.Domain.Generators.csproj", "{FE275667-2001-44B0-99B1-49B5EEB8BC7E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__", "__", "{E8F41190-9A08-47E3-AD90-2D3FA56A77E9}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		Whaally.Domain.sln.DotSettings = Whaally.Domain.sln.DotSettings
+		README.md = README.md
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		.gitignore = .gitignore
+		.releaserc = .releaserc
+		.dockerignore = .dockerignore
+		.github\workflows\CI.yml = .github\workflows\CI.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
