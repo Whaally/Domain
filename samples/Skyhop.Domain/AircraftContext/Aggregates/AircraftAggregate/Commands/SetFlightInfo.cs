@@ -15,7 +15,7 @@ public record SetFlightInfo(
 [GenerateMetadata]
 public partial class SetFlightInfoHandler : ICommandHandler<Aircraft, SetFlightInfo>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Aircraft> context, SetFlightInfo command)
     {
         return Command.Stage(
             new FlightInfoSet(command.FlightId, command.Departure, command.Arrival));

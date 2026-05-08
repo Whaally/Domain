@@ -12,7 +12,7 @@ public record RemoveFlight(Guid FlightId) : ICommand;
 [GenerateMetadata]
 public partial class RemoveFlightHandler : ICommandHandler<Aircraft, RemoveFlight>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Aircraft> context, RemoveFlight command)
     {
         return Command.Stage(new FlightRemoved(command.FlightId));
     }

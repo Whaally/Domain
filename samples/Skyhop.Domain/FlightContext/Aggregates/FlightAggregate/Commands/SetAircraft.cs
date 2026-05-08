@@ -15,7 +15,7 @@ public record SetAircraft(
 [GenerateMetadata]
 public partial class SetAircraftHandler : ICommandHandler<Flight, SetAircraft>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Flight> context, SetAircraft command)
     {
         var result = Command.Result;
         if (!context.Aggregate.IsInitialized) 

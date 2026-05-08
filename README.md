@@ -154,6 +154,18 @@ Check out this talk by [@corstian](https://github.com/corstian) from NDC Oslo 20
 
 [![How complex software impacts your cognitive abilities](./assets/NDCOslo2023-video-thumbnail.jpg)](https://www.youtube.com/watch?v=5A22s_QXTRg)
 
+## Capabilities
+This project facilitates one in gathering meta-capabilities. Things not necessarily part of the domain but still rather useful from an infrastructure oriented perspective. These capabilities primarily come from the cohesive structure this project facilitates, the metadata generation, and introspection capabilities.
+
+These capabilities are not packaged up in a drop-in library by default. This is an intentional choice. Not in the least place because infrastructure is complex and people have complex taste, but perhaps more importantly to get people to start building their own tools specifically tailored to their context.
+
+Some aspects easily implemented in a generic manner:
+
+- offline clients & distributed sync protocols
+- automated (embedded) generation of domain documentation and diagrams
+- elastic horizontal distribution of domain load
+- generated dev/support tools to interact with the domain model
+- default form scaffolding for domain models including client-side evaluation of validation rules
 
 ## ⚠️ A work in progress
 This is the first public version of a library already running in production. Over time the documentation around this project will be slowly built up, and further documentation and examples will be added.

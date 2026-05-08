@@ -14,7 +14,7 @@ public record SetCompletion(bool completed) : ICommand;
 
 public class CreateTodoItemHandler : ICommandHandler<TodoItemAggregate, CreateTodoItem>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<TodoItemAggregate> context, CreateTodoItem command)
     {
         return Command
             .Stage(new TodoItemCreated(command.item))
@@ -24,7 +24,7 @@ public class CreateTodoItemHandler : ICommandHandler<TodoItemAggregate, CreateTo
 
 public class SetCompletionHandler : ICommandHandler<TodoItemAggregate, SetCompletion>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<TodoItemAggregate> context, SetCompletion command)
     {
         return Command.Stage(new CompletionSet(command.completed));
     }

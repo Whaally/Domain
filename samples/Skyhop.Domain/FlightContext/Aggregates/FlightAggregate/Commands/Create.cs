@@ -12,7 +12,7 @@ public record Create : ICommand;
 [GenerateMetadata]
 public partial class CreateHandler : ICommandHandler<Flight, Create>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, Create command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Flight> context, Create command)
     {
         if (context.Aggregate.IsInitialized) 
             return Command.WithError("Flight had already been created");

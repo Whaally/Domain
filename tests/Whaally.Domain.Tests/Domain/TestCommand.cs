@@ -15,7 +15,7 @@ internal record TestCommand : ICommand
 
 internal class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
     {
         var result = Command.Result;
         

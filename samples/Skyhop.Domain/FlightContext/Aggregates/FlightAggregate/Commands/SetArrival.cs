@@ -17,7 +17,7 @@ public record SetArrival(
 [GenerateMetadata]
 public partial class SetArrivalHandler : ICommandHandler<Flight, SetArrival>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, SetArrival command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Flight> context, SetArrival command)
     {
         var result = Command.Result;
         

@@ -12,7 +12,7 @@ public record RemoveAircraft : ICommand;
 [GenerateMetadata]
 public partial class RemoveAircraftHandler : ICommandHandler<Flight, RemoveAircraft>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Flight> context, RemoveAircraft command)
     {
         var result = Command.Result;
         

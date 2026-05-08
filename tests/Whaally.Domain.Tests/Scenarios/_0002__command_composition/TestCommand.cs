@@ -7,7 +7,7 @@ public record TestCommand : ICommand;
 public class TestCommandHandler : ICommandHandler<Aggregate, TestCommand>
 {
     // todo: reconsider this test. This one is most likely to fail as the execution dynamics had changed
-    public ICommandResult Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Aggregate> context, TestCommand command)
     {
         var result = Command.Invoke(new AnotherCommand());
 

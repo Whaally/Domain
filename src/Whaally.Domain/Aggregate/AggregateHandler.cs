@@ -41,14 +41,13 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
     public virtual Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope) =>
         Evaluate(commandEnvelope, null);
     
-    public virtual Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope, CancellationToken? cancellationToken)
+    public virtual async Task<IResult<EventEnvelope>> Evaluate(CommandEnvelope commandEnvelope, CancellationToken? cancellationToken)
     {
         if (commandEnvelope.Metadata.AggregateId != Guid.Empty && commandEnvelope.Metadata.AggregateId != Id)
             throw new Exception("The provided commands seem intended for a different aggregate instance");
         
         if (cancellationToken?.IsCancellationRequested ?? false)
-            return Task.FromResult<IResult<EventEnvelope>>(
-                Result<EventEnvelope>.Fail("Operation was cancelled"));
+            return Result<EventEnvelope>.Fail("Operation was cancelled");
         
         // TODO: Allow concurrent uses, though queue subsequent operations
         if (_activity != null
@@ -88,7 +87,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                 commandEnvelope.Metadata,
                 _activity);
 
-            var output = _domainContext
+            var output = await _domainContext
                 .GetCommandHandler(command.GetType())
                 .Evaluate(commandContext, command);
                 
@@ -104,8 +103,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
             foreach (var intermediateEvent in intermediateEvents)
             {
                 if (cancellationToken?.IsCancellationRequested ?? false)
-                    return Task.FromResult<IResult<EventEnvelope>>(
-                        Result<EventEnvelope>.Fail("Operation was cancelled"));
+                    return Result<EventEnvelope>.Fail("Operation was cancelled");
                 
                 var @event = intermediateEvent;
 
@@ -131,7 +129,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
 
         var result = new Result(results.SelectMany(q => q.Errors));
         
-        return Task.FromResult<IResult<EventEnvelope>>(
+        return 
             result.IsSuccess
                 ? new Result<EventEnvelope>(
                     new EventEnvelope(
@@ -145,7 +143,7 @@ public class AggregateHandler<TAggregate> : IAggregateHandler<TAggregate>
                             TransactionId = commandEnvelope.Metadata.TransactionId
                         },
                         events))
-                : new Result<EventEnvelope>(result.Errors));
+                : new Result<EventEnvelope>(result.Errors);
     }
 
     public virtual Task<IResult> Apply(EventEnvelope eventEnvelope) => Apply(eventEnvelope, null);

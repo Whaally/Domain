@@ -31,10 +31,17 @@ public abstract class CommandTest<TAggregate, TCommand> : DomainTest
             Aggregate = Aggregate
         };
         
-        var output = Handler.Evaluate(Context, Command);
+        var task = Handler.Evaluate(Context, Command);
 
-        Result = output;
-        Events = output.Operations
+        // todo: figure out how to properly deal with async lifetime here
+        if (task is {
+            IsCompleted: false, 
+            IsCanceled: false, 
+            IsFaulted: false
+        }) task.RunSynchronously();
+        
+        Result = task.Result;
+        Events = task.Result.Operations
             .Cast<EventEnvelope>()
             .SelectMany(q => q.Messages);
     }

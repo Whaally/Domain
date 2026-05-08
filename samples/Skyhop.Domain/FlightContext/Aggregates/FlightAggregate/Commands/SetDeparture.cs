@@ -22,7 +22,7 @@ public record SetDeparture(
 [GenerateMetadata]
 public partial class SetDepartureHandler : ICommandHandler<Flight, SetDeparture>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Flight> context, SetDeparture command)
     {
         var result = Command.Result;
         

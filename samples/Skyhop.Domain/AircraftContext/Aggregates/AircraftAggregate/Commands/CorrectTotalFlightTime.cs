@@ -13,7 +13,7 @@ public record CorrectTotalFlightTime(
 [GenerateMetadata]
 public partial class CorrectTotalFlightTimeHandler : ICommandHandler<Aircraft, CorrectTotalFlightTime>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Aircraft> context, CorrectTotalFlightTime command)
     {
         return Command.Result;
     }

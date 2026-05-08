@@ -10,7 +10,7 @@ public class _0006__enumerable_reason_returns
     class TestCommand : ICommand;
     class TestCommandHandler : ICommandHandler<TestAggregate, TestCommand>
     {
-        public ICommandResult Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
+        public async Task<ICommandResult> Evaluate(ICommandHandlerContext<TestAggregate> context, TestCommand command)
         {
             return Command.WithError("Failure");
         }

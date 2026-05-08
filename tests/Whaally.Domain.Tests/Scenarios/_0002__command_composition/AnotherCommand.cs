@@ -6,7 +6,7 @@ public record AnotherCommand() : ICommand;
 
 public class AnotherCommandHandler : ICommandHandler<Aggregate, AnotherCommand>
 {
-    public ICommandResult Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
+    public async Task<ICommandResult> Evaluate(ICommandHandlerContext<Aggregate> context, AnotherCommand command)
     {
         return Command.Stage(new TestEvent());
     }
