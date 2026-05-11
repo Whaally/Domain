@@ -23,7 +23,7 @@ public class Result<T> : Result, IResult<T>
     public Result(IEnumerable<ValidationResult> errors) : base(errors)
     {
         // todo: uncomment
-        if (IsSuccess) throw new InvalidOperationException("Result indicates no error yet lacks value");
+        // if (IsSuccess) throw new InvalidOperationException("Result indicates no error yet lacks value");
     }
 
     public Result(T value) : base([])
