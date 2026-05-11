@@ -5,7 +5,7 @@ namespace Whaally.Domain.Testing;
 
 public abstract class DomainTest
 {
-    public IServiceProvider Services { get; init; } 
+    public virtual IServiceProvider Services { get; init; } 
         = new ServiceCollection()
             .AddDomain()
             .BuildServiceProvider();

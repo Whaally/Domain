@@ -5,7 +5,7 @@ namespace Whaally.Domain.Testing;
 public abstract class ServiceTest<TService> : DomainTest
     where TService : class, IService
 {
-    public IServiceHandler<TService> Handler { get; } 
+    public IServiceHandler Handler { get; } 
     public TService Service { get; }
     
     public ServiceHandlerContext Context { get; }
@@ -13,10 +13,9 @@ public abstract class ServiceTest<TService> : DomainTest
     public IEnumerable<ICommand> Commands { get; private init; }
     
     public ServiceTest(
-        IServiceHandler<TService> handler,
         TService service)
     {
-        Handler = handler;
+        Handler = Domain.GetServiceHandler(typeof(TService));
         Service = service;
         
         var id = Guid.NewGuid();
